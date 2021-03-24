@@ -11,10 +11,22 @@ public class SettingMasterScript : MonoBehaviour
 
     void Start()
     {
-        MasterScript.map = new Map<IObject>(width, height, mapObject);
+        List<List<Transform>> mapPrefab = new List<List<Transform>>();
 
-        for (int i = 0; i < width; i++)
-            for (int j = 0; j < height; j++)
+        foreach (Transform row in mapObject.transform)
+        {
+            List<Transform> fields = new List<Transform>();
+
+            foreach (Transform field in row.gameObject.transform)
+                fields.Add(field);
+
+            mapPrefab.Add(fields);
+        }
+
+        MasterScript.map = new IObjectMap(height, width, mapPrefab);
+
+        for (int i = 0; i < height; i++)
+            for (int j = 0; j < width; j++)
             {
                 MasterScript.map[i, j] = new Grass();
             }

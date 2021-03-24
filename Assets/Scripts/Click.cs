@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Click : MonoBehaviour
 {
-    public PlayerTroop troop;
+    public ITroop troop;
     // Start is called before the first frame update
     void Start()
     {

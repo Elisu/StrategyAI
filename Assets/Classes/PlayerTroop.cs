@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerTroop :  MonoBehaviour, ITroop
+public class PlayerTroop :  MonoBehaviour //ITroop
 {
     [SerializeField]
     private Transform player;
@@ -16,6 +16,11 @@ public class PlayerTroop :  MonoBehaviour, ITroop
     }
 
     public bool TakeDamage(int damage)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void TakeDamage(int damage, int index, int count)
     {
         throw new System.NotImplementedException();
     }
@@ -43,4 +48,8 @@ public class PlayerTroop :  MonoBehaviour, ITroop
     public bool Passable { get => false; }
 
     public int Size => throw new System.NotImplementedException();
+
+    public int Count => throw new System.NotImplementedException();
+
+    public State CurrentState => throw new System.NotImplementedException();
 }

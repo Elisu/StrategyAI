@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node
+public class Node : IMappable
 {
     public static int STRAIGHT_COST = 10;
     public static int DIAGONAL_COST = 14;

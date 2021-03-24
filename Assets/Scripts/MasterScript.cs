@@ -4,19 +4,15 @@ using UnityEngine;
 
 public class MasterScript : MonoBehaviour
 {
-    public static Map<IObject> map = new Map<IObject>(20,20);
-    public static List<ITroop> defenderTroops = new List<ITroop>();
-    public static List<ITroop> attackerTroops = new List<ITroop>();
+    public static IObjectMap map;
+    public static Army defenderArmy = new Army(Role.Defender);
+    public static Army attackerArmy = new Army(Role.Attacker);
     public static Queue<Tuple<IMovable, Queue<Vector2Int>>> moving = new Queue<Tuple<IMovable, Queue<Vector2Int>>>();
 
     // Start is called before the first frame update
     void Start()
     {
-        for (int i = 0; i < map.Width; i++)
-            for (int j = 0; j < map.Height; j++)
-            {
-                map[i, j] = new Grass(); 
-            }
+
     }
 
     void FixedUpdate()
@@ -41,9 +37,25 @@ public class MasterScript : MonoBehaviour
             }
             else
             {
-                //TO DO recompute route
+                //recompute
             }
 
         }
+    }
+
+    public static Army GetEnemyArmy(Role role)
+    {
+        if (role == Role.Attacker)
+            return defenderArmy;
+        else
+            return attackerArmy;
+    }
+
+    public static Army GetArmy(Role role)
+    {
+        if (role == Role.Defender)
+            return defenderArmy;
+        else
+            return attackerArmy;
     }
 }

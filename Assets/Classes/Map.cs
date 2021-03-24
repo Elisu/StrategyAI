@@ -2,30 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Map<T>
+public class Map<T> where T : IMappable
 {
-    private T[,] map;
-    private GameObject[,] realMap;
+    protected T[,] map;
 
-    public int Width { get; private set; }
-    public int Height { get; private set; }
+    public int Width { get; protected set; }
+    public int Height { get; protected set; }
 
-    public Map(int width, int height, GameObject mapObejct = null)
+    public Map(int height, int width)
     {
-        map = new T[width, height];
+        map = new T[height, width];
         Width = width;
         Height = height;
-
-        if (mapObejct != null)
-        {
-
-        }
     }
 
     public T this[Vector2Int index]
     {
-        get => map[index.x, index.y];
-        set => map[index.x,index.y] = value;
+        get => map[index.y, index.y];
+        set => map[index.y,index.x] = value;
     }
 
     public T this[int x, int y]
@@ -33,6 +27,5 @@ public class Map<T>
         get => map[x, y];
         set => map[x, y] = value;
     }
-
 
 }

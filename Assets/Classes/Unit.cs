@@ -4,24 +4,19 @@ using UnityEngine;
 
 public abstract class Unit
 {
-    public int Health;
-    public int Speed;
-    public int Defense;
-    public int Damage;
-    public int Range;
-    public int Size;
+    public int health;
+    public int speed;
+    public int defense;
+    public int damage;
+    public int range;
+    public int size;
     public readonly bool Passable = false;
-
-    [SerializeField]
-    public Vector2Int Position { get; set; }
-
-    public Role Side => throw new System.NotImplementedException();
 
     public bool TakeDamage(int damage)
     {
-        Health -= Defense * damage;
+        health -= defense * damage;
 
-        if (Health <= 0)
+        if (health <= 0)
             return true;
 
         return false;

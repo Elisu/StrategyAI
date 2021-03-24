@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class BasicAI : MonoBehaviour
 {
+    public Transform spawn;
+    public GameObject unit;
+
     public Role role;
     float delay = 5000;
 
-    List<ITroop> troops = new List<ITroop>();
+    Army troops;
 
     // Start is called before the first frame update
     void Start()
     {
-        troops.Add(new Troop<Swordsmen>(10, role));
+        troops = MasterScript.GetArmy(role);
+        troops.Add(new Troop<Swordsmen>(10, role, unit));
     }
 
     // Update is called once per frame
@@ -27,6 +31,15 @@ public class BasicAI : MonoBehaviour
 
     void FindAction()
     {
-        
+        ITroop troop = troops.GetTroopFree();
+
+        if (troop != null)
+        {
+            if (!MacroActions.AttackInRange(troop))
+            {
+                MacroActions.AttackClosest(troop);
+            }
+        }
+
     }
 }

@@ -4,14 +4,35 @@ using UnityEngine;
 
 public enum Role
 {
-    attacker,
-    defender,
+    Attacker,
+    Defender,
+    Neutral,
 }
 
-public interface IObject
+public enum State
 {
-    Vector2Int Position { get;}
+    Moving,
+    Fighting,
+    Free,
+}
 
+public enum SquareType
+{
+    Grass,
+    Water,
+    Debris,
+    Spawn,    
+}
+
+public delegate bool SelectionPredicate(ITroop selected, ITroop current);
+
+public interface IMappable
+{
+    Vector2Int Position { get; }
+}
+
+public interface IObject : IMappable
+{
     Role Side { get;}
 
     bool Passable {get;}
@@ -38,6 +59,8 @@ public interface IMovable : IObject
 public interface ITroop : IMovable, IAttack
 {
     public int Count { get; }
+
+    public void TakeDamage(int damage, int index, int count);
 }
 
 public interface IAttack : IDamageable
@@ -45,9 +68,18 @@ public interface IAttack : IDamageable
     int Damage { get; }
 
     int Range { get; }
+
+    public State CurrentState { get; }
+
+    public void GiveDamage(IDamageable enemy);
 }
 
 public interface IAction
 {
     void Execute();
+}
+
+public interface IAI
+{
+
 }
