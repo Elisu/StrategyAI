@@ -20,6 +20,12 @@ public class Move : IAction
         this.troop = troop;
     }
 
+    public Move(Vector2Int targetPos, ITroop troop)
+    {
+        target = targetPos;
+        this.troop = troop;
+    }
+
     public void Execute()
     {
         Debug.Log("Executing Move");

@@ -23,6 +23,20 @@ public class MasterScript : MonoBehaviour
             Debug.Log(string.Format("Moving {0}xtimes", moving.Count));
             Tuple<IMovable, Queue<Vector2Int>> movingObject = moving.Dequeue();
             Vector2Int nextPos = movingObject.Item2.Peek();
+
+
+            ///IN PROGRESS
+            //if (movingObject.Item1.Move(nextPos))
+            //{
+            //    movingObject.Item2.Dequeue();
+
+            //    if (movingObject.Item2.Count > 0)
+            //        moving.Enqueue(movingObject);
+            //}
+                
+
+           
+
             if (map[nextPos] == null || map[nextPos].Passable == true)
             {
                 map[movingObject.Item1.Position] = new Grass();

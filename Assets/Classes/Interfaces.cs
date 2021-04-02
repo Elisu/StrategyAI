@@ -13,6 +13,7 @@ public enum State
 {
     Moving,
     Fighting,
+    UnderAttack,
     Free,
 }
 
@@ -54,6 +55,8 @@ public interface IMovable : IObject
     Vector2 ActualPosition { get; set; }
 
     float Speed { get; }
+
+    public bool Move(Vector2Int targetPos);
 }
 
 public interface ITroop : IMovable, IAttack

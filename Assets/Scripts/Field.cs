@@ -6,18 +6,21 @@ public class Field : MonoBehaviour, IObject
 {
     public SquareType square;
 
+    [SerializeField]
+    private Role side;
+
     public Vector2Int Position { get; set; }
 
     public IObject OnField { get; set; }
 
     public Role Side
     {
-        get 
+        get
         {
-            if (OnField != null)
-                return OnField.Side;
+            if (OnField == null)
+                return side;
             else
-                return Role.Neutral;
+                return OnField.Side;
         }
     }
 

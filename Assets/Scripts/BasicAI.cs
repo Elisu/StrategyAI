@@ -8,7 +8,7 @@ public class BasicAI : MonoBehaviour
     public GameObject unit;
 
     public Role role;
-    float delay = 5000;
+    float delay = 300;
 
     Army troops;
 

@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class Tower : Building
 {
-    public int Damage { get; private set; }
-    public int Range { get; private set; }
+    public Tower()
+    {
+        Health = TowerSetup.Health;
+        Damage = TowerSetup.Damage;
+        Defense = TowerSetup.Defense;
+        Range = TowerSetup.Range;
+    }
 }

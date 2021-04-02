@@ -4,19 +4,20 @@ using UnityEngine;
 
 public abstract class Unit
 {
-    public int health;
-    public int speed;
-    public int defense;
-    public int damage;
-    public int range;
-    public int size;
+    public int Health { get; protected set; }
+    public int Speed { get; protected set; }
+    public int Defense { get; protected set; }
+    public int Damage { get; protected set; }
+    public int Range { get; protected set; }
+    public int Size { get; protected set; }
+
     public readonly bool Passable = false;
 
     public bool TakeDamage(int damage)
     {
-        health -= defense * damage;
+        Health -= Defense * damage;
 
-        if (health <= 0)
+        if (Health <= 0)
             return true;
 
         return false;

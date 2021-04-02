@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Attack : IAction
@@ -24,7 +23,13 @@ public class Attack : IAction
     public void Execute()
     {
         IDamageable enemy = (IDamageable)MasterScript.map[targetPosition.x, targetPosition.y];
-        attacker.GiveDamage(enemy);
+
+        //In case attack held on distant troop - have to move in range
+        if (Vector2Int.Distance(attacker.Position, targetPosition) > attacker.Range)
+        {
+
+        }
         
     }
+    
 }

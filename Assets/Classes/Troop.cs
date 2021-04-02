@@ -6,10 +6,11 @@ public class Troop<T>: ITroop where T: Unit, new()
 {
     public Role Side { get; private set; }
 
-    public int Count { get; private set; }
-    public int Damage => Count * troop[0].damage;
+    public int Count => troop.Count;
 
-    public int Range => troop[0].range;
+    public int Damage => Count * troop[0].Damage;
+
+    public int Range => troop[0].Range;
 
     public int Defense { get; private set; }
 
@@ -17,9 +18,9 @@ public class Troop<T>: ITroop where T: Unit, new()
 
     public bool Passable => troop[0].Passable;
 
-    public int Size => Count * troop[0].size;
+    public int Size => Count * troop[0].Size;
 
-    public float Speed => troop[0].speed;
+    public float Speed => troop[0].Speed;
 
     private Vector2 actualPosition;
 
@@ -31,7 +32,9 @@ public class Troop<T>: ITroop where T: Unit, new()
             actualPosition = value;
 
             if (visual != null)
-                visual.transform.position = actualPosition * MasterScript.map.SizeMultiplier;
+                visual.transform.position = new Vector3(actualPosition.x * MasterScript.map.SizeMultiplier,
+                                                        1.5f,
+                                                        actualPosition.y * MasterScript.map.SizeMultiplier);
         }        
     }
 
@@ -41,34 +44,35 @@ public class Troop<T>: ITroop where T: Unit, new()
 
     private GameObject visual;
 
-    List<T> troop = new List<T>();
+    private int MaxHealth;
 
-    System.Random rnd;
+    List<T> troop = new List<T>();
+    System.Random rnd = new System.Random();
 
     public Troop(int count, Role side, GameObject prefab = null)
     {
         for (int i = 0; i < count; i++)
             troop.Add(new T());
 
-        ActualPosition = MasterScript.map.GetFreeSpawn(Side);
+        if (prefab != null)
+            visual = prefab;
+
+        Health = Count * troop[0].Health;
+        MaxHealth = Health;
         Side = side;
+        ActualPosition = MasterScript.map.GetFreeSpawn(Side);
+        CurrentState = State.Free;
 
         MasterScript.map[Position] = this;
-
-        rnd = new System.Random();
-
-        if (prefab != null)
-        {
-            visual = prefab;
-            MonoBehaviour.Instantiate(visual, visual.transform.position, Quaternion.identity);
-        }
-
-        MasterScript.GetArmy(Side).Add(this);
+       
+        if (visual != null)
+            visual = Object.Instantiate(visual, visual.transform.position, Quaternion.identity);
     }
 
 
     public bool TakeDamage(int damage)
     {
+        Health -= damage;
         while (damage > 0)
         {
             int randomUnit = rnd.Next(0, troop.Count - 1);
@@ -76,7 +80,7 @@ public class Troop<T>: ITroop where T: Unit, new()
 
             if (u.TakeDamage(damage))
             {
-                damage -= u.health;
+                damage -= u.Health;
                 troop.RemoveAt(randomUnit);
             }
         }
@@ -85,6 +89,15 @@ public class Troop<T>: ITroop where T: Unit, new()
 
     public void TakeDamage(int damage, int index, int countToDamage)
     {
+        Health -= damage;
+
+        Debug.Log(string.Format("Current health {0}", Health));
+        if (Health <= 0)
+        {
+            DestroyTroop();
+            return;
+        }
+
         for (int i = index; i < Count; i++)
         {
             if (troop[i].TakeDamage(damage))
@@ -97,6 +110,7 @@ public class Troop<T>: ITroop where T: Unit, new()
 
     public void GiveDamage(IDamageable enemy)
     {
+        CurrentState = State.Fighting;
         troop[0].GiveDamage(enemy, Damage);
     }
 
@@ -114,5 +128,40 @@ public class Troop<T>: ITroop where T: Unit, new()
     {
         foreach (T u in other.troop)
             troop.Add(u);
+    }
+
+    private void DestroyTroop()
+    {
+        MasterScript.GetArmy(Side).Remove(this);
+        MasterScript.map[Position] = null;
+
+        if (visual != null)
+            Object.Destroy(visual);
+    }
+
+    public bool Move(Vector2Int nextPos)
+    {
+        if (MasterScript.map[nextPos] == null || MasterScript.map[nextPos].Passable == true)
+        {
+            MasterScript.map[Position] = null;
+            Vector2 next = new Vector2(nextPos.x - Position.x, nextPos.y - Position.y);
+            ActualPosition += next * Speed;
+            MasterScript.map[Position] = this;
+
+            if (Position == nextPos)
+                return true;
+        }
+        else
+        {
+            RecomputeAndScheduleMove();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void RecomputeAndScheduleMove()
+    {
+
     }
 }

@@ -24,11 +24,5 @@ public class SettingMasterScript : MonoBehaviour
         }
 
         MasterScript.map = new IObjectMap(height, width, mapPrefab);
-
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++)
-            {
-                MasterScript.map[i, j] = new Grass();
-            }
     }
 }

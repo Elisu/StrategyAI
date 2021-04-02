@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +7,7 @@ public class IObjectMap : Map<Field>
 
     private List<Field> spawns;
 
-    public IObjectMap (int height, int width, List<List<Transform>> realMap = null) : base(height, width)
+    public IObjectMap(int height, int width, List<List<Transform>> realMap = null) : base(width, height)
     {
         if (realMap == null)
             return;
@@ -16,15 +15,17 @@ public class IObjectMap : Map<Field>
         SizeMultiplier = realMap[0][0].localScale.x;
         spawns = new List<Field>();
 
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++)
+        for (int i = 0; i < width; i++)
+            for (int j = 0; j < height; j++)
             {
-                Field field = realMap[i][j].GetComponent<Field>();
+                Field field = realMap[j][i].GetComponent<Field>();
+                field.Position = new Vector2Int(i, j);
                 map[i, j] = field;
+
 
                 if (field != null)
                     if (field.square == SquareType.Spawn)
-                        spawns.Add(map[i, j]);                    
+                        spawns.Add(map[i, j]);
             }
     }
 

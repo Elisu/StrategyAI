@@ -18,6 +18,7 @@ public class Scheduler : MonoBehaviour
 
        if (Defender.Count != 0)
        {
+            Debug.Log("Defender action");
             IAction action = Defender.Dequeue();
             action.Execute();
         }      

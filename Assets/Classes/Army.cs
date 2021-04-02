@@ -34,6 +34,8 @@ public class Army : IEnumerable<ITroop>
 
     public void Add(ITroop troop) => army.Add(troop);
 
+    public void Remove(ITroop troop) => army.Remove(troop);
+
     public ITroop GetTroopFree() => army.Find(x => x.CurrentState == State.Free);
 
     public ITroop GetTroopLowestHealth() => GetTrooOnCondition((x, y) => x.Health > y.Health);
