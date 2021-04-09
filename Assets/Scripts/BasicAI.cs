@@ -8,7 +8,7 @@ public class BasicAI : MonoBehaviour
     public GameObject unit;
 
     public Role role;
-    float delay = 300;
+    float delay = 100;
 
     Army troops;
 
@@ -17,6 +17,8 @@ public class BasicAI : MonoBehaviour
     {
         troops = MasterScript.GetArmy(role);
         troops.Add(new Troop<Swordsmen>(10, role, unit));
+        troops.Add(new Troop<Swordsmen>(5, role, unit));
+        troops.Add(new Troop<Swordsmen>(20, role, unit));
     }
 
     // Update is called once per frame
@@ -40,6 +42,12 @@ public class BasicAI : MonoBehaviour
                 MacroActions.AttackClosest(troop);
             }
         }
+        else
+        {
+            troop = troops.GetTroopHighestDamge();
+            MacroActions.AttackWithLowestHealth(troop);
+        }
 
+        delay = 100;
     }
 }

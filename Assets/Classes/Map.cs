@@ -9,17 +9,17 @@ public class Map<T> where T : IMappable
     public int Width { get; protected set; }
     public int Height { get; protected set; }
 
-    public Map(int height, int width)
+    public Map(int width, int height)
     {
-        map = new T[height, width];
+        map = new T[width, height];
         Width = width;
         Height = height;
     }
 
     public T this[Vector2Int index]
     {
-        get => map[index.y, index.y];
-        set => map[index.y,index.x] = value;
+        get => map[index.x, index.y];
+        set => map[index.x,index.y] = value;
     }
 
     public T this[int x, int y]

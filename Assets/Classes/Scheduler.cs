@@ -13,14 +13,14 @@ public class Scheduler : MonoBehaviour
        {
             Debug.Log("Attacker action");
             IAction action = Attacker.Dequeue();
-            action.Execute();
+            MasterScript.actionsInProgress.Enqueue(action);
        }    
 
        if (Defender.Count != 0)
        {
             Debug.Log("Defender action");
             IAction action = Defender.Dequeue();
-            action.Execute();
+            MasterScript.actionsInProgress.Enqueue(action);
         }      
             
     }

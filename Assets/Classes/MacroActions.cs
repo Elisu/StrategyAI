@@ -12,13 +12,21 @@ public class MacroActions : MonoBehaviour
         if (army.Count == 0)
             return false;
 
-        ITroop closest = army[0];
+        IAttack closest = army[0];
 
-        foreach (ITroop troop in army)
+        foreach (IAttack troop in army)
         {
-            if (Mathf.Abs(Vector2Int.Distance(attacker.Position, closest.Position)) > Mathf.Abs(Vector2Int.Distance(attacker.Position, troop.Position)))
+            if (Vector2Int.Distance(attacker.Position, closest.Position) > Vector2Int.Distance(attacker.Position, troop.Position))
                 closest = troop;
         }
+
+        //Tower cant move and closest target beyond range
+        if (closest is Tower && Vector2Int.Distance(closest.Position, attacker.Position) > attacker.Range)
+            return false;
+
+        Debug.Log("Attacking closest");
+
+        attacker.StopAction();
 
         if (attacker.Side == Role.Attacker)
             Scheduler.Attacker.Enqueue(new Attack(closest, attacker));
@@ -42,6 +50,8 @@ public class MacroActions : MonoBehaviour
 
         if (inRange == null)
             return false;
+
+        attacker.StopAction();
 
         if (attacker.Side == Role.Attacker)
             Scheduler.Attacker.Enqueue(new Attack(inRange, attacker));
@@ -78,6 +88,8 @@ public class MacroActions : MonoBehaviour
             return false;
         else
         {
+            attacker.StopAction();
+
             if (attacker.Side == Role.Attacker)
                 Scheduler.Attacker.Enqueue(new Attack(selected, attacker));
             else
@@ -89,7 +101,9 @@ public class MacroActions : MonoBehaviour
 
     public bool MoveToSafety()
     {
+        //TO DO
         return false;
     }
+
 }
 

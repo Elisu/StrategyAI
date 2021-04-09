@@ -20,7 +20,12 @@ public class Field : MonoBehaviour, IObject
             if (OnField == null)
                 return side;
             else
-                return OnField.Side;
+            {
+                if (OnField is IRecruitable recruit)
+                    return recruit.Side;
+                else
+                    return Role.Neutral;
+            }
         }
     }
 

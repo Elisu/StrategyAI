@@ -34,9 +34,7 @@ public interface IMappable
 
 public interface IObject : IMappable
 {
-    Role Side { get;}
-
-    bool Passable {get;}
+    public bool Passable {get;}
 
     int Size { get; }
 }
@@ -47,6 +45,8 @@ public interface IDamageable : IObject
 
     int Health { get; }
 
+    Role Side { get; }
+
     bool TakeDamage(int damage);
 }
 
@@ -56,14 +56,16 @@ public interface IMovable : IObject
 
     float Speed { get; }
 
-    public bool Move(Vector2Int targetPos);
+    void PrepareForMove(Vector2Int targetPos);
+
+    bool Move();
 }
 
-public interface ITroop : IMovable, IAttack
+public interface ITroop : IRecruitable, IAttack, IMovable
 {
-    public int Count { get; }
+    int Count { get; }
 
-    public void TakeDamage(int damage, int index, int count);
+    bool TakeDamage(int damage, int index, int count);
 }
 
 public interface IAttack : IDamageable
@@ -72,14 +74,30 @@ public interface IAttack : IDamageable
 
     int Range { get; }
 
-    public State CurrentState { get; }
+    int DealtDamage { get; }
 
-    public void GiveDamage(IDamageable enemy);
+    IDamageable Target { get; }
+
+    void StopAction();
+
+    void PrepareForAttack(IDamageable enemy);
+
+    bool Attack();
+
+    bool GiveDamage(IDamageable enemy);
+
+}
+
+public interface IRecruitable : IDamageable
+{
+    State CurrentState { get; }
+
+    int ReceivedDamage { get; }
 }
 
 public interface IAction
 {
-    void Execute();
+    bool Execute();
 }
 
 public interface IAI

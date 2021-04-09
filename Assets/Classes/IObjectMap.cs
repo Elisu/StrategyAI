@@ -31,9 +31,9 @@ public class IObjectMap : Map<Field>
 
     public Vector2Int GetFreeSpawn(Role role)
     {
-        IObject spawn = spawns.Find(x => x.Side == role);
+        IObject spawn = spawns.Find(x => x.Side == role && x.Passable == true);
 
-        if (spawn != null && spawn.Passable)
+        if (spawn != null)
         {
             return spawn.Position;
         }

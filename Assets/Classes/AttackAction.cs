@@ -4,32 +4,37 @@ using UnityEngine;
 
 public class Attack : IAction
 {
-    Vector2Int targetPosition;
-    IAttack attacker;
-
-    public Attack(int x, int y, IAttack attacker)
-    {
-        targetPosition.x = x;
-        targetPosition.y = y;
-        this.attacker = attacker;
-    }
+    readonly IDamageable target;
+    readonly IAttack attacker;
 
     public Attack(IDamageable defender, IAttack attacker)
     {
-        targetPosition = defender.Position;
+        target = defender;
         this.attacker = attacker;
     }
 
-    public void Execute()
+    public bool Execute()
     {
-        IDamageable enemy = (IDamageable)MasterScript.map[targetPosition.x, targetPosition.y];
+        if (attacker.Health <= 0)
+            return false;
 
         //In case attack held on distant troop - have to move in range
-        if (Vector2Int.Distance(attacker.Position, targetPosition) > attacker.Range)
+        if (Vector2Int.Distance(attacker.Position, target.Position) > attacker.Range)
         {
-
+            if (attacker is IMovable movableAttacker)
+            {
+                movableAttacker.PrepareForMove(target.Position);
+                return (movableAttacker.Move());
+            }
+            else
+                return false;
         }
-        
+        else
+        {
+            attacker.PrepareForAttack(target);
+            return (attacker.Attack());
+        }
+
     }
     
 }

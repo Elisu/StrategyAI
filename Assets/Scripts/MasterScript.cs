@@ -7,7 +7,7 @@ public class MasterScript : MonoBehaviour
     public static IObjectMap map;
     public static Army defenderArmy = new Army(Role.Defender);
     public static Army attackerArmy = new Army(Role.Attacker);
-    public static Queue<Tuple<IMovable, Queue<Vector2Int>>> moving = new Queue<Tuple<IMovable, Queue<Vector2Int>>>();
+    public static Queue<IAction> actionsInProgress = new Queue<IAction>();
 
     // Start is called before the first frame update
     void Start()
@@ -17,42 +17,14 @@ public class MasterScript : MonoBehaviour
 
     void FixedUpdate()
     {
-        int count = moving.Count;
+        int count = actionsInProgress.Count;
+        Debug.Log(string.Format("Number of running action: {0}", actionsInProgress.Count));
         for (int i = 0; i < count; i++)
         {
-            Debug.Log(string.Format("Moving {0}xtimes", moving.Count));
-            Tuple<IMovable, Queue<Vector2Int>> movingObject = moving.Dequeue();
-            Vector2Int nextPos = movingObject.Item2.Peek();
+            IAction action = actionsInProgress.Dequeue();
 
-
-            ///IN PROGRESS
-            //if (movingObject.Item1.Move(nextPos))
-            //{
-            //    movingObject.Item2.Dequeue();
-
-            //    if (movingObject.Item2.Count > 0)
-            //        moving.Enqueue(movingObject);
-            //}
-                
-
-           
-
-            if (map[nextPos] == null || map[nextPos].Passable == true)
-            {
-                map[movingObject.Item1.Position] = new Grass();
-                Vector2 next = new Vector2(nextPos.x - movingObject.Item1.Position.x, nextPos.y - movingObject.Item1.Position.y);
-                movingObject.Item1.ActualPosition += next * movingObject.Item1.Speed;
-                //if (Vector2.Distance(movingObject.Item1.ActualPosition, next) < movingObject.Item1.Speed)
-                if (movingObject.Item1.Position == nextPos)
-                    movingObject.Item2.Dequeue();
-                map[movingObject.Item1.Position] = movingObject.Item1;
-                if (movingObject.Item2.Count > 0)
-                    moving.Enqueue(movingObject);
-            }
-            else
-            {
-                //recompute
-            }
+            if (action.Execute())
+                actionsInProgress.Enqueue(action);
 
         }
     }

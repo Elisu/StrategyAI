@@ -6,24 +6,33 @@ public class Army : IEnumerable<ITroop>
 {
     public Role Side { get; private set; }
 
-    public int Count => army.Count;
+    public int Count => army.Count + towers.Count;
 
     private List<ITroop> army = new List<ITroop>();
+    private List<Building> buildings = new List<Building>();
+    private List<Tower> towers = new List<Tower>();
 
     public Army(Role side)
     {
         Side = side;
     }
-    public ITroop this[int index]
+    public IAttack this[int index]
     {
-        get => army[index];
+        get
+        {
+            if (index < army.Count)
+                return army[index];
+            else
+                return towers[index - army.Count];
+        }
     }
 
     public IEnumerator<ITroop> GetEnumerator()
     {
-        foreach (ITroop guest in army)
+        //TO DO FOR TOWERS
+        foreach (ITroop unit in army)
         {
-            yield return guest;
+            yield return unit;
         }
     }
 
@@ -32,9 +41,25 @@ public class Army : IEnumerable<ITroop>
         return GetEnumerator();
     }
 
-    public void Add(ITroop troop) => army.Add(troop);
+    public void Add(IRecruitable recruit)
+    {
+        if (recruit is ITroop troop)
+            army.Add(troop);
+        else if (recruit is Tower tower)
+            towers.Add(tower);
+        else
+            buildings.Add((Building)recruit);
+    }
 
-    public void Remove(ITroop troop) => army.Remove(troop);
+    public void Remove(IRecruitable recruit)
+    {
+        if (recruit is ITroop troop)
+            army.Remove(troop);
+        else if (recruit is Tower tower)
+            towers.Remove(tower);
+        else
+            buildings.Remove((Building)recruit);
+    }
 
     public ITroop GetTroopFree() => army.Find(x => x.CurrentState == State.Free);
 
@@ -53,6 +78,10 @@ public class Army : IEnumerable<ITroop>
     public ITroop GetTroopLowestSpeed() => GetTrooOnCondition((x, y) => x.Speed > y.Speed);
 
     public ITroop GetTroopHighestSpeed() => GetTrooOnCondition((x, y) => x.Speed < y.Speed);
+
+    public Tower GetFreeTower() => towers.Find(x => x.CurrentState == State.Free);
+
+    public Tower GetTowerUnderAttack() => towers.Find(x => x.CurrentState == State.UnderAttack);
 
     private ITroop GetTrooOnCondition(SelectionPredicate condition)
     {

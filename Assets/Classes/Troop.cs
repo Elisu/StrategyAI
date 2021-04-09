@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Troop<T>: ITroop where T: Unit, new()
+public class Troop<T>: ITroop where T: Human, new()
 {
     public Role Side { get; private set; }
 
@@ -40,13 +40,24 @@ public class Troop<T>: ITroop where T: Unit, new()
 
     public Vector2Int Position { get => Vector2Int.RoundToInt(ActualPosition); }
 
-    public State CurrentState { get; private set; }
+    public State CurrentState { get; protected set; }
+
+    public IDamageable Target { get; protected set; }
+
+    public int DealtDamage { get; protected set; }
+
+    public int ReceivedDamage { get; protected set; }
 
     private GameObject visual;
 
     private int MaxHealth;
 
+    private Queue<Vector2Int> route;
+
+    private Vector2Int targetPosition;
+
     List<T> troop = new List<T>();
+
     System.Random rnd = new System.Random();
 
     public Troop(int count, Role side, GameObject prefab = null)
@@ -73,45 +84,63 @@ public class Troop<T>: ITroop where T: Unit, new()
     public bool TakeDamage(int damage)
     {
         Health -= damage;
+
+        if (Health <= 0)
+        {
+            DestroyTroop();
+            return true;
+        }
+
         while (damage > 0)
         {
             int randomUnit = rnd.Next(0, troop.Count - 1);
             Unit u = troop[randomUnit];
 
-            if (u.TakeDamage(damage))
-            {
-                damage -= u.Health;
+            bool killed = u.TakeDamage(damage);            
+            damage -= u.Health;
+
+            if (killed)
                 troop.RemoveAt(randomUnit);
-            }
+            
         }
-        return true;
+
+        return false;
+        
     }
 
-    public void TakeDamage(int damage, int index, int countToDamage)
+    public bool TakeDamage(int damage, int index, int countToDamage)
     {
-        Health -= damage;
+        Debug.Log(string.Format("Current health {0}", Health));        
 
-        Debug.Log(string.Format("Current health {0}", Health));
-        if (Health <= 0)
-        {
-            DestroyTroop();
-            return;
-        }
+        int countHit = 0;
 
         for (int i = index; i < Count; i++)
         {
             if (troop[i].TakeDamage(damage))
                 troop.RemoveAt(i);
 
-            if (i + 1 == countToDamage)
-                return;
+            countHit++;
+
+            if (countHit == countToDamage)
+                break;
         }
+
+        Health -= damage * countHit;
+
+        if (Health <= 0)
+        {
+            DestroyTroop();
+            return true;
+        }
+
+        return false;
     }
 
-    public void GiveDamage(IDamageable enemy)
+    public bool GiveDamage(IDamageable enemy)
     {
         CurrentState = State.Fighting;
-        troop[0].GiveDamage(enemy, Damage);
+        Target = enemy;
+        return troop[0].GiveDamage(enemy, Damage);
     }
 
     public Troop<T> Split(int count)
@@ -139,29 +168,112 @@ public class Troop<T>: ITroop where T: Unit, new()
             Object.Destroy(visual);
     }
 
-    public bool Move(Vector2Int nextPos)
+    private void RecomputeAndScheduleMove()
     {
+
+    }
+
+    public void StopAction()
+    {
+        CurrentState = State.Free;
+        Target = null;
+        route = null;
+    }
+
+    public void PrepareForAttack(IDamageable enemy)
+    {
+        CurrentState = State.Fighting;
+        Target = enemy;
+        route = null;        
+    }
+
+    public void PrepareForMove(Vector2Int targetPos)
+    {
+        CurrentState = State.Moving;
+        Target = null;
+        route = null;
+
+        if (FindSpotInRange(targetPos, out Vector2Int inRange))
+            RecomputeRoute(inRange);
+    }
+
+    public bool Move()
+    {
+        if (route == null)
+            return false;
+
+        Vector2Int nextPos = route.Peek();
+
         if (MasterScript.map[nextPos] == null || MasterScript.map[nextPos].Passable == true)
         {
             MasterScript.map[Position] = null;
-            Vector2 next = new Vector2(nextPos.x - Position.x, nextPos.y - Position.y);
+            Vector2 next = new Vector2(nextPos.x - ActualPosition.x, nextPos.y - ActualPosition.y);
             ActualPosition += next * Speed;
+
+            if (ActualPosition == nextPos)
+                route.Dequeue();
+
             MasterScript.map[Position] = this;
 
-            if (Position == nextPos)
+            if (route.Count > 0)
                 return true;
         }
         else
         {
-            RecomputeAndScheduleMove();
-            return true;
+            RecomputeRoute(targetPosition);
+
+            if (route != null)
+                return true;
         }
 
+        StopAction();
         return false;
     }
 
-    private void RecomputeAndScheduleMove()
+    private void RecomputeRoute(Vector2Int targetPos)
     {
+        List<Vector2Int> path = Pathfinding.FindPath(Position, targetPos);
 
+        if (path == null)
+        {
+            route = null;
+            return;
+        }
+
+        targetPosition = targetPos;
+        route = new Queue<Vector2Int>(path);
+    }
+
+    private bool FindSpotInRange(Vector2Int target, out Vector2Int pos)
+    {
+        //float distance = float.MaxValue;
+
+        for (int i = Mathf.Max(0, target.x - Range); i <= Mathf.Min(MasterScript.map.Width, target.x + Range); i++)
+            for (int j = Mathf.Max(0, target.y - Range); j <= Mathf.Min(MasterScript.map.Height, target.y + Range); j++)
+            {
+                if (MasterScript.map[i,j].Passable)
+                {
+                    pos = new Vector2Int(i, j);
+                    return true;
+                }
+            }
+
+        pos = new Vector2Int(0, 0);
+        return false;
+    }
+
+    public bool Attack()
+    {
+        if (Target == null)
+            return false;
+
+        if (GiveDamage(Target))
+        {
+            StopAction();
+            return false;
+        }
+            
+
+        return true;
     }
 }

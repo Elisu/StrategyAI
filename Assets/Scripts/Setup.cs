@@ -8,7 +8,7 @@ public class Setup<T> : MonoBehaviour where T: Unit
     [SerializeField]
     private int health;
     [SerializeField]
-    private int speed;
+    private float speed;
     [SerializeField]
     private int defense;
     [SerializeField]
@@ -19,10 +19,10 @@ public class Setup<T> : MonoBehaviour where T: Unit
     private static Setup<T> instance;
     
     public static int Health { get => instance.health; }
-    public static int Speed { get => instance.speed; }
-    public static int Defense { get => instance.speed; }
-    public static int Damage { get => instance.speed; }
-    public static int Range { get => instance.speed; }
+    public static float Speed { get => instance.speed; }
+    public static int Defense { get => instance.defense; }
+    public static int Damage { get => instance.damage; }
+    public static int Range { get => instance.range; }
 
     private void Awake()
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class Swordsmen : Unit
+public class Swordsmen : Human
 {
     public Swordsmen()
     {
@@ -14,10 +14,10 @@ public class Swordsmen : Unit
         Range = SwordsmenSetup.Range;
     }
 
-    public override void GiveDamage(IDamageable enemy, int totalDamage)
+    public override bool GiveDamage(IDamageable enemy, int totalDamage)
     {
         if (enemy is Building building)
-            building.TakeDamage(totalDamage);
+            return building.TakeDamage(totalDamage);
         else
         {
             ITroop enemyTroop = (ITroop)enemy;
@@ -25,11 +25,16 @@ public class Swordsmen : Unit
 
             while (totalDamage > 0)
             {
-                enemyTroop.TakeDamage(Damage, index, 1);
+                if (enemyTroop.TakeDamage(Damage, index, 1))
+                    return true;
+                
                 totalDamage -= Damage;
                 index++;
             }
 
-        }        
+        }
+
+        //IDamagable not killed
+        return false;
     }
 }
