@@ -15,6 +15,8 @@ public class Setup<T> : MonoBehaviour where T: Unit
     private int damage;
     [SerializeField]
     private int range;
+    [SerializeField]
+    public GameObject unitPrefab;
 
     private static Setup<T> instance;
     
@@ -23,6 +25,7 @@ public class Setup<T> : MonoBehaviour where T: Unit
     public static int Defense { get => instance.defense; }
     public static int Damage { get => instance.damage; }
     public static int Range { get => instance.range; }
+    public static GameObject UnitPrefab { get => instance.unitPrefab; }
 
     private void Awake()
     {

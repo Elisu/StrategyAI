@@ -30,6 +30,11 @@ public class Move : IAction
     {
         Debug.Log("Executing Move");
         troop.PrepareForMove(target);
-        return (troop.Move());
+        bool stillGoing = troop.Move();
+
+        if (!stillGoing)
+            troop.StopAction();
+
+        return stillGoing;
     }
 }

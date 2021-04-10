@@ -27,6 +27,13 @@ public class Army : IEnumerable<ITroop>
         }
     }
 
+    public void Clear()
+    {
+        army.Clear();
+        buildings.Clear();
+        towers.Clear();
+    }
+
     public IEnumerator<ITroop> GetEnumerator()
     {
         //TO DO FOR TOWERS

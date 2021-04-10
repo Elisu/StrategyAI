@@ -29,7 +29,7 @@ public class Pathfinding
 
     public static List<Vector2Int> FindPath(Vector2Int start, Vector2Int target)
     {
-        Debug.Log("Looking for path");
+        //Debug.Log("Looking for path");
         List<Node> opened = new List<Node>();
         Map<Node> pathMap = new Map<Node>(MasterScript.map.Width, MasterScript.map.Height);
 
@@ -56,23 +56,27 @@ public class Pathfinding
             for (int i = Mathf.Max(0, currentNode.Position.x - 1); i < Mathf.Min(pathMap.Width, currentNode.Position.x + 2); i++)
                 for (int j = Mathf.Max(0, currentNode.Position.y - 1); j < Mathf.Min(pathMap.Height, currentNode.Position.y + 2); j++)
                 {
-                    if (MasterScript.map[i, j].Passable == true)
+                    if (i == currentNode.Position.x || j == currentNode.Position.y)
                     {
-                        if (pathMap[i, j].visited == false)
+                        if (MasterScript.map[i, j].Passable == true)
                         {
-                            int cumulatedCost = currentNode.FromStartCost + CalculateDistance(new Vector2Int(i, j), currentNode.Position);
-                            if (cumulatedCost < pathMap[i, j].FromStartCost)
+                            if (pathMap[i, j].visited == false)
                             {
-                                pathMap[i, j].ToTargetCost = CalculateDistance(new Vector2Int(i, j), target);
-                                pathMap[i, j].FromStartCost = cumulatedCost;
-                                pathMap[i, j].previous = currentNode;
+                                int cumulatedCost = currentNode.FromStartCost + CalculateDistance(new Vector2Int(i, j), currentNode.Position);
+                                if (cumulatedCost < pathMap[i, j].FromStartCost)
+                                {
+                                    pathMap[i, j].ToTargetCost = CalculateDistance(new Vector2Int(i, j), target);
+                                    pathMap[i, j].FromStartCost = cumulatedCost;
+                                    pathMap[i, j].previous = currentNode;
 
-                                if (!opened.Contains(pathMap[i, j]))
-                                    opened.Add(pathMap[i, j]);
+                                    if (!opened.Contains(pathMap[i, j]))
+                                        opened.Add(pathMap[i, j]);
+                                }
+
                             }
-
                         }
-                    }                                
+                    }
+                                        
                    
                     
                 }

@@ -4,12 +4,17 @@ using UnityEngine;
 
 public class SettingMasterScript : MonoBehaviour
 {
-    public int width;
-    public int height;
+    public bool trainingMode;
 
     public GameObject mapObject;
 
-    void Start()
+    void Awake()
+    {
+        MasterScript.IsTrainingMode = trainingMode;
+        LoadMap();
+    }
+
+    private void LoadMap()
     {
         List<List<Transform>> mapPrefab = new List<List<Transform>>();
 
@@ -23,6 +28,7 @@ public class SettingMasterScript : MonoBehaviour
             mapPrefab.Add(fields);
         }
 
-        MasterScript.map = new IObjectMap(height, width, mapPrefab);
-    }
+        MasterScript.IsTrainingMode = trainingMode;
+        MasterScript.map = new IObjectMap(mapPrefab.Count, mapPrefab[0].Count, mapPrefab);
+    }    
 }

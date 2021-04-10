@@ -12,6 +12,7 @@ public class Swordsmen : Human
         Damage = SwordsmenSetup.Damage;
         Defense = SwordsmenSetup.Defense;
         Range = SwordsmenSetup.Range;
+        UnitPrefab = SwordsmenSetup.UnitPrefab;
     }
 
     public override bool GiveDamage(IDamageable enemy, int totalDamage)

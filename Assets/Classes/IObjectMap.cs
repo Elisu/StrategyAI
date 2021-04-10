@@ -7,6 +7,8 @@ public class IObjectMap : Map<Field>
 
     private List<Field> spawns;
 
+    List<List<Transform>> MapPrefab;
+
     public IObjectMap(int height, int width, List<List<Transform>> realMap = null) : base(width, height)
     {
         if (realMap == null)
@@ -14,11 +16,16 @@ public class IObjectMap : Map<Field>
 
         SizeMultiplier = realMap[0][0].localScale.x;
         spawns = new List<Field>();
+        MapPrefab = realMap;
+        ReloadMap();
+    }
 
-        for (int i = 0; i < width; i++)
-            for (int j = 0; j < height; j++)
+    public void ReloadMap()
+    {
+        for (int i = 0; i < Width; i++)
+            for (int j = 0; j < Height; j++)
             {
-                Field field = realMap[j][i].GetComponent<Field>();
+                Field field = MapPrefab[j][i].GetComponent<Field>();
                 field.Position = new Vector2Int(i, j);
                 map[i, j] = field;
 
@@ -58,6 +65,9 @@ public class IObjectMap : Map<Field>
     {
         get
         {
+            if (x >= Width || y >= Height)
+                Debug.LogWarning(string.Format("x {0}  y {1}", x, y));
+
             if (map[x, y].OnField != null)
                 return map[x, y].OnField;
             else

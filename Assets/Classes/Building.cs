@@ -12,6 +12,8 @@ public abstract class Building : Unit, IRecruitable
 
     bool IObject.Passable => Passable;
 
+    int IObject.Size => Size;
+
     public int ReceivedDamage { get; protected set; }
 
     private GameObject visual;

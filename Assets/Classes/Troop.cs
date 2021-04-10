@@ -8,9 +8,9 @@ public class Troop<T>: ITroop where T: Human, new()
 
     public int Count => troop.Count;
 
-    public int Damage => Count * troop[0].Damage;
+    public int Damage => Count * Human.Damage;
 
-    public int Range => troop[0].Range;
+    public int Range => Human.Range;
 
     public int Defense { get; private set; }
 
@@ -18,9 +18,9 @@ public class Troop<T>: ITroop where T: Human, new()
 
     public bool Passable => troop[0].Passable;
 
-    public int Size => Count * troop[0].Size;
+    public int Size => Count * Unit.Size;
 
-    public float Speed => troop[0].Speed;
+    public float Speed => Human.Speed;
 
     private Vector2 actualPosition;
 
@@ -60,13 +60,13 @@ public class Troop<T>: ITroop where T: Human, new()
 
     System.Random rnd = new System.Random();
 
-    public Troop(int count, Role side, GameObject prefab = null)
+    public Troop(int count, Role side)
     {
         for (int i = 0; i < count; i++)
             troop.Add(new T());
 
-        if (prefab != null)
-            visual = prefab;
+        if (!MasterScript.IsTrainingMode)
+            visual = Human.UnitPrefab;
 
         Health = Count * troop[0].Health;
         MaxHealth = Health;
@@ -77,7 +77,13 @@ public class Troop<T>: ITroop where T: Human, new()
         MasterScript.map[Position] = this;
        
         if (visual != null)
+        {
             visual = Object.Instantiate(visual, visual.transform.position, Quaternion.identity);
+
+            if (Side == Role.Defender)
+                visual.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
+        }         
+        
     }
 
 
@@ -110,7 +116,7 @@ public class Troop<T>: ITroop where T: Human, new()
 
     public bool TakeDamage(int damage, int index, int countToDamage)
     {
-        Debug.Log(string.Format("Current health {0}", Health));        
+        //Debug.Log(string.Format("Current health {0}", Health));        
 
         int countHit = 0;
 
@@ -182,6 +188,7 @@ public class Troop<T>: ITroop where T: Human, new()
 
     public void PrepareForAttack(IDamageable enemy)
     {
+        ActualPosition = Position;
         CurrentState = State.Fighting;
         Target = enemy;
         route = null;        
@@ -208,10 +215,12 @@ public class Troop<T>: ITroop where T: Human, new()
         {
             MasterScript.map[Position] = null;
             Vector2 next = new Vector2(nextPos.x - ActualPosition.x, nextPos.y - ActualPosition.y);
-            ActualPosition += next * Speed;
+                ActualPosition += next * Speed;
 
-            if (ActualPosition == nextPos)
+            if (Position == nextPos)
+            {
                 route.Dequeue();
+            }               
 
             MasterScript.map[Position] = this;
 
@@ -226,7 +235,6 @@ public class Troop<T>: ITroop where T: Human, new()
                 return true;
         }
 
-        StopAction();
         return false;
     }
 
@@ -237,6 +245,7 @@ public class Troop<T>: ITroop where T: Human, new()
         if (path == null)
         {
             route = null;
+            CurrentState = State.Free;
             return;
         }
 
@@ -248,8 +257,8 @@ public class Troop<T>: ITroop where T: Human, new()
     {
         //float distance = float.MaxValue;
 
-        for (int i = Mathf.Max(0, target.x - Range); i <= Mathf.Min(MasterScript.map.Width, target.x + Range); i++)
-            for (int j = Mathf.Max(0, target.y - Range); j <= Mathf.Min(MasterScript.map.Height, target.y + Range); j++)
+        for (int i = Mathf.Max(0, target.x - Range); i < Mathf.Min(MasterScript.map.Width, target.x + Range + 1); i++)
+            for (int j = Mathf.Max(0, target.y - Range); j < Mathf.Min(MasterScript.map.Height, target.y + Range + 1); j++)
             {
                 if (MasterScript.map[i,j].Passable)
                 {
@@ -269,11 +278,15 @@ public class Troop<T>: ITroop where T: Human, new()
 
         if (GiveDamage(Target))
         {
-            StopAction();
             return false;
         }
             
 
         return true;
+    }
+
+    public void PrepareForAction()
+    {
+        CurrentState = State.PreparingForAction;
     }
 }

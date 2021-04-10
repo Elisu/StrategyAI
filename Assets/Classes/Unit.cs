@@ -6,7 +6,7 @@ public abstract class Unit
 {
     public int Health { get; protected set; }
     public int Defense { get; protected set; }
-    public int Size { get; protected set; }
+    public static int Size { get; protected set; }
 
     public readonly bool Passable = false;
 

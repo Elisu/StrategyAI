@@ -11,12 +11,16 @@ public class Attack : IAction
     {
         target = defender;
         this.attacker = attacker;
+        attacker.PrepareForAction();
     }
 
     public bool Execute()
     {
-        if (attacker.Health <= 0)
+        if (attacker.Health <= 0 || target.Health <= 0)
+        {
+            attacker.StopAction();
             return false;
+        }
 
         //In case attack held on distant troop - have to move in range
         if (Vector2Int.Distance(attacker.Position, target.Position) > attacker.Range)
@@ -24,15 +28,24 @@ public class Attack : IAction
             if (attacker is IMovable movableAttacker)
             {
                 movableAttacker.PrepareForMove(target.Position);
-                return (movableAttacker.Move());
+                movableAttacker.Move();
+
+                //Always schedule again - needs to attack if move finished
+                return true;
             }
             else
                 return false;
         }
         else
         {
+            Debug.Log(string.Format("Attacker health: {0}\nDefender health {1}", attacker.Health, target.Health));
             attacker.PrepareForAttack(target);
-            return (attacker.Attack());
+            bool stillGoing = attacker.Attack();
+
+            if (!stillGoing)
+                attacker.StopAction();
+
+            return stillGoing;
         }
 
     }

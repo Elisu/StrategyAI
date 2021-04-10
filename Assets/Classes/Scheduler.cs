@@ -7,6 +7,16 @@ public class Scheduler : MonoBehaviour
     public static Queue<IAction> Attacker = new Queue<IAction>();
     public static Queue<IAction> Defender = new Queue<IAction>();
 
+    private void OnEnable()
+    {
+        MasterScript.GameOver += Restart;
+    }
+
+    private void OnDisable()
+    {
+        MasterScript.GameOver -= Restart;
+    }
+
     private void FixedUpdate()
     {
        if (Attacker.Count != 0)
@@ -23,5 +33,11 @@ public class Scheduler : MonoBehaviour
             MasterScript.actionsInProgress.Enqueue(action);
         }      
             
+    }
+
+    private void Restart()
+    {
+        Attacker.Clear();
+        Defender.Clear();
     }
 }

@@ -24,7 +24,7 @@ public class MacroActions : MonoBehaviour
         if (closest is Tower && Vector2Int.Distance(closest.Position, attacker.Position) > attacker.Range)
             return false;
 
-        Debug.Log("Attacking closest");
+        Debug.LogWarning("Attacking closest");
 
         attacker.StopAction();
 
@@ -50,6 +50,8 @@ public class MacroActions : MonoBehaviour
 
         if (inRange == null)
             return false;
+
+        Debug.LogWarning("Attacking in Range");
 
         attacker.StopAction();
 
@@ -99,7 +101,21 @@ public class MacroActions : MonoBehaviour
         }       
     }
 
-    public bool MoveToSafety()
+    public static bool AttackGiven(IDamageable target, IAttack attacker)
+    {
+        Debug.LogWarning("Attacking given");
+
+        attacker.StopAction();
+
+        if (attacker.Side == Role.Attacker)
+            Scheduler.Attacker.Enqueue(new Attack(target, attacker));
+        else
+            Scheduler.Defender.Enqueue(new Attack(target, attacker));
+
+        return true;
+    }
+
+    public static bool MoveToSafety(IMovable runner)
     {
         //TO DO
         return false;

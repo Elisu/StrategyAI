@@ -11,6 +11,8 @@ public class Tower : Building, IAttack
 
     public int DealtDamage { get; protected set; }
 
+    int IObject.Size => Size;
+
     protected Tower() { }
 
     public Tower(Role role)
@@ -47,5 +49,10 @@ public class Tower : Building, IAttack
     {
         GiveDamage(Target);
         return true;
+    }
+
+    public void PrepareForAction()
+    {
+        CurrentState = State.PreparingForAction;
     }
 }

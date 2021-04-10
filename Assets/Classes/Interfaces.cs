@@ -14,6 +14,7 @@ public enum State
     Moving,
     Fighting,
     UnderAttack,
+    PreparingForAction,
     Free,
 }
 
@@ -34,7 +35,7 @@ public interface IMappable
 
 public interface IObject : IMappable
 {
-    public bool Passable {get;}
+    bool Passable {get;}
 
     int Size { get; }
 }
@@ -77,6 +78,8 @@ public interface IAttack : IDamageable
     int DealtDamage { get; }
 
     IDamageable Target { get; }
+
+    void PrepareForAction();
 
     void StopAction();
 

@@ -5,14 +5,20 @@ using UnityEngine;
 public class MasterScript : MonoBehaviour
 {
     public static IObjectMap map;
-    public static Army defenderArmy = new Army(Role.Defender);
-    public static Army attackerArmy = new Army(Role.Attacker);
-    public static Queue<IAction> actionsInProgress = new Queue<IAction>();
+    public static Army defenderArmy;
+    public static Army attackerArmy;
+    public static Queue<IAction> actionsInProgress;
+
+    public static bool IsTrainingMode;
+
+    public static event Action GameOver;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-
+        defenderArmy = new Army(Role.Defender); 
+        attackerArmy = new Army(Role.Attacker);
+        actionsInProgress = new Queue<IAction>();
     }
 
     void FixedUpdate()
@@ -27,6 +33,10 @@ public class MasterScript : MonoBehaviour
                 actionsInProgress.Enqueue(action);
 
         }
+
+        if (defenderArmy.Count == 0 || attackerArmy.Count == 0)
+            GameOverHandler();
+            
     }
 
     public static Army GetEnemyArmy(Role role)
@@ -44,4 +54,15 @@ public class MasterScript : MonoBehaviour
         else
             return attackerArmy;
     }
+
+    private void GameOverHandler()
+    {
+        //Reset environment
+        actionsInProgress.Clear();
+        attackerArmy.Clear();
+        defenderArmy.Clear();
+        map.ReloadMap();
+
+        GameOver?.Invoke();
+    }    
 }
