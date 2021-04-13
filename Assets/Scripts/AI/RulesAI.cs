@@ -5,47 +5,58 @@ using static Genetic;
 
 public class RulesAI : AIBase
 {
-    public int individualLength;
     public int populationSize;
+    public int individualLength;
 
-    TryAction[] possibleActions;
-    Condition[] usedConditions;
-    Individual[] population;
+    StrategyGroup all;
 
-    Individual individual;
-
-    
-
-    void Start()
+    private void Awake()
     {
-        possibleActions = new TryAction[2] { MacroActions.AttackClosest, MacroActions.AttackWithLowestHealth };
-        usedConditions = new Condition[1] { Conditions.Damaged };
-        population = CreatePopulation(populationSize, individualLength, possibleActions.Length, usedConditions);
+        TryAction[] actions = new TryAction[2] { MacroActions.AttackClosest, MacroActions.AttackWithLowestHealth };
+        Condition[] conditions = new Condition[2] { Conditions.Damaged, Conditions.Free };
+        all = new StrategyGroup(populationSize, individualLength, actions, conditions);
     }
 
-    protected override void FindAction()
+    private void OnEnable()
     {
-        foreach (IAttack recruit in ownTroops)
+        MasterScript.GameOver += RunOver;
+    }
+
+    private void OnDisable()
+    {
+        MasterScript.GameOver -= RunOver;
+    }
+
+    protected override void OnStart()
+    {
+
+    }
+
+    protected override void FindAction(IAttack attacker)
+    {
+        int[] votes = new int[all.possibleActions.Length];
+
+        foreach (Rule rule in all.individual)
         {
-            int[] votes = new int[possibleActions.Length];
-
-            foreach (Rule rule in individual)
-            {
-                if (rule.AllTrue(recruit))
-                    votes[rule.ActionIndex]++;
-            }
-
-            int indexOfBest = 0;
-
-            for (int i = 0; i < votes.Length; i++)
-            {
-                if (votes[indexOfBest] < votes[i])
-                    indexOfBest = i;
-            }
-
-            possibleActions[indexOfBest].Invoke(recruit);
+            if (rule.AllTrue(attacker))
+                votes[rule.ActionIndex]++;
         }
 
+        int indexOfBest = 0;
+
+        for (int i = 0; i < votes.Length; i++)
+        {
+            if (votes[indexOfBest] < votes[i])
+                indexOfBest = i;
+        }
+
+        all.possibleActions[indexOfBest].Invoke(attacker);
+        
+    }
+
+    private void RunOver()
+    {
+        
     }
 
 

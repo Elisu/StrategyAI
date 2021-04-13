@@ -43,6 +43,7 @@ public class Genetic
         {
             return GetEnumerator();
         }
+
     }
 
     public class Rule
@@ -52,7 +53,9 @@ public class Genetic
 
         public Rule(int possibleActionsCount, Condition[] possibleConditions)
         {
-            for (int i = 0; i < 5; i++)
+            conditions = new Condition[possibleConditions.Length];
+
+            for (int i = 0; i < possibleConditions.Length; i++)
             {
                 conditions[i] = possibleConditions[Random.Range(0, conditions.Length)];
             }
@@ -79,9 +82,47 @@ public class Genetic
 
         public static bool Damaged(IAttack damaged)
         {
-            return true;
+            if (damaged.ReceivedDamage > 0)
+                return true;
+
+            return false;
         }
 
+        public static bool Free (IAttack attacker)
+        {
+            if (attacker.CurrentState == State.Free)
+                return true;
+
+            return false;
+        }
+
+    }
+
+    public class StrategyGroup
+    {
+        public int individualLength { get; protected set; }
+        public int populationSize { get; protected set; }
+
+        public TryAction[] possibleActions;
+        public Condition[] usedConditions;
+        public Individual[] population;
+
+        public Individual individual;
+
+        public StrategyGroup(int popSize, int indLength, TryAction[] actions, Condition[] conditions)
+        {
+            possibleActions = actions;
+            usedConditions = conditions;
+            population = CreatePopulation(popSize, indLength, actions.Length, conditions);
+            individual = population[0];
+        }
+
+        public void GeneticOperations()
+        {
+           // Individual[] selected = selection;
+           // mutate(selection)
+           // 
+        }
     }
 
 
