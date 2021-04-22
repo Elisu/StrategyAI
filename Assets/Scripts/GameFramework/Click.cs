@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Click : MonoBehaviour
 {
-    public ITroop troop;
+    public TroopBase troop;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,8 +23,8 @@ public class Click : MonoBehaviour
             {
                 if (hit.transform != null)
                 {
-                    Move move = new Move(hit.transform.position.x, hit.transform.position.z, troop);
-                    Scheduler.Attacker.Enqueue(move);
+                    //Move move = new Move(hit.transform.position.x, hit.transform.position.z, troop);
+                    //Scheduler.Attacker.Enqueue(move);
                 }
             }
         }       

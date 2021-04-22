@@ -169,6 +169,31 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &409651046 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7171948027913415861, guid: 8b2947a7469d45345a043a82b3f916f5,
+    type: 3}
+  m_PrefabInstance: {fileID: 7171948027689706345}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &409651050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409651046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88501309b6fbf4458bbe03f3e2b3167, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 500
+  speed: 0.24
+  defense: 1
+  damage: 2
+  range: 1
+  unitPrefab: {fileID: 5761984030114095444, guid: 82b956aa2b7b55d4aa603a36c39a0ff3,
+    type: 3}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -541,7 +566,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attacker: {fileID: 1847787639}
   defender: {fileID: 229671585}
-  GenerationCount: 3
+  GenerationCount: 1
 --- !u!4 &1435923424
 Transform:
   m_ObjectHideFlags: 0
@@ -580,6 +605,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71d494b37dc33484d9c0fb6ab9ff18fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  trainer: {fileID: 1435923423}
 --- !u!114 &1435923427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -647,8 +673,13 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7171948027913415860, guid: 8b2947a7469d45345a043a82b3f916f5,
         type: 3}
+      propertyPath: speed
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 7171948027913415860, guid: 8b2947a7469d45345a043a82b3f916f5,
+        type: 3}
       propertyPath: health
-      value: 500
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 7171948027913415860, guid: 8b2947a7469d45345a043a82b3f916f5,
         type: 3}

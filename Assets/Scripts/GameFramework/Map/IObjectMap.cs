@@ -22,6 +22,8 @@ internal class IObjectMap : Map<Field>
 
     public void ReloadMap()
     {
+        spawns.Clear();
+
         for (int i = 0; i < Width; i++)
             for (int j = 0; j < Height; j++)
             {
@@ -65,9 +67,6 @@ internal class IObjectMap : Map<Field>
     {
         get
         {
-            if (x >= Width || y >= Height)
-                Debug.LogWarning(string.Format("x {0}  y {1}", x, y));
-
             if (map[x, y].OnField != null)
                 return map[x, y].OnField;
             else

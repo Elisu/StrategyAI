@@ -26,7 +26,7 @@ public enum SquareType
     Spawn,    
 }
 
-public delegate bool SelectionPredicate(ITroop selected, ITroop current);
+public delegate bool SelectionPredicate(TroopBase selected, TroopBase current);
 
 public interface IMappable
 {
@@ -52,69 +52,108 @@ public interface IDamageable : IObject
 
     State CurrentState { get; }
 
-    bool TakeDamage(int damage);  //
 }
 
 public abstract class Damageable : IDamageable
 {
-    public int Defense { get; protected set; }
+    public abstract int Defense { get; }
 
-    public int Health => throw new System.NotImplementedException();
+    public abstract int Health { get; protected set; }
 
-    public Role Side => throw new System.NotImplementedException();
+    public Role Side { get; protected set; }
 
-    public int ReceivedDamage => throw new System.NotImplementedException();
+    public int ReceivedDamage { get; protected set; }
 
-    public State CurrentState => throw new System.NotImplementedException();
+    public State CurrentState { get; protected set; }
 
-    public bool Passable => throw new System.NotImplementedException();
+    public bool Passable { get; protected set; }
 
-    public int Size => throw new System.NotImplementedException();
+    public abstract int Size { get; }
 
-    public Vector2Int Position => throw new System.NotImplementedException();
+    public abstract Vector2Int Position { get; }
 
-    public virtual bool TakeDamage(int damage)
+    internal virtual bool TakeDamage(int damage)
     {
-        throw new System.NotImplementedException();
+        Health -= damage;
+        ReceivedDamage += damage;
+
+        if (Health <= 0)
+            return true;
+
+        return false;
     }
 }
 
 public abstract class Attacker : Damageable, IAttack
 {
-    public int Damage => throw new System.NotImplementedException();
+    public abstract int Damage { get; }
 
-    public int Range => throw new System.NotImplementedException();
+    public abstract int Range { get; }
 
-    public int DealtDamage => throw new System.NotImplementedException();
+    public int DealtDamage { get; protected set; }
 
-    public IAction Action => throw new System.NotImplementedException();
+    public Damageable Target { get; protected set; }
 
-    public IDamageable Target => throw new System.NotImplementedException();
+    public int EnemiesKilled { get; protected set; }
 
-    public bool Attack()
+    public int BuildingsDestroyed { get; protected set; }
+
+    internal IAction Action { get; private protected set; }
+
+    public IAttack SenseClosest()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool GiveDamage(IDamageable enemy)
+    /// <summary>
+    /// Function which attacks target set in object
+    /// </summary>
+    /// <returns>
+    ///     True -> continue with attack  
+    ///     False -> end attack
+    /// </returns>
+    internal virtual bool Attack()
     {
-        throw new System.NotImplementedException();
+        //No target - do not want to reschedule action
+        if (Target == null)
+            return false;
+
+        //If true - target killed --> do not reschedule
+        if (GiveDamage(Target))
+            return false;        
+
+        return true;
     }
 
-    public void PrepareForAttack(IDamageable enemy)
+    internal virtual bool GiveDamage(Damageable enemy)
     {
-        throw new System.NotImplementedException();
+        CurrentState = State.Fighting;
+        Target = enemy;
+        DealtDamage += Damage * enemy.Defense;
+
+        return enemy.TakeDamage(Damage);
     }
 
-    public void SetAction(IAction action)
+    internal virtual void PrepareForAttack(Damageable enemy)
     {
-        throw new System.NotImplementedException();
+        CurrentState = State.Fighting;
+        Target = enemy;
     }
 
-    public void StopAction()
+    internal virtual void SetAction(IAction action)
     {
-        throw new System.NotImplementedException();
+        CurrentState = State.PreparingForAction;
+        Target = null;
+        Action = action;
     }
+
+    internal virtual void StopAction()
+    {
+        CurrentState = State.Free;
+        Target = null;
+        Action = null;
+    }
+
 }
 
 
@@ -123,20 +162,8 @@ public interface IMovable : IObject
     Vector2 ActualPosition { get; }
 
     float Speed { get; }
-
-    void PrepareForMove(Vector2Int targetPos); //
-
-    bool Move(); //
 }
 
-public interface ITroop : IRecruitable, IAttack, IMovable
-{
-    int Count { get; }
-
-    bool TakeDamage(int damage, int index, int count); //
-
-    bool FindSpotInRange(Vector2Int target, out Vector2Int pos); //
-}
 
 public interface IAttack : IDamageable
 {
@@ -146,28 +173,22 @@ public interface IAttack : IDamageable
 
     int DealtDamage { get; }
 
-    IAction Action { get; }
+    int EnemiesKilled { get; }
 
-    IDamageable Target { get; }
+    int BuildingsDestroyed { get; }
 
-    void SetAction(IAction action); //
+    Damageable Target { get; }
 
-    void StopAction(); //
-
-    void PrepareForAttack(IDamageable enemy); //
-
-    bool Attack(); //
-
-    bool GiveDamage(IDamageable enemy); //
+    IAttack SenseClosest();
 
 }
 
 public interface IRecruitable : IDamageable
 {
-
+    public Statistics GetStats();
 }
 
-public interface IAction
+internal interface IAction
 {
     void Schedule();
 
@@ -181,26 +202,3 @@ public interface IAI
 
 }
 
-internal interface B
-{
-    void ahoj();
-}
-
-public abstract class Pozdrav : B
-{
-
-    public void ahoj()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    internal void hello()
-    {
-
-    }
-}
-
-public class TR : Pozdrav
-{
-
-}

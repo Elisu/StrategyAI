@@ -11,20 +11,26 @@ public class BasicAI : AIBase
         {
             if (!MacroActions.AttackInRange(attacker))
             {
-                ITroop enemy = ownTroops.SenseEnemyLowestHealth();
+                TroopBase enemy = ownTroops.SenseEnemyLowestHealth();
                 if (enemy != null && enemy.Health < attacker.Health)
                     MacroActions.AttackGiven(enemy, attacker);
-                else if (!MacroActions.AttackWithLowestHealth(attacker))
-                    MacroActions.AttackClosest(attacker);
+                else
+                {
+                    enemy = ownTroops.SenseEnemyLowestDamage();
+                    if (enemy != null && enemy.Damage < attacker.Damage)
+                        MacroActions.AttackGiven(enemy, attacker);
+                    else
+                        MacroActions.AttackClosest(attacker);
+                }
             }
         }
         else 
         {
-            if (attacker is ITroop troop)
+            if (attacker is TroopBase troop)
             {
                 if (troop.CurrentState == State.Fighting && troop.Target.Health >= troop.Health * 2)
-                    MacroActions.MoveToSafety(troop);
-                
+                    MacroActions.MoveToSafety(troop);                
+               
             }
         }
     }

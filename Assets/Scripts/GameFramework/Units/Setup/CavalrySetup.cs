@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-internal class TowerSetup : Setup<Tower>
+internal class CavalrySetup : Setup<Cavalry>
 {
-    public static new int Speed => 0;
+
 }

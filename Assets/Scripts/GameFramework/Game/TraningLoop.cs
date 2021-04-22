@@ -9,18 +9,13 @@ internal class TraningLoop : MonoBehaviour
 
     public int GenerationCount;
 
-
-    private void OnEnable()
+    public void Start()
     {
-        MasterScript.GameOver += Run;
+        GenerationCount *= Mathf.Max(attacker.RunsPerGenerations, defender.RunsPerGenerations);
     }
 
-    private void OnDisable()
-    {
-        MasterScript.GameOver -= Run;
-    }
 
-    void Run()
+    internal void Run()
     {
         //One Run already happened 
         GenerationCount--;

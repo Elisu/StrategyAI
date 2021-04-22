@@ -20,8 +20,6 @@ public class MacroActions : MonoBehaviour
                 closest = troop;
         }
 
-        Debug.LogWarning("Attacking closest");
-
         return AttackGiven(closest, attacker);
     }
 
@@ -29,9 +27,9 @@ public class MacroActions : MonoBehaviour
     {
         Army army = MasterScript.GetEnemyArmy(attacker.Side);
 
-        ITroop inRange = null;
+        TroopBase inRange = null;
 
-        foreach (ITroop troop in army)
+        foreach (TroopBase troop in army)
         {
             if (Mathf.Abs(attacker.Position.x - troop.Position.x) < attacker.Range || Mathf.Abs(attacker.Position.y - troop.Position.y) < attacker.Range)
                 inRange = troop;
@@ -40,7 +38,6 @@ public class MacroActions : MonoBehaviour
         if (inRange == null)
             return false;
 
-        Debug.LogWarning("Attacking in Range");
 
         return AttackGiven(inRange, attacker);
     }
@@ -64,9 +61,9 @@ public class MacroActions : MonoBehaviour
         return AttackOnCondition(army.SenseEnemyLowestDefense, attacker);
     }
 
-    private static bool AttackOnCondition(Func<ITroop> Selection, IAttack attacker)
+    private static bool AttackOnCondition(Func<TroopBase> Selection, IAttack attacker)
     {
-        ITroop selected = Selection();
+        TroopBase selected = Selection();
 
         if (selected == null)
             return false;
@@ -78,10 +75,10 @@ public class MacroActions : MonoBehaviour
     private static bool Reachable(IAttack attacker, Vector2Int target)
     {
         //Tower cant move and closest target beyond range
-        if (attacker is Tower && Vector2Int.Distance(attacker.Position, target) > attacker.Range)
+        if (attacker is TowerBase && Vector2Int.Distance(attacker.Position, target) > attacker.Range)
             return false;
 
-        if (attacker is ITroop troop)
+        if (attacker is TroopBase troop)
             if (troop.FindSpotInRange(target, out Vector2Int inRange))
                 if (Pathfinding.FindPath(attacker.Position, inRange) != null)
                      return true;
@@ -94,7 +91,7 @@ public class MacroActions : MonoBehaviour
         if (!Reachable(attacker, target.Position))
             return false;  
 
-        IAction action = new Attack(target, attacker);
+        IAction action = new Attack((Damageable)target, (Attacker)attacker);
         action.Schedule();
 
         return true;
@@ -106,7 +103,7 @@ public class MacroActions : MonoBehaviour
         return false;
     }
 
-    public static bool DoNothing(IMovable a)
+    public static bool DoNothing(IAttack a)
     {
         return true;
     }

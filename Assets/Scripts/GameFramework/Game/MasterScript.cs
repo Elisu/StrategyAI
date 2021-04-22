@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class MasterScript : MonoBehaviour
 {
+    [SerializeField]
+    private TraningLoop trainer;
+
     internal static IObjectMap map;
     internal static Army defenderArmy;
     internal static Army attackerArmy;
-    internal static Queue<IAttack> actionsInProgress;
+    internal static Queue<Attacker> actionsInProgress;
 
     public static bool IsTrainingMode;
 
@@ -20,20 +23,24 @@ public class MasterScript : MonoBehaviour
         attackerArmy = new Army(Role.Attacker);
         defenderArmy.SetEnemy();
         attackerArmy.SetEnemy();
-        actionsInProgress = new Queue<IAttack>();
+        actionsInProgress = new Queue<Attacker>();
     }
 
     void FixedUpdate()
     {
         int count = actionsInProgress.Count;
-        Debug.Log(string.Format("Number of running action: {0}", actionsInProgress.Count));
+
+        if (count == 0)
+            return;
+
+        //Debug.Log(string.Format("Number of running action: {0}", actionsInProgress.Count));
         for (int i = 0; i < count; i++)
         {
-            IAttack action = actionsInProgress.Dequeue();
+            Attacker attacker = actionsInProgress.Dequeue();
 
 
-            if (action != null && action.Action.Execute())
-                actionsInProgress.Enqueue(action);
+            if (attacker.Action != null && attacker.Action.Execute())
+                actionsInProgress.Enqueue(attacker);
 
         }
 
@@ -67,5 +74,6 @@ public class MasterScript : MonoBehaviour
         map.ReloadMap();
 
         GameOver?.Invoke();
+        trainer.Run();
     }    
 }

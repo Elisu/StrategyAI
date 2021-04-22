@@ -4,10 +4,10 @@ using UnityEngine;
 
 internal class Attack : IAction
 {
-    readonly IDamageable target;
-    readonly IAttack attacker;
+    readonly Damageable target;
+    readonly Attacker attacker;
 
-    public Attack(IDamageable defender, IAttack attacker)
+    public Attack(Damageable defender, Attacker attacker)
     {
         target = defender;
         this.attacker = attacker;
@@ -15,6 +15,7 @@ internal class Attack : IAction
 
     public void Schedule()
     {
+        Debug.Log("Scheduled");
         if (attacker.Side == Role.Attacker)
             Scheduler.Attacker.Enqueue(this);
         else
@@ -38,23 +39,26 @@ internal class Attack : IAction
             return false;
         }
 
+        Vector2Int distance = attacker.Position - target.Position;
         //In case attack held on distant troop - have to move in range
-        if (Vector2Int.Distance(attacker.Position, target.Position) > attacker.Range)
+        if ( Mathf.Abs(distance.x) > attacker.Range || Mathf.Abs(distance.y) > attacker.Range)
         {
-            if (attacker is IMovable movableAttacker)
+            //Debug.Log(string.Format("MOVE Pos:{0}  TargetPos:{1}", attacker.Position, target.Position));
+            if (attacker is TroopBase movableAttacker)
             {
-                movableAttacker.PrepareForMove(target.Position);
-                movableAttacker.Move();
+                movableAttacker.MoveForAttack(target.Position);
+                return true;
 
                 //Always schedule again - needs to attack if move finished
-                return true;
+                //return true;
             }
             else
                 return false;
         }
         else
         {
-            Debug.Log(string.Format("Attacker health: {0}\nDefender health {1}", attacker.Health, target.Health));
+            //Debug.Log(string.Format("Attacker health: {0}\nDefender health {1}", attacker.Health, target.Health));
+            ((TroopBase)attacker).CorrectPosition();
             attacker.PrepareForAttack(target);
             bool stillGoing = attacker.Attack();
 

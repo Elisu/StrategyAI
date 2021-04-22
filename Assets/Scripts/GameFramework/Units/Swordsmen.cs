@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class Swordsmen : Human
+public class Swordsmen : HumanUnit
 {
     public Swordsmen()
     {
@@ -15,13 +15,13 @@ public class Swordsmen : Human
         UnitPrefab = SwordsmenSetup.UnitPrefab;
     }
 
-    public override bool GiveDamage(IDamageable enemy, int totalDamage)
+    internal override bool GiveDamage(Damageable enemy, int totalDamage)
     {
         if (enemy is Building building)
             return building.TakeDamage(totalDamage);
         else
         {
-            ITroop enemyTroop = (ITroop)enemy;
+            TroopBase enemyTroop = (TroopBase)enemy;
             int index = 0;
 
             while (totalDamage > 0)

@@ -2,64 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tower : Building, IAttack
+public abstract class TowerBase : Attacker, IRecruitable
 {
-    public int Damage { get; protected set; }
-    public int Range { get; protected set; }
+    public Statistics GetStats() => new Statistics(DealtDamage, ReceivedDamage, EnemiesKilled, BuildingsDestroyed);
+}
 
-    public IDamageable Target { get; protected set; }
+public class Tower<T> : TowerBase where T : TowerUnit
+{
+    public override int Damage { get;  }
+    public override int Range { get; }
+    public override int Defense { get; }
+    public override int Health { get; protected set; }
+    public override int Size { get; }
+    public override Vector2Int Position { get; }
 
-    public int DealtDamage { get; protected set; }
-
-    public IAction Action { get; protected set; }
-
-    int IObject.Size => Size;
+    //public int Damage => 
+    //public int Range { get; protected set; }
 
     protected Tower() { }
 
     public Tower(Role role)
     {
-        Health = TowerSetup.Health;
-        Damage = TowerSetup.Damage;
-        Defense = TowerSetup.Defense;
-        Range = TowerSetup.Range;
         CurrentState = State.Free;
-
         Side = role;
-    }
-
-    public void SetAction(IAction action)
-    {
-        Action = action;
-    }
-
-    public virtual bool GiveDamage(IDamageable enemy)
-    {
-        CurrentState = State.Fighting;
-        Target = enemy;
-        DealtDamage += Damage * enemy.Defense;
-
-        return enemy.TakeDamage(Damage);
-    }
-
-    public void StopAction()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void PrepareForAttack(IDamageable enemy)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public bool Attack()
-    {
-        GiveDamage(Target);
-        return true;
-    }
-
-    public void PrepareForAction()
-    {
-        CurrentState = State.PreparingForAction;
     }
 }
