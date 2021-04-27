@@ -17,6 +17,14 @@ public struct Statistics
         destroyedBuildings = buildDestroyed;
     }
 
+    public Statistics(Statistics s)
+    {
+        dealtDamage = s.dealtDamage;
+        receivedDamage = s.receivedDamage;
+        killedEnemies = s.killedEnemies;
+        destroyedBuildings = s.destroyedBuildings;
+    }
+
     public static Statistics operator+ (Statistics a, Statistics b)
     {
         Statistics sum = new Statistics(a.dealtDamage + b.dealtDamage,

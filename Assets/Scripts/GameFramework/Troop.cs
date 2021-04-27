@@ -249,6 +249,7 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
     {
         CurrentState = State.Fighting;
         Target = enemy;
+        DealtDamage += Damage;
         bool killed = troop[0].GiveDamage(enemy, Damage);
 
         if (killed)
