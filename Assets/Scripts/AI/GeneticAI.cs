@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class Genetic
 {
-    public delegate bool TryAction(IAttack recruit);
-    public delegate bool Condition(IAttack recruit);
+    public delegate bool TryAction(Attacker recruit);
+    public delegate bool Condition(Attacker recruit);
 
     public delegate Individual[] Selection(Individual[] pop);
     public delegate Individual MutateFunc(Individual ind);
@@ -107,7 +107,7 @@ public class Genetic
             ActionCount = rule.ActionCount;
         }
 
-        public bool AllTrue(IAttack recruit)
+        public bool AllTrue(Attacker recruit)
         {
             foreach (Condition cond in conditions)
                 if (!cond(recruit))

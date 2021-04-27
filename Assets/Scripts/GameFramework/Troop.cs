@@ -16,9 +16,9 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
             actualPosition = value;
 
             if (visual != null)
-                visual.transform.position = new Vector3(actualPosition.x * MasterScript.map.SizeMultiplier,
+                visual.transform.position = new Vector3(actualPosition.x * Instance.map.SizeMultiplier,
                                                         1.5f,
-                                                        actualPosition.y * MasterScript.map.SizeMultiplier);
+                                                        actualPosition.y * Instance.map.SizeMultiplier);
         }
     }
 
@@ -39,7 +39,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
     internal virtual void MoveForAttack(Vector2Int targetPos)
     {
-        if (CurrentState != State.Moving || !MasterScript.map[targetPosition].Passable || Random.Range(0, 21) < 1)
+        if (CurrentState != State.Moving || !Instance.map[targetPosition].Passable || Random.Range(0, 21) < 1)
         {
             CurrentState = State.Moving;
             Target = null;
@@ -56,7 +56,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
     private void RecomputeRoute(Vector2Int targetPos)
     {
-        List<Vector2Int> path = Pathfinding.FindPath(Position, targetPos);
+        List<Vector2Int> path = Pathfinding.FindPath(Position, targetPos, Instance);
 
         if (path == null)
         {
@@ -75,10 +75,10 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
         Vector2Int coords = new Vector2Int(0, 0);
         bool found = false;
 
-        for (int i = Mathf.Max(0, target.x - this.Range); i < Mathf.Min(MasterScript.map.Width, target.x + this.Range + 1); i++)
-            for (int j = Mathf.Max(0, target.y - this.Range); j < Mathf.Min(MasterScript.map.Height, target.y + this.Range + 1); j++)
+        for (int i = Mathf.Max(0, target.x - this.Range); i < Mathf.Min(Instance.map.Width, target.x + this.Range + 1); i++)
+            for (int j = Mathf.Max(0, target.y - this.Range); j < Mathf.Min(Instance.map.Height, target.y + this.Range + 1); j++)
             {
-                if (MasterScript.map[i, j].Passable)
+                if (Instance.map[i, j].Passable)
                 {
                     int diffX = Mathf.Abs(Position.x - i);
                     int diffY = Mathf.Abs(Position.y - j);
@@ -105,9 +105,9 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
         Vector2Int nextPos = route.Peek();
 
-        if (MasterScript.map[nextPos] == null || MasterScript.map[nextPos].Passable == true)
+        if (Instance.map[nextPos] == null || Instance.map[nextPos].Passable == true)
         {
-            MasterScript.map[Position] = null;
+            Instance.map[Position] = null;
             Vector2 next = new Vector2(nextPos.x - ActualPosition.x, nextPos.y - ActualPosition.y);
 
             if (Mathf.Abs(next.normalized.x * Speed) > Mathf.Abs(next.x) || Mathf.Abs(next.normalized.y * Speed) > Mathf.Abs(next.y))
@@ -120,7 +120,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
                 route.Dequeue();
             }
 
-            MasterScript.map[Position] = this;
+            Instance.map[Position] = this;
 
             if (route.Count > 0)
                 return true;
@@ -159,8 +159,10 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
     public override int Health { get; protected set; }
     public override int Size => troop[0].Size * Count;
 
-    public Troop(int count, Role side)
+    public Troop(int count, Role side, GameInstance instance)
     {
+        Instance = instance;
+
         for (int i = 0; i < count; i++)
             troop.Add(new T());
 
@@ -171,15 +173,15 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
         Speed = HumanUnit.Speed;
         MaxHealth = Health;
         Side = side;
-        ActualPosition = MasterScript.map.GetFreeSpawn(Side);
+        ActualPosition = Instance.map.GetFreeSpawn(Side);
         CurrentState = State.Free;
 
-        MasterScript.map[Position] = this;
+        Instance.map[Position] = this;
        
         if (visual != null)
         {
             visual = Object.Instantiate(visual, visual.transform.position, Quaternion.identity);
-            MasterScript.GameOver += GameOver;
+            Instance.GameOver += GameOver;
 
             if (Side == Role.Defender)
                 visual.GetComponent<Renderer>().material.color = new Color(0, 0, 255);
@@ -282,8 +284,8 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
 
     private void DestroyTroop()
     {
-        MasterScript.GetArmy(Side).Remove(this);
-        MasterScript.map[Position] = null;
+        Instance.GetArmy(Side).Remove(this);
+        Instance.map[Position] = null;
 
         if (visual != null)
             Object.Destroy(visual);

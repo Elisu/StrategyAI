@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Genetic;
 
-public class CoevolutionAI : AIBase
+public class CoevolutionAI : AIPlayer
 {
     public int populationSize;
     public int individualLength;

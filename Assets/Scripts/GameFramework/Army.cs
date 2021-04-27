@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Army : IEnumerable<IAttack>
+public class Army : IEnumerable<Attacker>
 {
     public Role Side { get; private set; }
 
@@ -28,7 +28,7 @@ public class Army : IEnumerable<IAttack>
         enemyTroops = MasterScript.GetEnemyArmy(Side);
     }
 
-    public IAttack this[int index]
+    public Attacker this[int index]
     {
         get
         {
@@ -55,7 +55,7 @@ public class Army : IEnumerable<IAttack>
         graveyard.Clear();
     }
 
-    public IEnumerator<IAttack> GetEnumerator()
+    public IEnumerator<Attacker> GetEnumerator()
     {
         foreach (TroopBase unit in army)
             yield return unit;

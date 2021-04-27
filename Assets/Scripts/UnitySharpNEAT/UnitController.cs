@@ -16,7 +16,7 @@ namespace UnitySharpNEAT
     /// Abstract representation of a Unit, which is equipped with a Neural Net (IBlackBox).
     /// The IBlackBox gets fed with inputs and computes an output, which can be used to control the Unit.
     /// </summary>
-    public abstract class UnitController : AIBase
+    public abstract class UnitController : AIPlayer
     {
         public IBlackBox BlackBox { get; private set; }
 
@@ -38,7 +38,7 @@ namespace UnitySharpNEAT
         private bool _isActive;
 
 
-        protected override void FindAction(IAttack attacker)
+        protected override void FindAction(Attacker attacker)
         {
             if (IsActive)
             {

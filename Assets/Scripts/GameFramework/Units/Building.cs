@@ -8,8 +8,8 @@ public abstract class Building : Damageable, IRecruitable
 
     private void Destroy()
     {
-        MasterScript.GetArmy(Side).Remove(this);
-        MasterScript.map[Position] = null;
+        Instance.GetArmy(Side).Remove(this);
+        Instance.map[Position] = null;
 
         if (visual != null)
             Object.Destroy(visual);

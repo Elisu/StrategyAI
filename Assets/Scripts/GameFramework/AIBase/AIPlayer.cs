@@ -2,14 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AIBase : MonoBehaviour
+public abstract class AIPlayer : IPlayer
 {
     public virtual int RunsPerGenerations => runsPerGen;
-
-    public Role role;
     float delay = 10;
-
-    protected Army ownTroops;
 
     protected int runsPerGen = 1;
     private bool scheduleInProgress = false;
@@ -95,7 +91,7 @@ public class AIBase : MonoBehaviour
     /// <summary>
     /// Override function with implementation of AI action selection
     /// </summary>
-    protected virtual void FindAction(IAttack attcker)
+    protected virtual void FindAction(Attacker attcker)
     {
         throw new System.NotImplementedException("Your AI must override FindAction method");
     }

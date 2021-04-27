@@ -27,11 +27,13 @@ public class Node : IMappable
 public class Pathfinding
 { 
 
-    public static List<Vector2Int> FindPath(Vector2Int start, Vector2Int target)
+    public static List<Vector2Int> FindPath(Vector2Int start, Vector2Int target, GameInstance instance)
     {
+        IObjectMap gameMap = instance.map;
+
         //Debug.Log("Looking for path");
         List<Node> opened = new List<Node>();
-        Map<Node> pathMap = new Map<Node>(MasterScript.map.Width, MasterScript.map.Height);
+        Map<Node> pathMap = new Map<Node>(gameMap.Width, gameMap.Height);
 
         for (int i = 0; i < pathMap.Width; i++)
             for (int j = 0; j < pathMap.Height; j++)
@@ -58,7 +60,7 @@ public class Pathfinding
                 {
                     if (i == currentNode.Position.x || j == currentNode.Position.y)
                     {
-                        if (MasterScript.map[i, j].Passable == true)
+                        if (gameMap[i, j].Passable == true)
                         {
                             if (pathMap[i, j].visited == false)
                             {
@@ -75,8 +77,7 @@ public class Pathfinding
 
                             }
                         }
-                    }
-                                        
+                    }                               
                    
                     
                 }

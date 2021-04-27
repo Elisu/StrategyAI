@@ -72,6 +72,9 @@ public abstract class Damageable : IDamageable
 
     public abstract Vector2Int Position { get; }
 
+    internal GameInstance Instance { get; private protected set; }
+
+
     internal virtual bool TakeDamage(int damage)
     {
         Health -= damage;

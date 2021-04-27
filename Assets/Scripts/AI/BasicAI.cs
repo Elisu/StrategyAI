@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BasicAI : AIBase
+public class BasicAI : AIPlayer
 {
 
-    protected override void FindAction(IAttack attacker)
+    protected override void FindAction(Attacker attacker)
     { 
         if (attacker.CurrentState == State.Free)
         {

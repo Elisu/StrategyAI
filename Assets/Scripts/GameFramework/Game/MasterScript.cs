@@ -7,7 +7,7 @@ public class MasterScript : MonoBehaviour
     [SerializeField]
     private TraningLoop trainer;
 
-    internal static IObjectMap map;
+    //internal static IObjectMap map;
     internal static Army defenderArmy;
     internal static Army attackerArmy;
     internal static Queue<Attacker> actionsInProgress;
@@ -71,7 +71,7 @@ public class MasterScript : MonoBehaviour
         actionsInProgress.Clear();
         attackerArmy.Clear();
         defenderArmy.Clear();
-        map.ReloadMap();
+        //map.ReloadMap();
 
         GameOver?.Invoke();
         trainer.Run();

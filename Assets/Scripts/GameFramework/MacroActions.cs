@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class MacroActions : MonoBehaviour
 {
-    public static bool AttackClosest(IAttack attacker)
+    public static bool AttackClosest(Attacker attacker)
     {
-        Army army = MasterScript.GetEnemyArmy(attacker.Side);
+        Army army = attacker.Instance.GetEnemyArmy(attacker.Side);
 
         if (army.Count == 0)
             return false;
@@ -23,9 +23,9 @@ public class MacroActions : MonoBehaviour
         return AttackGiven(closest, attacker);
     }
 
-    public static bool AttackInRange(IAttack attacker) 
+    public static bool AttackInRange(Attacker attacker) 
     {
-        Army army = MasterScript.GetEnemyArmy(attacker.Side);
+        Army army = attacker.Instance.GetEnemyArmy(attacker.Side);
 
         TroopBase inRange = null;
 
@@ -43,25 +43,25 @@ public class MacroActions : MonoBehaviour
     }
 
 
-    public static bool AttackWithLowestHealth(IAttack attacker)
+    public static bool AttackWithLowestHealth(Attacker attacker)
     {
-        Army army = MasterScript.GetArmy(attacker.Side);
+        Army army = attacker.Instance.GetArmy(attacker.Side);
         return AttackOnCondition(army.SenseEnemyLowestHealth, attacker);
     }
 
-    public static bool AttackWithLowestDamage(IAttack attacker)
+    public static bool AttackWithLowestDamage(Attacker attacker)
     {
-        Army army = MasterScript.GetArmy(attacker.Side);
+        Army army = attacker.Instance.GetArmy(attacker.Side);
         return AttackOnCondition(army.SenseEnemyLowestDamage, attacker);
     }
 
-    public static bool AttackWithLowestDefense(IAttack attacker)
+    public static bool AttackWithLowestDefense(Attacker attacker)
     {
-        Army army = MasterScript.GetArmy(attacker.Side);
+        Army army = attacker.Instance.GetArmy(attacker.Side);
         return AttackOnCondition(army.SenseEnemyLowestDefense, attacker);
     }
 
-    private static bool AttackOnCondition(Func<TroopBase> Selection, IAttack attacker)
+    private static bool AttackOnCondition(Func<TroopBase> Selection, Attacker attacker)
     {
         TroopBase selected = Selection();
 
@@ -72,7 +72,7 @@ public class MacroActions : MonoBehaviour
            
     }
 
-    private static bool Reachable(IAttack attacker, Vector2Int target)
+    private static bool Reachable(Attacker attacker, Vector2Int target)
     {
         //Tower cant move and closest target beyond range
         if (attacker is TowerBase && Vector2Int.Distance(attacker.Position, target) > attacker.Range)
@@ -80,18 +80,18 @@ public class MacroActions : MonoBehaviour
 
         if (attacker is TroopBase troop)
             if (troop.FindSpotInRange(target, out Vector2Int inRange))
-                if (Pathfinding.FindPath(attacker.Position, inRange) != null)
+                if (Pathfinding.FindPath(attacker.Position, inRange, attacker.Instance) != null)
                      return true;
 
         return false;
     }
 
-    public static bool AttackGiven(IDamageable target, IAttack attacker)
+    public static bool AttackGiven(IDamageable target, Attacker attacker)
     {
         if (!Reachable(attacker, target.Position))
             return false;  
 
-        IAction action = new Attack((Damageable)target, (Attacker)attacker);
+        IAction action = new Attack((Damageable)target, attacker);
         action.Schedule();
 
         return true;
@@ -103,7 +103,7 @@ public class MacroActions : MonoBehaviour
         return false;
     }
 
-    public static bool DoNothing(IAttack a)
+    public static bool DoNothing(Attacker a)
     {
         return true;
     }

@@ -4,14 +4,18 @@ using UnityEngine;
 
 internal class TraningLoop : MonoBehaviour
 {
-    public AIBase attacker;
-    public AIBase defender;
+    public AIPlayer attacker;
+    public AIPlayer defender;
+
+    public int gameInstancesCount;
+    public GameInstance gameInstance;
 
     public int GenerationCount;
 
     public void Start()
     {
-        GenerationCount *= Mathf.Max(attacker.RunsPerGenerations, defender.RunsPerGenerations);
+        for (int i = 0; i < gameInstancesCount; i++)
+            Instantiate(gameInstance);
     }
 
 

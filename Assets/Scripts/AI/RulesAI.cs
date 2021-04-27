@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Genetic;
 
-public class RulesAI : AIBase
+public class RulesAI : AIPlayer
 {
     public int populationSize;
     public int individualLength;    
@@ -24,7 +24,7 @@ public class RulesAI : AIBase
         all.SelectIndividual();
     }
 
-    protected override void FindAction(IAttack attacker)
+    protected override void FindAction(Attacker attacker)
     {
         int[] votes = new int[all.possibleActions.Length];
 
