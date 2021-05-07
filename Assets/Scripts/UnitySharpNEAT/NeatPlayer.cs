@@ -16,7 +16,7 @@ namespace UnitySharpNEAT
     /// Abstract representation of a Unit, which is equipped with a Neural Net (IBlackBox).
     /// The IBlackBox gets fed with inputs and computes an output, which can be used to control the Unit.
     /// </summary>
-    public abstract class UnitController : AIPlayer
+    public abstract class NeatPlayer : AIPlayer
     {
         public IBlackBox BlackBox { get; private set; }
 
@@ -38,7 +38,7 @@ namespace UnitySharpNEAT
         private bool _isActive;
 
 
-        protected override void FindAction(Attacker attacker)
+        protected override IAction FindAction(Attacker attacker)
         {
             if (IsActive)
             {
@@ -51,6 +51,8 @@ namespace UnitySharpNEAT
                 // do something with those outputs
                 UseBlackBoxOutpts(BlackBox.OutputSignalArray, attacker);
             }
+
+            return null;
         }
 
         /// <summary>
@@ -77,13 +79,13 @@ namespace UnitySharpNEAT
         /// Do that by modifying its input signal array.
         /// The size of the array corresponds to NeatSupervisor.NetworkInputCount
         /// </summary>
-        protected abstract void UpdateBlackBoxInputs(ISignalArray inputSignalArray, IAttack attacker);
+        protected abstract void UpdateBlackBoxInputs(ISignalArray inputSignalArray, Attacker attacker);
 
         /// <summary>
         /// Do something with the computed outputs of the BlackBox.
         /// The size of the array corresponds to NeatSupervisor.NetworkOutputCount
         /// </summary>
-        protected abstract void UseBlackBoxOutpts(ISignalArray outputSignalArray, IAttack attacker);
+        protected abstract void UseBlackBoxOutpts(ISignalArray outputSignalArray, Attacker attacker);
 
         /// <summary>
         /// Called during the evaluation phase (at the end of each trail). 

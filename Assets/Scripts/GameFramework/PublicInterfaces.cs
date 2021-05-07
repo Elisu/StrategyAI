@@ -72,7 +72,7 @@ public abstract class Damageable : IDamageable
 
     public abstract Vector2Int Position { get; }
 
-    internal GameInstance Instance { get; private protected set; }
+    internal Instance CurrentInstance { get; private protected set; }
 
 
     internal virtual bool TakeDamage(int damage)
@@ -191,12 +191,8 @@ public interface IRecruitable : IDamageable
     public Statistics GetStats();
 }
 
-internal interface IAction
+public interface IAction
 {
-    void Schedule();
-
-    void Start();
-
     bool Execute();
 }
 

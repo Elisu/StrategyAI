@@ -27,9 +27,9 @@ public class Node : IMappable
 public class Pathfinding
 { 
 
-    public static List<Vector2Int> FindPath(Vector2Int start, Vector2Int target, GameInstance instance)
+    public static List<Vector2Int> FindPath(Vector2Int start, Vector2Int target, Instance instance)
     {
-        IObjectMap gameMap = instance.map;
+        IObjectMap gameMap = instance.Map;
 
         //Debug.Log("Looking for path");
         List<Node> opened = new List<Node>();

@@ -28,6 +28,6 @@ internal class SettingMasterScript : MonoBehaviour
             mapPrefab.Add(fields);
         }
 
-        MasterScript.map = new IObjectMap(mapPrefab.Count, mapPrefab[0].Count, mapPrefab);
+        //MasterScript.map = new IObjectMap(mapPrefab.Count, mapPrefab[0].Count, mapPrefab);
     }    
 }

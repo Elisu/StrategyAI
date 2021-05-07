@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Genetic
 {
-    public delegate bool TryAction(Attacker recruit);
+    public delegate bool TryAction(Attacker recruit, out IAction action);
     public delegate bool Condition(Attacker recruit);
 
     public delegate Individual[] Selection(Individual[] pop);
@@ -27,11 +27,14 @@ public class Genetic
         public int Fitness { get; set; }
         public int Length => rules.Length;
 
+        public int PossibleActions { get; private set; }
+
         Rule[] rules;
 
         public Individual(int indLength, int possibleActionCount, Condition[] conditions)
         {
             rules = new Rule[indLength];
+            PossibleActions = possibleActionCount;
 
             for (int i = 0; i < indLength; i++)
             {
@@ -40,12 +43,13 @@ public class Genetic
         }
 
         /// <summary>
-        /// Copies individual
+        /// Copy contructor for individual
         /// </summary>
         /// <param name="ind"></param>
         public Individual(Individual ind)
         {
             rules = new Rule[ind.Length];
+            PossibleActions = ind.PossibleActions;
 
             for (int i = 0; i < ind.Length; i++)
                 rules[i] = new Rule(ind.rules[i]);
@@ -54,6 +58,7 @@ public class Genetic
         public Individual(List<Rule> rules)
         {
             this.rules = rules.ToArray();
+            PossibleActions = rules[0].ActionCount;
         }
 
         public IEnumerator<Rule> GetEnumerator()
@@ -146,15 +151,13 @@ public class Genetic
     public class StrategyGroup
     {
         public int IndividualLength { get; protected set; }
-        public int PopulationSize { get; protected set; }
+        public int PopulationSize => population.Length;
 
         public int GenerationRunCount => population.Length * 1;
 
         public TryAction[] possibleActions;
         public Condition[] usedConditions;
         public Individual[] population;
-
-        public Individual individual;
         private int currentIndex = -1;
 
         public StrategyGroup(int popSize, int indLength, TryAction[] actions, Condition[] conditions)
@@ -162,7 +165,11 @@ public class Genetic
             possibleActions = actions;
             usedConditions = conditions;
             population = CreatePopulation(popSize, indLength, actions.Length, conditions);
-            individual = population[0];
+        }
+
+        public Individual this[int index]
+        {
+            get => population[index];
         }
 
         public bool IsGenOver()
@@ -173,11 +180,6 @@ public class Genetic
                 return false;
         }
 
-        public void SelectIndividual()
-        {
-            currentIndex = (currentIndex + 1) % population.Length;
-            individual = population[currentIndex];
-        }
 
         public void SetFitness(List<Statistics> stats)
         {
@@ -193,7 +195,7 @@ public class Genetic
 
             }
 
-            individual.Fitness = kills * 100 + dealtDamage * 50 - receivedDamage * 10;
+            //individual.Fitness = kills * 100 + dealtDamage * 50 - receivedDamage * 10;
         }
 
         public void GeneticOperations(Selection selection, CrossFunc cross, MutateFunc mutate )

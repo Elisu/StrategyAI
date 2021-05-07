@@ -13,24 +13,6 @@ internal class Attack : IAction
         this.attacker = attacker;
     }
 
-    public void Schedule()
-    {
-        Debug.Log("Scheduled");
-        if (attacker.Side == Role.Attacker)
-            Scheduler.Attacker.Enqueue(this);
-        else
-            Scheduler.Defender.Enqueue(this);
-    }
-
-    public void Start()
-    {
-        if (attacker.Action == null)
-            MasterScript.actionsInProgress.Enqueue(attacker);
-
-        attacker.SetAction(this);
-    }
-
-
     public bool Execute()
     {
         if (attacker.Health <= 0 || target.Health <= 0)

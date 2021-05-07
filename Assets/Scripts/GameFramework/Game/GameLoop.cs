@@ -2,15 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameLoop : MonoBehaviour
+
+internal class GameLoop : MonoBehaviour
 {
     public GameInstance game;
-    public IPlayer attacker;
-    public IPlayer defender;
+    public AITrainingHandler attacker;
+    public AITrainingHandler defender;
 
     private void Start()
     {
         game = Instantiate(game);
-        game.Run(attacker, defender);
+        game.Run(attacker.GetRepresentative(), defender.GetRepresentative());
     }
 }

@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MacroActions : MonoBehaviour
+public class MacroActions
 {
-    public static bool AttackClosest(Attacker attacker)
+    public static bool AttackClosest(Attacker attacker, out IAction resultAction)
     {
-        Army army = attacker.Instance.GetEnemyArmy(attacker.Side);
+        Army army = attacker.CurrentInstance.GetEnemyArmy(attacker.Side);
+        resultAction = null;
 
         if (army.Count == 0)
             return false;
@@ -20,12 +21,13 @@ public class MacroActions : MonoBehaviour
                 closest = troop;
         }
 
-        return AttackGiven(closest, attacker);
+        return AttackGiven(closest, attacker, out resultAction);
     }
 
-    public static bool AttackInRange(Attacker attacker) 
+    public static bool AttackInRange(Attacker attacker, out IAction resultAction) 
     {
-        Army army = attacker.Instance.GetEnemyArmy(attacker.Side);
+        Army army = attacker.CurrentInstance.GetEnemyArmy(attacker.Side);
+        resultAction = null;
 
         TroopBase inRange = null;
 
@@ -39,36 +41,37 @@ public class MacroActions : MonoBehaviour
             return false;
 
 
-        return AttackGiven(inRange, attacker);
+        return AttackGiven(inRange, attacker, out resultAction);
     }
 
 
-    public static bool AttackWithLowestHealth(Attacker attacker)
+    public static bool AttackWithLowestHealth(Attacker attacker, out IAction resultAction)
     {
-        Army army = attacker.Instance.GetArmy(attacker.Side);
-        return AttackOnCondition(army.SenseEnemyLowestHealth, attacker);
+        Army army = attacker.CurrentInstance.GetArmy(attacker.Side);
+        return AttackOnCondition(army.SenseEnemyLowestHealth, attacker, out resultAction);
     }
 
-    public static bool AttackWithLowestDamage(Attacker attacker)
+    public static bool AttackWithLowestDamage(Attacker attacker, out IAction resultAction)
     {
-        Army army = attacker.Instance.GetArmy(attacker.Side);
-        return AttackOnCondition(army.SenseEnemyLowestDamage, attacker);
+        Army army = attacker.CurrentInstance.GetArmy(attacker.Side);
+        return AttackOnCondition(army.SenseEnemyLowestDamage, attacker, out resultAction);
     }
 
-    public static bool AttackWithLowestDefense(Attacker attacker)
+    public static bool AttackWithLowestDefense(Attacker attacker, out IAction resultAction)
     {
-        Army army = attacker.Instance.GetArmy(attacker.Side);
-        return AttackOnCondition(army.SenseEnemyLowestDefense, attacker);
+        Army army = attacker.CurrentInstance.GetArmy(attacker.Side);
+        return AttackOnCondition(army.SenseEnemyLowestDefense, attacker, out resultAction);
     }
 
-    private static bool AttackOnCondition(Func<TroopBase> Selection, Attacker attacker)
+    private static bool AttackOnCondition(Func<TroopBase> Selection, Attacker attacker, out IAction resultAction)
     {
         TroopBase selected = Selection();
+        resultAction = null;
 
         if (selected == null)
             return false;
         else
-            return AttackGiven(selected, attacker);
+            return AttackGiven(selected, attacker, out resultAction);
            
     }
 
@@ -80,31 +83,33 @@ public class MacroActions : MonoBehaviour
 
         if (attacker is TroopBase troop)
             if (troop.FindSpotInRange(target, out Vector2Int inRange))
-                if (Pathfinding.FindPath(attacker.Position, inRange, attacker.Instance) != null)
+                if (Pathfinding.FindPath(attacker.Position, inRange, attacker.CurrentInstance) != null)
                      return true;
 
         return false;
     }
 
-    public static bool AttackGiven(IDamageable target, Attacker attacker)
+    public static bool AttackGiven(IDamageable target, Attacker attacker, out IAction resultAction)
     {
+        resultAction = null;
+
         if (!Reachable(attacker, target.Position))
             return false;  
 
-        IAction action = new Attack((Damageable)target, attacker);
-        action.Schedule();
-
+        resultAction = new Attack((Damageable)target, attacker);
         return true;
     }
 
-    public static bool MoveToSafety(IMovable runner)
+    public static bool MoveToSafety(IMovable runner, out IAction resultAction)
     {
         //TO DO
+        resultAction = null;
         return false;
     }
 
-    public static bool DoNothing(Attacker a)
+    public static bool DoNothing(Attacker a, out IAction resultAction)
     {
+        resultAction = null;
         return true;
     }
 

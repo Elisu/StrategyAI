@@ -6,7 +6,7 @@ using UnityEngine;
 using UnitySharpNEAT;
 using static Genetic;
 
-public class NeatAI : UnitController
+public class NeatAI : NeatPlayer
 {
     TryAction[] possibleActions;
     Condition[] inputs;
@@ -51,13 +51,13 @@ public class NeatAI : UnitController
         
     }
 
-    protected override void UpdateBlackBoxInputs(ISignalArray inputSignalArray, IAttack attacker)
+    protected override void UpdateBlackBoxInputs(ISignalArray inputSignalArray, Attacker attacker)
     {
         for (int i = 0; i < inputSignalArray.Length; i++)
             inputSignalArray[i] = Convert.ToDouble(inputs[i].Invoke(attacker));
     }
 
-    protected override void UseBlackBoxOutpts(ISignalArray outputSignalArray, IAttack attacker)
+    protected override void UseBlackBoxOutpts(ISignalArray outputSignalArray, Attacker attacker)
     {
         int bestAction = 0;
         double best = 0;
@@ -69,16 +69,21 @@ public class NeatAI : UnitController
                 bestAction = i;
             }
 
-        possibleActions[bestAction].Invoke(attacker);
+        //possibleActions[bestAction].Invoke(attacker);
     }
 
     protected override void RunOver()
     {
         GenerationFinished = true;
-        List<IRecruitable> dead = ownTroops.GetDead();
+        List<IRecruitable> dead = OwnArmy.GetDead();
 
         stats.Clear();
         for (int i = 0; i < dead.Count; i++)
             stats.Add(new Statistics(dead[i].GetStats()));
+    }
+
+    public override AIPlayer Clone()
+    {
+        throw new NotImplementedException();
     }
 }

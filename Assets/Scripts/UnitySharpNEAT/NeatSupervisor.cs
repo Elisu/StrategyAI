@@ -56,7 +56,7 @@ namespace UnitySharpNEAT
         [Header("Unit Management")]
 
         [SerializeField, Tooltip("The Unit Prefab, which inherits from UnitController, that should be evaluated and spawned.")]
-        private UnitController _unitControllerPrefab = default;
+        private NeatPlayer _unitControllerPrefab = default;
 
         [SerializeField, Tooltip("The parent transform which will hold the instantiated Units.")]
         private Transform _spawnParent = default;
@@ -69,11 +69,11 @@ namespace UnitySharpNEAT
 
 
         // Object pooling and Unit management
-        private Dictionary<IBlackBox, UnitController> _blackBoxMap = new Dictionary<IBlackBox, UnitController>();
+        private Dictionary<IBlackBox, NeatPlayer> _blackBoxMap = new Dictionary<IBlackBox, NeatPlayer>();
 
-        private HashSet<UnitController> _unusedUnitsPool = new HashSet<UnitController>();
+        private HashSet<NeatPlayer> _unusedUnitsPool = new HashSet<NeatPlayer>();
 
-        private HashSet<UnitController> _usedUnitsPool = new HashSet<UnitController>();
+        private HashSet<NeatPlayer> _usedUnitsPool = new HashSet<NeatPlayer>();
 
         private DateTime _startTime;
         #endregion
@@ -195,7 +195,7 @@ namespace UnitySharpNEAT
         /// </summary>
         public void ActivateUnit(IBlackBox box)
         {
-            UnitController controller = GetUnusedUnit(box);
+            NeatPlayer controller = GetUnusedUnit(box);
             controller.ActivateUnit(box);
         }
 
@@ -207,7 +207,7 @@ namespace UnitySharpNEAT
         {
             if (_blackBoxMap.ContainsKey(box))
             {
-                UnitController controller = _blackBoxMap[box];
+                NeatPlayer controller = _blackBoxMap[box];
                 controller.DeactivateUnit();
 
                 _blackBoxMap.Remove(box);
@@ -219,9 +219,9 @@ namespace UnitySharpNEAT
         /// Spawns a Unit. This means either reusing a deactivated unit from the pool or to instantiate a Unit into the pool, in case the pool is empty.
         /// Units don't get Destroyed, instead they are just reset to avoid unneccessary instantiation calls.
         /// </summary>
-        private UnitController GetUnusedUnit(IBlackBox box)
+        private NeatPlayer GetUnusedUnit(IBlackBox box)
         {
-            UnitController controller;
+            NeatPlayer controller;
 
             if (_unusedUnitsPool.Any())
             {
@@ -240,26 +240,28 @@ namespace UnitySharpNEAT
         /// <summary>
         /// Instantiates a Unit in case no Unit can be drawn from the _unusedUnitPool.
         /// </summary>
-        private UnitController InstantiateUnit(IBlackBox box)
+        private NeatPlayer InstantiateUnit(IBlackBox box)
         {
-            UnitController controller = FindObjectOfType<UnitController>();
+            //NeatPlayer controller = FindObjectOfType<NeatPlayer>();
 
-            if (controller == null)
-                controller = Instantiate(_unitControllerPrefab, _unitControllerPrefab.transform.position, _unitControllerPrefab.transform.rotation);
+            //if (controller == null)
+            //    controller = Instantiate(_unitControllerPrefab, _unitControllerPrefab.transform.position, _unitControllerPrefab.transform.rotation);
 
-            if (_spawnParent != null)
-                controller.transform.parent = _spawnParent;
-            else
-                controller.transform.parent = this.transform;
+            //if (_spawnParent != null)
+            //    controller.transform.parent = _spawnParent;
+            //else
+            //    controller.transform.parent = this.transform;
 
-            _blackBoxMap.Add(box, controller);
-            return controller;
+            //_blackBoxMap.Add(box, controller);
+            //return controller;
+
+            return null;
         }
 
         /// <summary>
         /// Puts Units into either the Unused or the Used object pool.
         /// </summary>
-        private void PoolUnit(UnitController controller, bool markUsed)
+        private void PoolUnit(NeatPlayer controller, bool markUsed)
         {
             if (markUsed)
             {
@@ -278,9 +280,9 @@ namespace UnitySharpNEAT
         /// </summary>
         private void DeactivateAllUnits()
         {
-            Dictionary<IBlackBox, UnitController> _blackBoxMapCopy = new Dictionary<IBlackBox, UnitController>(_blackBoxMap);
+            Dictionary<IBlackBox, NeatPlayer> _blackBoxMapCopy = new Dictionary<IBlackBox, NeatPlayer>(_blackBoxMap);
 
-            foreach (KeyValuePair<IBlackBox, UnitController> boxUnitPair in _blackBoxMapCopy)
+            foreach (KeyValuePair<IBlackBox, NeatPlayer> boxUnitPair in _blackBoxMapCopy)
             {
                 DeactivateUnit(boxUnitPair.Key);
             }

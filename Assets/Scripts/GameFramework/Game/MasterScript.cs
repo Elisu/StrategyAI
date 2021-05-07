@@ -5,7 +5,7 @@ using UnityEngine;
 public class MasterScript : MonoBehaviour
 {
     [SerializeField]
-    private TraningLoop trainer;
+    //private TraningLoop trainer;
 
     //internal static IObjectMap map;
     internal static Army defenderArmy;
@@ -21,8 +21,8 @@ public class MasterScript : MonoBehaviour
     {
         defenderArmy = new Army(Role.Defender); 
         attackerArmy = new Army(Role.Attacker);
-        defenderArmy.SetEnemy();
-        attackerArmy.SetEnemy();
+        //defenderArmy.SetEnemy();
+        //attackerArmy.SetEnemy();
         actionsInProgress = new Queue<Attacker>();
     }
 
@@ -74,6 +74,6 @@ public class MasterScript : MonoBehaviour
         //map.ReloadMap();
 
         GameOver?.Invoke();
-        trainer.Run();
+        //trainer.Run();
     }    
 }

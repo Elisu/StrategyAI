@@ -1,31 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Jobs;
 using UnityEngine;
 
-public class GameInstance : MonoBehaviour
+internal class GameInstance : Instance
 {
-    internal IObjectMap map { get; private set; }
+    public override bool IsTraining => false;
 
-    IPlayer attacker;
-    IPlayer defender;
-
-    Queue<Attacker> actionsInProgress;
-
-    public event Action GameOver;
-
-    public bool IsRunning { get; private set; }
-
-    public void Run(IPlayer attacker, IPlayer defender)
+    public override void Run(IPlayer attack, IPlayer defend)
     {
-        //Resets inner game state
-        actionsInProgress.Clear();
-        map.ReloadMap();
-
-        //Assigns players
-        this.attacker = attacker;
-        this.defender = defender;        
-
+        SetPlayers(attack, defend);
         IsRunning = true;
     }
 
@@ -33,47 +18,26 @@ public class GameInstance : MonoBehaviour
     {
         if (IsRunning)
         {
-            int count = actionsInProgress.Count;
-
-            if (count == 0)
-                return;
-
-            //Debug.Log(string.Format("Number of running action: {0}", actionsInProgress.Count));
-            for (int i = 0; i < count; i++)
-            {
-                Attacker attacker = actionsInProgress.Dequeue();
-
-
-                if (attacker.Action != null && attacker.Action.Execute())
-                    actionsInProgress.Enqueue(attacker);
-
-            }
-
-            if (defender.ownTroops.Count == 0 || attacker.ownTroops.Count == 0)
-                GameOverHandler();
+            RunGameStep();
         }
-    }
-
-    internal Army GetEnemyArmy(Role role)
-    {
-        if (role == Role.Attacker)
-            return defender.ownTroops;
         else
-            return attacker.ownTroops;
+        {
+            if (defender.OwnArmy.Count == 0)
+                Debug.Log("Attacker won");
+            else
+                Debug.Log("Defender won");
+        }
+        
     }
 
-    internal Army GetArmy(Role role)
+    protected void RunGameStep()
     {
-        if (role == Role.Defender)
-            return defender.ownTroops;
-        else
-            return attacker.ownTroops;
-    }
+        if (defender.OwnArmy.Count == 0 || attacker.OwnArmy.Count == 0)
+            IsRunning = false;
 
-    private void GameOverHandler()
-    {
-        IsRunning = false;
-        GameOver?.Invoke();
+        scheduler.ScheduleActions();
+        scheduler.RunActions();
     }
 
 }
+

@@ -23,9 +23,9 @@ public class Army : IEnumerable<Attacker>
         Side = side;
     }
 
-    public void SetEnemy()
+    public void SetEnemy(Instance instance)
     {
-        enemyTroops = MasterScript.GetEnemyArmy(Side);
+        enemyTroops = instance.GetEnemyArmy(Side);
     }
 
     public Attacker this[int index]

@@ -1,39 +1,23 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Base class to every AI has to inherit from and implement required methods
+/// </summary>
 public abstract class AIPlayer : IPlayer
 {
     public virtual int RunsPerGenerations => runsPerGen;
-    float delay = 10;
 
     protected int runsPerGen = 1;
-    private bool scheduleInProgress = false;
-    private bool running;
 
-    protected void Start()
-    {
-        Run();
-    }
-
-    protected void OnEnable()
-    {
-        MasterScript.GameOver += RunOverHandler;
-    }
-
-    protected void OnDisable()
-    {
-        MasterScript.GameOver -= RunOverHandler;
-    }
+    int currentToSchedule = 0;
 
     public void Run()
     {
-        ownTroops = MasterScript.GetArmy(role);
-        ownTroops.Add(new Troop<Swordsmen>(50, role));
-        ownTroops.Add(new Troop<Swordsmen>(30, role));
-        //ownTroops.Add(new Troop<Cavalry>(10, role));
-        ownTroops.ClearGraveyard();
-        running = true;
+        
+        OwnArmy.ClearGraveyard();
         OnStart();
     }
 
@@ -53,46 +37,30 @@ public abstract class AIPlayer : IPlayer
     {
         return;
     }
-  
 
-    protected void FixedUpdate()
+    public override Tuple<Attacker, IAction> GetActions()
     {
-        if (!running)
-            return;
+        Attacker attack = OwnArmy[currentToSchedule % OwnArmy.Count];
+        currentToSchedule++;
 
-        delay -= 1;
-
-        if (delay <= 0 || !scheduleInProgress )
-        {
-            StartCoroutine(ScheduleFind());
-            delay = 100;
-        }
-            
+        IAction action = FindAction(attack);
+        return new Tuple<Attacker, IAction>(attack, action);
     }
 
-    private IEnumerator ScheduleFind()
-    {
-        scheduleInProgress = true;
-        for (int i = 0; i < ownTroops.Count; i++)
-        {
-            FindAction(ownTroops[i]);
-            yield return new WaitForSeconds(1);
-        }
-
-        scheduleInProgress = false;
-    }
-
-    private void RunOverHandler()
-    {
-        running = false;
-        RunOver();
-    }
 
     /// <summary>
     /// Override function with implementation of AI action selection
     /// </summary>
-    protected virtual void FindAction(Attacker attcker)
-    {
-        throw new System.NotImplementedException("Your AI must override FindAction method");
-    }
+    /// <param name="attacker">unit which will carry out selected action</param>
+    /// <returns>selected action - null means nothing will happen</returns>
+    protected internal abstract IAction FindAction(Attacker attacker);
+
+
+    /// <summary>
+    /// Implement deepcopy of your AI player
+    /// </summary>
+    /// <typeparam name="AIType">Your AI class</typeparam>
+    /// <returns>deep copy of this instance of your child of AIPlayer</returns>
+    public abstract AIPlayer Clone();
+
 }
