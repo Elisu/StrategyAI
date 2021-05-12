@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 using static Genetic;
@@ -8,15 +10,36 @@ public class RulesAI : AIPlayer
     Individual individual;
     TryAction[] possibleActions;
 
+    ConcurrentQueue<int> AccumulatedFitnesses;
+
     public RulesAI(Individual ind, TryAction[] actions)
     {
         possibleActions = actions;
         individual = ind;
+        AccumulatedFitnesses = new ConcurrentQueue<int>();
+    }
+
+    private RulesAI(Individual ind, TryAction[] actions, ref ConcurrentQueue<int> fitnesses)
+    {
+        possibleActions = actions;
+        individual = ind;
+        AccumulatedFitnesses = fitnesses;
     }
 
     public override AIPlayer Clone()
     {
-        return new RulesAI(new Individual(individual), possibleActions);
+        return new RulesAI(new Individual(individual), possibleActions, ref AccumulatedFitnesses);
+    }
+
+    public int GetFitnessMean()
+    {
+        int[] fitnessArray = AccumulatedFitnesses.ToArray();
+
+        if (fitnessArray.Length == 1)
+            return fitnessArray[0];
+
+        Array.Sort(fitnessArray);
+        return fitnessArray[Mathf.CeilToInt(fitnessArray.Length / 2)];
     }
 
     protected override IAction FindAction(Attacker attacker)
@@ -43,20 +66,14 @@ public class RulesAI : AIPlayer
         return resultAction;
     }
 
-    protected override void RunOver()
+    protected override int PickToBuy()
     {
-        List<IRecruitable> dead = OwnArmy.GetDead();
-
-        List<Statistics> stats = new List<Statistics>();
-        for (int i = 0; i < dead.Count; i++)
-            stats[i] = dead[i].GetStats();
-
-       // individual.SetFitness(stats);
-
+        return UnitFinder.PickOnBudget(OwnArmy.Money);
     }
 
-
-
-
-
+    protected override void RunOver(GameStats stats)
+    {
+        individual.SetFtiness(stats, role);
+        AccumulatedFitnesses.Enqueue(individual.Fitness);
+    }
 }

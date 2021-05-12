@@ -49,7 +49,7 @@ namespace UnitySharpNEAT
                 BlackBox.Activate();
 
                 // do something with those outputs
-                UseBlackBoxOutpts(BlackBox.OutputSignalArray, attacker);
+                return UseBlackBoxOutpts(BlackBox.OutputSignalArray, attacker);
             }
 
             return null;
@@ -85,7 +85,7 @@ namespace UnitySharpNEAT
         /// Do something with the computed outputs of the BlackBox.
         /// The size of the array corresponds to NeatSupervisor.NetworkOutputCount
         /// </summary>
-        protected abstract void UseBlackBoxOutpts(ISignalArray outputSignalArray, Attacker attacker);
+        protected abstract IAction UseBlackBoxOutpts(ISignalArray outputSignalArray, Attacker attacker);
 
         /// <summary>
         /// Called during the evaluation phase (at the end of each trail). 

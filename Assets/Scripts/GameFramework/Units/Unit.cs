@@ -12,6 +12,8 @@ public abstract class Unit
 
     public int Range { get; protected set; }
 
+    public int Price { get; protected set; }
+
     public readonly bool Passable = false;
 
     internal virtual bool TakeDamage(int damage)

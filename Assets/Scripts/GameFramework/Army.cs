@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,21 +7,21 @@ public class Army : IEnumerable<Attacker>
 {
     public Role Side { get; private set; }
 
-    public int Count => army.Count + towers.Count;
+    public int Count => troops.Count + towers.Count;
 
-    public Statistics Stats { get; private set; }
+    public int Money { get; private set; }
 
-    private List<TroopBase> army = new List<TroopBase>();
+    private List<TroopBase> troops = new List<TroopBase>();
     private List<Building> buildings = new List<Building>();
     private List<TowerBase> towers = new List<TowerBase>();
     private Army enemyTroops;
 
     private List<IRecruitable> graveyard = new List<IRecruitable>();
 
-
     public Army(Role side)
     {
         Side = side;
+        Money = 10000;
     }
 
     public void SetEnemy(Instance instance)
@@ -28,24 +29,50 @@ public class Army : IEnumerable<Attacker>
         enemyTroops = instance.GetEnemyArmy(Side);
     }
 
+    public bool TryBuying(int toBuy, Instance instance)
+    {
+        Type unitType = UnitFinder.unitTypes[toBuy];
+        int price = UnitFinder.prices[toBuy];
+
+        //Attacker can't buy towers
+        if (Side == Role.Attacker && !(unitType.IsSubclassOf(typeof(HumanUnit))))
+            return false;
+
+        if (price <= Money && instance.Map.GetFreeSpawn(Side, out Vector2Int spawnPos))
+        {
+            Money -= price;
+
+            
+            Add(UnitFactory.CreateUnit(unitType, Side, spawnPos, instance));
+            return true;
+        }
+
+        return false;
+    }
+
+    public void MoneyGain()
+    {
+        Money += 5;
+    }
+
     public Attacker this[int index]
     {
         get
         {
-            if (index < army.Count)
-                return army[index];
+            if (index < troops.Count)
+                return troops[index];
             else
-                return towers[index - army.Count];
+                return towers[index - troops.Count];
         }
     }
 
     internal void Clear()
     {
-        graveyard.AddRange(army);
+        graveyard.AddRange(troops);
         graveyard.AddRange(buildings);
         graveyard.AddRange(towers);
 
-        army.Clear();
+        troops.Clear();
         buildings.Clear();
         towers.Clear();
     }
@@ -57,7 +84,7 @@ public class Army : IEnumerable<Attacker>
 
     public IEnumerator<Attacker> GetEnumerator()
     {
-        foreach (TroopBase unit in army)
+        foreach (TroopBase unit in troops)
             yield return unit;
         
 
@@ -73,7 +100,7 @@ public class Army : IEnumerable<Attacker>
     public void Add(IRecruitable recruit)
     {
         if (recruit is TroopBase troop)
-            army.Add(troop);
+            troops.Add(troop);
         else if (recruit is TowerBase tower)
             towers.Add(tower);
         else
@@ -85,7 +112,7 @@ public class Army : IEnumerable<Attacker>
         graveyard.Add(recruit);
 
         if (recruit is TroopBase troop)
-            army.Remove(troop);
+            troops.Remove(troop);
         else if (recruit is TowerBase tower)
             towers.Remove(tower);
         else
@@ -124,7 +151,7 @@ public class Army : IEnumerable<Attacker>
         return closest;
     }
 
-    public TroopBase GetTroopFree() => army.Find(x => x.CurrentState == State.Free);
+    public TroopBase GetTroopFree() => troops.Find(x => x.CurrentState == State.Free);
 
     public TowerBase GetFreeTower() => towers.Find(x => x.CurrentState == State.Free);
 
@@ -132,11 +159,11 @@ public class Army : IEnumerable<Attacker>
 
     private TroopBase GetTrooOnCondition(SelectionPredicate condition)
     {
-        if (army.Count == 0)
+        if (troops.Count == 0)
             return null;
 
-        TroopBase selected = army[0];
-        foreach (TroopBase troop in army)
+        TroopBase selected = troops[0];
+        foreach (TroopBase troop in troops)
             if (condition(selected, troop))
                 selected = troop;
 
@@ -146,5 +173,21 @@ public class Army : IEnumerable<Attacker>
     public List<IRecruitable> GetDead()
     {
         return graveyard;
+    }
+
+    public List<Statistics> GetAllStats()
+    {
+        List<Statistics> stats = new List<Statistics>();
+
+        foreach (TowerBase tower in towers)
+            stats.Add(tower.GetStats());
+        foreach (TroopBase troop in troops)
+            stats.Add(troop.GetStats());
+        foreach (Building building in buildings)
+            stats.Add(building.GetStats());
+        foreach (IRecruitable dead in graveyard)
+            stats.Add(dead.GetStats());
+
+        return stats;
     }
 }

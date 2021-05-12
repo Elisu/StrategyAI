@@ -30,15 +30,8 @@ public abstract class AIPlayer : IPlayer
         return;
     } 
     
-    /// <summary>
-    /// Called at the end of a run
-    /// </summary>
-    protected virtual void RunOver()
-    {
-        return;
-    }
 
-    public override Tuple<Attacker, IAction> GetActions()
+    protected internal override Tuple<Attacker, IAction> GetActions()
     {
         Attacker attack = OwnArmy[currentToSchedule % OwnArmy.Count];
         currentToSchedule++;

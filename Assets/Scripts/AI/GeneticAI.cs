@@ -12,6 +12,8 @@ public class Genetic
     public delegate Individual MutateFunc(Individual ind);
     public delegate Tuple<Individual, Individual> CrossFunc(Individual a, Individual b);
 
+    public delegate int FitnessCalculation(GameStats stats, Role role);
+
     public static Individual[] CreatePopulation(int popSize, int indSize, int possibleActionsCount, Condition[] conditions)
     {
         Individual[] population = new Individual[popSize];
@@ -30,9 +32,11 @@ public class Genetic
         public int PossibleActions { get; private set; }
 
         Rule[] rules;
+        FitnessCalculation customFitness;
 
-        public Individual(int indLength, int possibleActionCount, Condition[] conditions)
+        public Individual(int indLength, int possibleActionCount, Condition[] conditions, FitnessCalculation fitnessMath = null)
         {
+            customFitness = fitnessMath;
             rules = new Rule[indLength];
             PossibleActions = possibleActionCount;
 
@@ -50,6 +54,7 @@ public class Genetic
         {
             rules = new Rule[ind.Length];
             PossibleActions = ind.PossibleActions;
+            customFitness = ind.customFitness;
 
             for (int i = 0; i < ind.Length; i++)
                 rules[i] = new Rule(ind.rules[i]);
@@ -76,6 +81,30 @@ public class Genetic
 
         public Rule this[int index] => rules[index];
 
+        public void SetFtiness(GameStats stats, Role role)
+        {
+            if (customFitness != null)
+                Fitness = customFitness.Invoke(stats, role);
+            else
+                Fitness = GetFitness(stats, role);
+
+            //Debug.Log(string.Format("Fitness: {0}", Fitness));
+        }
+
+        private int GetFitness(GameStats stats, Role role)
+        {
+            int fitnessResult = 0;
+
+            List<Statistics> ownStats = stats.GetMyStats(role);
+
+            if (stats.Winner == role)
+                fitnessResult += 15000;
+
+            foreach (Statistics stat in ownStats)
+                fitnessResult += stat.dealtDamage + stat.destroyedBuildings * 100 + stat.killedEnemies * 1000;
+
+            return fitnessResult;
+        }
     }
 
     public class Rule
@@ -158,7 +187,6 @@ public class Genetic
         public TryAction[] possibleActions;
         public Condition[] usedConditions;
         public Individual[] population;
-        private int currentIndex = -1;
 
         public StrategyGroup(int popSize, int indLength, TryAction[] actions, Condition[] conditions)
         {
@@ -172,35 +200,9 @@ public class Genetic
             get => population[index];
         }
 
-        public bool IsGenOver()
-        {
-            if (currentIndex == population.Length - 1)
-                return true;
-            else
-                return false;
-        }
-
-
-        public void SetFitness(List<Statistics> stats)
-        {
-            int kills = 0;
-            int dealtDamage = 0;
-            int receivedDamage = 0;
-
-            foreach(Statistics stat in stats)
-            {
-                kills += stat.killedEnemies;
-                dealtDamage += stat.dealtDamage;
-                receivedDamage += stat.receivedDamage;
-
-            }
-
-            //individual.Fitness = kills * 100 + dealtDamage * 50 - receivedDamage * 10;
-        }
-
         public void GeneticOperations(Selection selection, CrossFunc cross, MutateFunc mutate )
         {
-            Debug.LogWarning("GENETIC");
+            //Debug.LogWarning("GENETIC");
             Individual[] selected = selection(population);
 
             if (selected == null)
@@ -217,7 +219,7 @@ public class Genetic
 
             for (int i = 1; i < pop.Length; i += 2)
             {
-                if (UnityEngine.Random.value < 0.5)
+                if (UnityEngine.Random.value < 0.4)
                 {
                     Tuple<Individual, Individual> offs = cross(pop[i - 1], pop[i]);
                     crossed[i - 1] = offs.Item1;
@@ -244,7 +246,7 @@ public class Genetic
 
             foreach (Individual ind in pop)
             {
-                if (UnityEngine.Random.value < 0.5)
+                if (UnityEngine.Random.value < 0.25)
                     mutated.Add(mutate(ind));
                 else
                     mutated.Add(new Individual(ind));

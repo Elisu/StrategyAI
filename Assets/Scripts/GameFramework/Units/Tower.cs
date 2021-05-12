@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class TowerBase : Attacker, IRecruitable
 {
-    public Statistics GetStats() => new Statistics(DealtDamage, ReceivedDamage, EnemiesKilled, BuildingsDestroyed);
+    public abstract Statistics GetStats();
 }
 
 public class Tower<T> : TowerBase where T : TowerUnit
@@ -15,6 +15,8 @@ public class Tower<T> : TowerBase where T : TowerUnit
     public override int Health { get; protected set; }
     public override int Size { get; }
     public override Vector2Int Position { get; }
+
+    public override Statistics GetStats() => new Statistics(DealtDamage, ReceivedDamage, EnemiesKilled, BuildingsDestroyed, typeof(T));
 
     //public int Damage => 
     //public int Range { get; protected set; }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 internal class Scheduler
@@ -11,7 +9,7 @@ internal class Scheduler
     IPlayer defender;
 
     //Queue<Attacker> inProgress = new Queue<Attacker>();
-    ConcurrentQueue<Attacker> inProgress = new ConcurrentQueue<Attacker>();
+    Queue<Attacker> inProgress = new Queue<Attacker>();
 
     public void ScheduleActions()
     {
@@ -49,8 +47,7 @@ internal class Scheduler
         Debug.Log(string.Format("Number of running action: {0}", inProgress.Count));
         for (int i = 0; i < count; i++)
         {
-            //Attacker attacker = inProgress.Dequeue();
-            inProgress.TryDequeue(out Attacker attacker);
+            Attacker attacker = inProgress.Dequeue();            
 
             //if action set and doesn't finish yet -> reschedule again
             if (attacker.Action != null && attacker.Action.Execute())
@@ -59,12 +56,21 @@ internal class Scheduler
         }
     }
 
+    public void Shopping(Instance instance)
+    {
+        attacker.OwnArmy.MoneyGain();
+        defender.OwnArmy.MoneyGain();
+
+        attacker.OwnArmy.TryBuying(attacker.PickToBuy(), instance);
+        defender.OwnArmy.TryBuying(defender.PickToBuy(), instance);
+    }
+
     public void Set(IPlayer attacker, IPlayer defender)
     {
         this.attacker = attacker;
         this.defender = defender;
 
-        //inProgress.Clear();
+        inProgress.Clear();
         
     }
 }

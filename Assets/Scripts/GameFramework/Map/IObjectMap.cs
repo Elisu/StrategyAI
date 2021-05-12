@@ -31,23 +31,30 @@ internal class IObjectMap : Map<Field>
                 field.Position = new Vector2Int(i, j);
                 map[i, j] = field;
 
-
                 if (field != null)
+                {
+                    if (field.OnField != null && field.OnField is TroopBase)
+                        field.OnField = null;
+
                     if (field.square == SquareType.Spawn)
                         spawns.Add(map[i, j]);
+                }
+                    
             }
     }
 
-    public Vector2Int GetFreeSpawn(Role role)
+    public bool GetFreeSpawn(Role role, out Vector2Int spawnPos)
     {
         IObject spawn = spawns.Find(x => x.Side == role && x.Passable == true);
 
         if (spawn != null)
         {
-            return spawn.Position;
+            spawnPos = spawn.Position;
+            return true;
         }
 
-        return new Vector2Int(-1, -1);
+        spawnPos = new Vector2Int(-1, -1);
+        return false;
     }
 
     public new IObject this[Vector2Int index]

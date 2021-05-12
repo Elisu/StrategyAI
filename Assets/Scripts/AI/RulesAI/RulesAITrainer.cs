@@ -26,7 +26,18 @@ public class RulesAITrainer : AITrainingHandler
 
     public override void GenerationDone()
     {
-        throw new System.NotImplementedException();
+        int bestFitness = 0;
+
+        for (int i = 0; i < population.Count; i++)
+        {
+            all[i].Fitness = ((RulesAI)population[i]).GetFitnessMean();
+            if (bestFitness < all[i].Fitness)
+                bestFitness = all[i].Fitness;
+        }
+
+        Debug.LogWarning(string.Format("Best individual: {0}", bestFitness));
+
+        all.GeneticOperations(Genetic.RouletteWheel, Genetic.UniformCrossover, Genetic.ActionMutation);
     }
 
     public override AIPlayer GetRepresentative()

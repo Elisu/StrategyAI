@@ -57,8 +57,10 @@ public class NeatAI : NeatPlayer
             inputSignalArray[i] = Convert.ToDouble(inputs[i].Invoke(attacker));
     }
 
-    protected override void UseBlackBoxOutpts(ISignalArray outputSignalArray, Attacker attacker)
+    protected override IAction UseBlackBoxOutpts(ISignalArray outputSignalArray, Attacker attacker)
     {
+        IAction resultAction = null;
+
         int bestAction = 0;
         double best = 0;
 
@@ -69,20 +71,27 @@ public class NeatAI : NeatPlayer
                 bestAction = i;
             }
 
-        //possibleActions[bestAction].Invoke(attacker);
+        possibleActions[bestAction].Invoke(attacker, out resultAction);
+
+        return resultAction;
     }
 
-    protected override void RunOver()
+    protected override void RunOver(GameStats stats)
     {
-        GenerationFinished = true;
-        List<IRecruitable> dead = OwnArmy.GetDead();
+        //GenerationFinished = true;
+        //List<IRecruitable> dead = OwnArmy.GetDead();
 
-        stats.Clear();
-        for (int i = 0; i < dead.Count; i++)
-            stats.Add(new Statistics(dead[i].GetStats()));
+        //stats.Clear();
+        //for (int i = 0; i < dead.Count; i++)
+        //    stats.Add(new Statistics(dead[i].GetStats()));
     }
 
     public override AIPlayer Clone()
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override int PickToBuy()
     {
         throw new NotImplementedException();
     }

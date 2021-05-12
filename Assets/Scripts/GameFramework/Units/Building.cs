@@ -28,6 +28,6 @@ public abstract class Building : Damageable, IRecruitable
         return false;
     }
 
-    public Statistics GetStats() => new Statistics(0, ReceivedDamage, 0, 0);
+    public Statistics GetStats() => new Statistics(0, ReceivedDamage, 0, 0, typeof(Building));
         
 }

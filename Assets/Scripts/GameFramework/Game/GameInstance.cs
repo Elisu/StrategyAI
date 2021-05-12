@@ -12,6 +12,9 @@ internal class GameInstance : Instance
     {
         SetPlayers(attack, defend);
         IsRunning = true;
+        scheduler.Shopping(this);
+        scheduler.Shopping(this);
+        scheduler.Shopping(this);
     }
 
     private void FixedUpdate()
@@ -35,6 +38,7 @@ internal class GameInstance : Instance
         if (defender.OwnArmy.Count == 0 || attacker.OwnArmy.Count == 0)
             IsRunning = false;
 
+        scheduler.Shopping(this);
         scheduler.ScheduleActions();
         scheduler.RunActions();
     }

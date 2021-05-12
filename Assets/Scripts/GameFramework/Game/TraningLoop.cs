@@ -36,12 +36,21 @@ internal class TraningLoop : MonoBehaviour
     private void Update()
     {
         if (GenerationCount <= 0)
+        {
+            Debug.Log("Traning Finished");
             return;
+        }
+           
 
         if (RunOneGeneration())
-            GenerationCount--;        
+        {
+            attacker.GenerationDone();
+            defender.GenerationDone();
+            GenerationCount--;
+        }
+                  
 
-        Debug.Log("Done");
+        //Debug.Log("Done");
 
         foreach (TrainingInstance ins in instances)
             ins.Restart();
@@ -56,27 +65,30 @@ internal class TraningLoop : MonoBehaviour
 
         int i = 0;
 
-        for (int j = currentAttacker; j < attackerPop.Count; j++)
-            for (int k = currentDefender; k < defenderPop.Count; k++, i++)
+        for (; currentAttacker < attackerPop.Count; currentAttacker++)
+        {
+            for (; currentDefender < defenderPop.Count; currentDefender++, i++)
             {
-                currentAttacker = j;
-                currentDefender = k;
-
                 if (i >= gameInstancesCount)
                     break;
 
                 int index = i;
-                AIPlayer att = attackerPop[j].Clone();
-                AIPlayer def = defenderPop[k].Clone();
+                AIPlayer att = attackerPop[currentAttacker].Clone();
+                AIPlayer def = defenderPop[currentDefender].Clone();
 
-                runningTasks.Add(Task.Run(() => instances[index].Run(att, def)));                                 
+                runningTasks.Add(Task.Run(() => instances[index].Run(att, def)));
             }
 
-        Debug.Log("Waiting");
-        Task.WaitAll(runningTasks.ToArray());
-        Debug.Log("Finished Waiting");
+            if (i >= gameInstancesCount)
+                break;
+        }
+            
 
-        if (currentAttacker == attackerPop.Count - 1 && currentDefender == defenderPop.Count - 1)
+        //Debug.Log("Waiting");
+        Task.WaitAll(runningTasks.ToArray());
+        //Debug.Log("Finished Waiting");
+
+        if (currentAttacker == attackerPop.Count && currentDefender == defenderPop.Count)
         {
             currentAttacker = 0;
             currentDefender = 0;

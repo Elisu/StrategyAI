@@ -43,4 +43,13 @@ public class BasicAI : AIPlayer
         return resultAction;
     }
 
+    protected override void RunOver(GameStats stats)
+    {
+        return;
+    }
+
+    protected override int PickToBuy()
+    {
+        return UnitFinder.PickOnBudget(OwnArmy.Money);
+    }
 }

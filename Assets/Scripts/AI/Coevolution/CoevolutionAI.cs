@@ -12,6 +12,8 @@ public class CoevolutionAI : AIPlayer
     Individual meleeUnits;
     Individual rangedUnits;
 
+    TryAction[] possibleActions;
+
     public CoevolutionAI(Individual tw, Individual melee, Individual ranged)
     {
         towers = tw;
@@ -63,36 +65,25 @@ public class CoevolutionAI : AIPlayer
         }
 
 
-        //current.possibleActions[indexOfBest].Invoke(attacker);
-        return null;
+        possibleActions[indexOfBest].Invoke(attacker, out resultAction);
+        return resultAction;
     }
 
 
-    protected override void RunOver()
+    protected override void RunOver(GameStats stats)
     {
-        List<IRecruitable> dead = OwnArmy.GetDead();
+        List<Statistics> towerStats = new List<Statistics>();
+        List<Statistics> meleeStats = new List<Statistics>();
+        List<Statistics> rangedStats = new List<Statistics>();
 
-        List<Statistics> statsTowers = new List<Statistics>();
-        List<Statistics> statsMelee = new List<Statistics>();
-        List<Statistics> statsRanged = new List<Statistics>();
-
-        for (int i = 0; i < dead.Count; i++)
-        {
-            IRecruitable corpse = dead[i];
-
-            if (corpse is TowerBase)
-                statsTowers.Add(corpse.GetStats());
-            else if (corpse is Troop<Archers>)
-                statsMelee.Add(corpse.GetStats());
-            else
-                statsRanged.Add(corpse.GetStats());
-        }
-
-        towers.Fitness = 0;
-        meleeUnits.Fitness = 0;
-        rangedUnits.Fitness = 0;
-
-        
+        towers.SetFtiness(stats, role);
+        meleeUnits.SetFtiness(stats, role);
+        rangedUnits.SetFtiness(stats, role);        
             
+    }
+
+    protected override int PickToBuy()
+    {
+        throw new System.NotImplementedException();
     }
 }

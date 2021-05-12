@@ -25,6 +25,7 @@ public abstract class Instance : MonoBehaviour
 
     private void Awake()
     {
+        mapObject = Instantiate(mapObject);
         LoadMap();
     }
 

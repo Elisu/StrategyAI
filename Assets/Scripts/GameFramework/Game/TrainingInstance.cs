@@ -16,20 +16,42 @@ internal class TrainingInstance : Instance
 
     private void RunGameTrainingLoop()
     {
+        scheduler.Shopping(this);
+        scheduler.Shopping(this);
+        scheduler.Shopping(this);
+
         while (defender.OwnArmy.Count != 0 && attacker.OwnArmy.Count != 0)
         {
             if (IsRunning)
             {
+                scheduler.Shopping(this);
                 scheduler.ScheduleActions();
-                scheduler.RunActions();
+                scheduler.RunActions();                
             }
         }
 
-        if (defender.OwnArmy.Count == 0)
-            Debug.LogWarning("Attacker won");
+        GameStats stats;
+
+        if (defender.OwnArmy.Count == 0 && attacker.OwnArmy.Count == 0)
+            stats = GetGameStats(Role.Neutral);
+        else if (attacker.OwnArmy.Count == 0)
+            stats = GetGameStats(Role.Defender);
         else
-            Debug.LogWarning("Defender won");
+            stats = GetGameStats(Role.Attacker);
+        
+        defender.RunOver(stats);
+        attacker.RunOver(stats);
 
         GameOverHandler();
+    }
+
+    private GameStats GetGameStats(Role winner)
+    {
+        //Debug.LogWarning(string.Format("The WINNER is: {0}", winner.ToString()));
+
+        List<Statistics> attackerStats = attacker.OwnArmy.GetAllStats();
+        List<Statistics> defenderStats = defender.OwnArmy.GetAllStats();
+
+        return new GameStats(attackerStats, defenderStats, winner); 
     }
 }

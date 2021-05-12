@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Cavalry : HumanUnit
 {
+    System.Random rnd = new System.Random();
+
     public Cavalry()
     {
         Health = CavalrySetup.Health;
@@ -21,7 +23,7 @@ public class Cavalry : HumanUnit
         else
         {
             TroopBase enemyTroop = (TroopBase)enemy;
-            int index = Random.Range(0, enemyTroop.Count);
+            int index = rnd.Next(0, enemyTroop.Count);
 
             while (totalDamage > 0)
             {
@@ -29,7 +31,7 @@ public class Cavalry : HumanUnit
                     return true;
 
                 totalDamage -= Damage;
-                index = Random.Range(0, enemyTroop.Count);
+                index = rnd.Next(0, enemyTroop.Count);
             }
 
         }

@@ -146,6 +146,7 @@ MonoBehaviour:
   defense: 1
   damage: 2
   range: 1
+  price: 8000
   unitPrefab: {fileID: 5761984030114095444, guid: 82b956aa2b7b55d4aa603a36c39a0ff3,
     type: 3}
 --- !u!1 &705507993
@@ -528,6 +529,49 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1927392791
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1927392793}
+  - component: {fileID: 1927392792}
+  m_Layer: 0
+  m_Name: UnitFinder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1927392792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927392791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f57a03a3ba374724d99f686beddfb4da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1927392793
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927392791}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 47.49625, y: 0.60015005, z: 30}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &7171948027689706345
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -535,6 +579,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7171948027913415860, guid: 8b2947a7469d45345a043a82b3f916f5,
+        type: 3}
+      propertyPath: price
+      value: 5000
+      objectReference: {fileID: 0}
     - target: {fileID: 7171948027913415860, guid: 8b2947a7469d45345a043a82b3f916f5,
         type: 3}
       propertyPath: speed
@@ -555,6 +604,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: UnitSetup
+      objectReference: {fileID: 0}
+    - target: {fileID: 7171948027913415862, guid: 8b2947a7469d45345a043a82b3f916f5,
+        type: 3}
+      propertyPath: price
+      value: 20000
       objectReference: {fileID: 0}
     - target: {fileID: 7171948027913415863, guid: 8b2947a7469d45345a043a82b3f916f5,
         type: 3}

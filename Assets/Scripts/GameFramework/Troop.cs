@@ -6,6 +6,8 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 {
     public abstract int Count { get;}
 
+    public abstract int Price { get; protected set; }
+
     private Vector2 actualPosition;
 
     public Vector2 ActualPosition
@@ -144,8 +146,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
         ActualPosition = Position;
     }
 
-    public Statistics GetStats() => new Statistics(DealtDamage, ReceivedDamage, EnemiesKilled, BuildingsDestroyed);
-
+    public abstract Statistics GetStats();
 }
 
 public class Troop<T>: TroopBase where T: HumanUnit, new()
@@ -160,7 +161,11 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
     public override int Health { get; protected set; }
     public override int Size => troop[0].Size * Count;
 
-    public Troop(int count, Role side, Instance instance)
+    public override int Price { get => throw new System.NotImplementedException(); protected set => throw new System.NotImplementedException(); }
+
+    public override Statistics GetStats() => new Statistics(DealtDamage, ReceivedDamage, EnemiesKilled, BuildingsDestroyed, typeof(T));
+
+    public Troop(int count, Role side, Vector2Int spawnPos,  Instance instance)
     {
         CurrentInstance = instance;
 
@@ -168,13 +173,13 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
             troop.Add(new T());
 
         if (!CurrentInstance.IsTraining)
-            visual = HumanUnit.UnitPrefab;
+            visual = troop[0].UnitPrefab;
 
         Health = Count * troop[0].Health;
-        Speed = HumanUnit.Speed;
+        Speed = troop[0].Speed;
         MaxHealth = Health;
         Side = side;
-        ActualPosition = CurrentInstance.Map.GetFreeSpawn(Side);
+        ActualPosition = spawnPos;
         CurrentState = State.Free;
 
         CurrentInstance.Map[Position] = this;

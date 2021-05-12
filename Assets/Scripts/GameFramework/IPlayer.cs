@@ -21,11 +21,19 @@ public abstract class IPlayer
     internal void Start(Instance game, Role role)
     {
         this.role = role;
-
         OwnArmy = new Army(role);
-        OwnArmy.Add(new Troop<Swordsmen>(50, role, game));
+
+        //OwnArmy.Add(new Troop<Swordsmen>(50, role, game));
+        //OwnArmy.Add(new Troop<Cavalry>(10, role, game));
     }
 
-    public abstract Tuple<Attacker, IAction> GetActions();
+    protected internal abstract Tuple<Attacker, IAction> GetActions();
 
+    /// <summary>
+    /// Called at the end of a run
+    /// </summary>
+    protected internal abstract void RunOver(GameStats stats);
+
+
+    protected internal abstract int PickToBuy();
 }
