@@ -804,9 +804,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
     type: 3}
-  defender: {fileID: 6138801334774653003, guid: 560fa0612cee94d48ab784d6b24c2e30,
+  defender: {fileID: 7067290049789075546, guid: 186f7a5ee06e88740a263c80a4cc45a0,
     type: 3}
-  gameInstancesCount: 25
+  gameInstancesCount: 15
   gameInstance: {fileID: 6862441489602338825, guid: 852759d35db7ab54a8e80f3f364d295e,
     type: 3}
   GenerationCount: 200

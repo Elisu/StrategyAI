@@ -10,7 +10,7 @@ public static class UnitFactory
         if (unit.IsSubclassOf(typeof(HumanUnit)))
         {
             var troopType = typeof(Troop<>).MakeGenericType(unit);
-            return (IRecruitable)Activator.CreateInstance(troopType, 10, side, spawnPos, instance);
+            return (IRecruitable)Activator.CreateInstance(troopType, side, spawnPos, instance);
         }
         else
         {

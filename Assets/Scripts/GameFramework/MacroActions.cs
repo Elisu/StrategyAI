@@ -57,12 +57,6 @@ public class MacroActions
         return AttackOnCondition(army.SenseEnemyLowestDamage, attacker, out resultAction);
     }
 
-    public static bool AttackWithLowestDefense(Attacker attacker, out IAction resultAction)
-    {
-        Army army = attacker.CurrentInstance.GetArmy(attacker.Side);
-        return AttackOnCondition(army.SenseEnemyLowestDefense, attacker, out resultAction);
-    }
-
     private static bool AttackOnCondition(Func<TroopBase> Selection, Attacker attacker, out IAction resultAction)
     {
         TroopBase selected = Selection();

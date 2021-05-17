@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,4 +13,8 @@ public class BasicTower : TowerUnit
         //UnitPrefab = SwordsmenSetup.UnitPrefab;
     }
 
+    public override float GetDefenseAgainst(Type unitType)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -126,10 +126,6 @@ public class Army : IEnumerable<Attacker>
     public TroopBase SenseEnemyLowestDamage() => enemyTroops.GetTrooOnCondition((x, y) => x.Damage > y.Damage);
            
     public TroopBase SeneseEnemyHighestDamage() => enemyTroops.GetTrooOnCondition((x, y) => x.Damage < y.Damage);
-        
-    public TroopBase SenseEnemyLowestDefense() => enemyTroops.GetTrooOnCondition((x, y) => x.Defense > y.Defense);
-        
-    public TroopBase SenseEnemyHighestDefense() => enemyTroops.GetTrooOnCondition((x, y) => x.Defense < y.Defense);
      
     public TroopBase SenseEnemyLowestSpeed() => enemyTroops.GetTrooOnCondition((x, y) => x.Speed > y.Speed);
 

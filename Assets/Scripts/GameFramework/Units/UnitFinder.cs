@@ -47,7 +47,7 @@ public class UnitFinder : MonoBehaviour
 
     }
 
-    private T GetValue<T>(Type unit, string fieldName)
+    private T GetValue<T>(Type unit, string fieldName) where T : notnull
     {
         PropertyInfo field = unit.BaseType.GetProperty(fieldName);
         return (T)field.GetValue(null);

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -42,7 +43,7 @@ public interface IObject : IMappable
 
 public interface IDamageable : IObject
 {
-    int Defense { get; }
+    Type type { get; }
 
     int Health { get; }
 
@@ -56,8 +57,6 @@ public interface IDamageable : IObject
 
 public abstract class Damageable : IDamageable
 {
-    public abstract int Defense { get; }
-
     public abstract int Health { get; protected set; }
 
     public Role Side { get; protected set; }
@@ -71,7 +70,7 @@ public abstract class Damageable : IDamageable
     public abstract int Size { get; }
 
     public abstract Vector2Int Position { get; }
-
+    public abstract Type type { get; }
     internal Instance CurrentInstance { get; private protected set; }
 
 
@@ -128,14 +127,7 @@ public abstract class Attacker : Damageable, IAttack
         return true;
     }
 
-    internal virtual bool GiveDamage(Damageable enemy)
-    {
-        CurrentState = State.Fighting;
-        Target = enemy;
-        DealtDamage += Damage * enemy.Defense;
-
-        return enemy.TakeDamage(Damage);
-    }
+    internal abstract bool GiveDamage(Damageable enemy);
 
     internal virtual void PrepareForAttack(Damageable enemy)
     {

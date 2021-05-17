@@ -17,7 +17,7 @@ public abstract class Building : Damageable, IRecruitable
 
     internal override bool TakeDamage(int totalDamage)
     {
-        ReceivedDamage += totalDamage * Defense;
+        ReceivedDamage += totalDamage;
 
         if (base.TakeDamage(totalDamage))
         {

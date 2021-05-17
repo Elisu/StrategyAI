@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,7 +30,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
     public override Vector2Int Position => Vector2Int.RoundToInt(ActualPosition);
     
 
-    public abstract float Speed { get; protected set; }
+    public abstract float Speed { get; }
 
     protected GameObject visual;
 
@@ -151,32 +153,35 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
 public class Troop<T>: TroopBase where T: HumanUnit, new()
 {
-    protected List<T> troop = new List<T>();
+    private List<int> troopHealth = new List<int>();
+    private T unit = new T();
 
-    public override int Count => troop.Count;
-    public override float Speed { get; protected set; }
-    public override int Damage => troop[0].Damage * Count;
-    public override int Range => troop[0].Range;
-    public override int Defense => troop[0].Defense;
+    private static ConcurrentDictionary<Type, float> defenseCache = new ConcurrentDictionary<Type, float>();
+
+    public override int Count => troopHealth.Count;
+    public override float Speed => unit.Speed;
+    public override int Damage => unit.Damage * Count;
+    public override int Range => unit.Range;
     public override int Health { get; protected set; }
-    public override int Size => troop[0].Size * Count;
+    public override int Size => unit.Size * Count;
+
+    public override Type type => typeof(T);
 
     public override int Price { get => throw new System.NotImplementedException(); protected set => throw new System.NotImplementedException(); }
 
     public override Statistics GetStats() => new Statistics(DealtDamage, ReceivedDamage, EnemiesKilled, BuildingsDestroyed, typeof(T));
 
-    public Troop(int count, Role side, Vector2Int spawnPos,  Instance instance)
+    public Troop(Role side, Vector2Int spawnPos,  Instance instance)
     {
         CurrentInstance = instance;
 
-        for (int i = 0; i < count; i++)
-            troop.Add(new T());
+        for (int i = 0; i < unit.BundleCount; i++)
+            troopHealth.Add(unit.Health);
 
         if (!CurrentInstance.IsTraining)
-            visual = troop[0].UnitPrefab;
+            visual = unit.UnitPrefab;
 
-        Health = Count * troop[0].Health;
-        Speed = troop[0].Speed;
+        Health = Count * unit.Health;
         MaxHealth = Health;
         Side = side;
         ActualPosition = spawnPos;
@@ -189,7 +194,7 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
 
         if (visual != null)
         {
-            visual = Object.Instantiate(visual, visual.transform.position, Quaternion.identity);
+            visual = UnityEngine.Object.Instantiate(visual, visual.transform.position, Quaternion.identity);
             CurrentInstance.GameOver += GameOver;
 
             if (Side == Role.Defender)
@@ -201,26 +206,25 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
 
     internal override bool TakeDamage(int damage)
     {
-        Health -= damage;
         ReceivedDamage += damage;
 
-        if (Health <= 0)
+        if (Health - damage <= 0)
         {
             DestroyTroop();
             return true;
         }
 
-        while (damage > 0)
+        while (damage > 0 && Count > 0)
         {
-            int randomUnit = rnd.Next(0, troop.Count - 1);
-            Unit u = troop[randomUnit];
+            int randomUnit = rnd.Next(0, Count - 1);
 
-            bool killed = u.TakeDamage(damage);            
-            damage -= u.Health;
+            int unitHealth = troopHealth[randomUnit];
+            troopHealth[randomUnit] -= damage;
+            Health -= Mathf.Min(unitHealth, damage);
+            damage -= unitHealth;
 
-            if (killed)
-                troop.RemoveAt(randomUnit);
-            
+            if (troopHealth[randomUnit] < 0)
+                troopHealth.RemoveAt(randomUnit);            
         }
 
         return false;
@@ -235,8 +239,12 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
 
         for (int i = index; i < Count; i++)
         {
-            if (troop[i].TakeDamage(damage))
-                troop.RemoveAt(i);
+            int unitHealth = troopHealth[i];
+            troopHealth[i] -= damage;
+            Health -= Mathf.Min(unitHealth, damage);
+
+            if (troopHealth[i] <= 0)
+                troopHealth.RemoveAt(i);              
 
             countHit++;
 
@@ -244,7 +252,6 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
                 break;
         }
 
-        Health -= damage * countHit;
         ReceivedDamage += damage * countHit;
 
         if (Health <= 0)
@@ -260,8 +267,18 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
     {
         CurrentState = State.Fighting;
         Target = enemy;
-        DealtDamage += Damage;
-        bool killed = troop[0].GiveDamage(enemy, Damage);
+
+        float defense;
+
+        if (!defenseCache.TryGetValue(enemy.type, out defense))
+        {
+            defense = unit.GetDefenseAgainst(enemy.type);
+            defenseCache.TryAdd(enemy.type, defense);
+        }
+
+        int damage = Mathf.CeilToInt(Damage * defense);
+        DealtDamage += damage;
+        bool killed = unit.GiveDamage(enemy, damage);
 
         if (killed)
         {
@@ -275,29 +292,13 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
         return killed;
     }
 
-    public Troop<T> Split(int count)
-    {
-        return null;
-    }
-
-    public void AddUnit(T u)
-    {
-        troop.Add(u);
-    }
-
-    public void UniteTroops(Troop<T> other)
-    {
-        foreach (T u in other.troop)
-            troop.Add(u);
-    }
-
     private void DestroyTroop()
     {
         CurrentInstance.GetArmy(Side).Remove(this);
         CurrentInstance.Map[Position] = null;
 
         if (visual != null)
-            Object.Destroy(visual);
+            UnityEngine.Object.Destroy(visual);
     }
 
     //public void StopAction()
