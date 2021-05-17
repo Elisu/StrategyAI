@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 using static Genetic;
@@ -12,13 +14,26 @@ public class CoevolutionAI : AIPlayer
     Individual meleeUnits;
     Individual rangedUnits;
 
-    TryAction[] possibleActions;
+    /// <summary>
+    /// order Towers, Melee, Ranged
+    /// </summary>
+    readonly List<TryAction[]> possibleActions;
 
-    public CoevolutionAI(Individual tw, Individual melee, Individual ranged)
+    ConcurrentQueue<int> AccumulatedFitnessesTowers;
+    ConcurrentQueue<int> AccumulatedFitnessesMelee;
+    ConcurrentQueue<int> AccumulatedFitnessesRanged;
+
+    public CoevolutionAI(Individual tw, Individual melee, Individual ranged, List<TryAction[]> actions)
     {
         towers = tw;
         meleeUnits = melee;
         rangedUnits = ranged;
+
+        possibleActions = actions;
+
+        AccumulatedFitnessesTowers = new ConcurrentQueue<int>();
+        AccumulatedFitnessesMelee = new ConcurrentQueue<int>();
+        AccumulatedFitnessesRanged = new ConcurrentQueue<int>();
     }
 
     private CoevolutionAI DeepCopy()
@@ -27,7 +42,7 @@ public class CoevolutionAI : AIPlayer
         Individual melee = new Individual(this.meleeUnits);
         Individual ranged = new Individual(this.rangedUnits);
 
-        return new CoevolutionAI(tw, melee, ranged);
+        return new CoevolutionAI(tw, melee, ranged, possibleActions);
     }
 
     public override AIPlayer Clone()
@@ -38,15 +53,24 @@ public class CoevolutionAI : AIPlayer
     protected override IAction FindAction(Attacker attacker)
     {
         IAction resultAction = null;
-
+        TryAction[] actions;
         Individual current;
 
         if (attacker is TowerBase)
+        {
             current = towers;
+            actions = possibleActions[0];
+        }           
         else if (attacker is Troop<Archers>)
+        {
             current = rangedUnits;
+            actions = possibleActions[1];
+        }
         else
+        {
             current = meleeUnits;
+            actions = possibleActions[2];
+        }            
 
         int[] votes = new int[current.PossibleActions];
 
@@ -65,25 +89,47 @@ public class CoevolutionAI : AIPlayer
         }
 
 
-        possibleActions[indexOfBest].Invoke(attacker, out resultAction);
+        actions[indexOfBest].Invoke(attacker, out resultAction);
         return resultAction;
+    }
+
+    public Tuple<int,int,int> GetFitnessMean()
+    {
+        int towers = MeanFitness(AccumulatedFitnessesTowers.ToArray());
+        int melee = MeanFitness(AccumulatedFitnessesMelee.ToArray());
+        int ranged = MeanFitness(AccumulatedFitnessesRanged.ToArray());
+
+        return new Tuple<int, int, int>(towers, melee, ranged);
+    }
+
+    private int MeanFitness(int[] fitnessArray)
+    {
+        if (fitnessArray.Length == 1)
+            return fitnessArray[0];
+
+        Array.Sort(fitnessArray);
+        return fitnessArray[Mathf.CeilToInt(fitnessArray.Length / 2)];
     }
 
 
     protected override void RunOver(GameStats stats)
     {
-        List<Statistics> towerStats = new List<Statistics>();
-        List<Statistics> meleeStats = new List<Statistics>();
-        List<Statistics> rangedStats = new List<Statistics>();
+        GameStats towerStats = stats.FilterStatistics((x) => x.UnitType.IsSubclassOf(typeof(TowerBase)));
+        GameStats meleeStats = stats.FilterStatistics((x) => x.UnitType.IsSubclassOf(typeof(HumanUnit)) && x.UnitType != typeof(Archers));
+        GameStats rangedStats = stats.FilterStatistics((x) => x.UnitType == typeof(Archers));
 
-        towers.SetFtiness(stats, role);
-        meleeUnits.SetFtiness(stats, role);
-        rangedUnits.SetFtiness(stats, role);        
+        towers.SetFtiness(towerStats, role);
+        meleeUnits.SetFtiness(meleeStats, role);
+        rangedUnits.SetFtiness(rangedStats, role);
+
+        AccumulatedFitnessesTowers.Enqueue(towers.Fitness);
+        AccumulatedFitnessesMelee.Enqueue(meleeUnits.Fitness);
+        AccumulatedFitnessesRanged.Enqueue(rangedUnits.Fitness);
             
     }
 
     protected override int PickToBuy()
     {
-        throw new System.NotImplementedException();
+        return UnitFinder.PickOnBudget(OwnArmy.Money);
     }
 }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-internal class Setup<T> : MonoBehaviour where T: Unit
+internal abstract class Setup<T> : MonoBehaviour where T: Unit
 {
     [SerializeField]
     private int health;
@@ -29,6 +29,7 @@ internal class Setup<T> : MonoBehaviour where T: Unit
     public static int Range { get => instance.range; }
     public static int Price { get => instance.price; }
     public static GameObject UnitPrefab { get => instance.unitPrefab; }
+
 
     public Setup()
     {

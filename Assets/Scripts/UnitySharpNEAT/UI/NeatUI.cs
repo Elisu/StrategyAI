@@ -27,11 +27,11 @@ namespace UnitySharpNEAT
             }
             if (GUI.Button(new Rect(10, 60, 110, 40), "Stop + save EA"))
             {
-                _neatSupervisor.StopEvolution();
+                //_neatSupervisor.StopEvolution();
             }
             if (GUI.Button(new Rect(10, 110, 110, 40), "Run best"))
             {
-                _neatSupervisor.RunBest();
+                //_neatSupervisor.RunBest();
             }
             if (GUI.Button(new Rect(10, 160, 110, 40), "Delete Saves"))
             {

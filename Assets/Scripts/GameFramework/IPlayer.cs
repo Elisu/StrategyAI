@@ -35,5 +35,9 @@ public abstract class IPlayer
     protected internal abstract void RunOver(GameStats stats);
 
 
+    /// <summary>
+    /// UnitFinder provides list of charachteristics of available units - pick one based on those charachteristics
+    /// </summary>
+    /// <returns>index of chosen unit</returns>
     protected internal abstract int PickToBuy();
 }

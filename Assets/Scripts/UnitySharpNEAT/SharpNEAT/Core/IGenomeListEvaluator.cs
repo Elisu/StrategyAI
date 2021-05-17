@@ -27,9 +27,12 @@ namespace SharpNeat.Core
     /// perhaps across several execution threads, or in some collective evaluation scheme such as an artificial
     /// life/world scenario.
     /// </summary>
-    public interface IGenomeListEvaluator<TGenome>
+    public interface IGenomeListEvaluator<TGenome, TPhenome>
         where TGenome : class, IGenome<TGenome>
+        where TPhenome : class
     {
+
+        IGenomeDecoder<TGenome, TPhenome> _genomeDecoder { get; }
         /// <summary>
         /// Gets the total number of individual genome evaluations that have been performed by this evaluator.
         /// </summary>

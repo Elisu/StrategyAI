@@ -6,34 +6,32 @@ using UnityEngine;
 using UnitySharpNEAT;
 using static Genetic;
 
-public class NeatAI : NeatPlayer
+public class NeatAI : INeatPlayer
 {
     TryAction[] possibleActions;
     Condition[] inputs;
-    List<Statistics> stats = new List<Statistics>();
+    GameStats stats;
 
-    private void Awake()
+    public NeatAI(TryAction[] actions, Condition[] conditions)
     {
-        possibleActions = new TryAction[5] { MacroActions.AttackClosest, MacroActions.AttackWithLowestHealth, MacroActions.AttackWithLowestDamage, MacroActions.AttackInRange, MacroActions.DoNothing };
-        inputs = new Condition[2] { Conditions.Damaged, Conditions.Free };
+        possibleActions = actions;
+        inputs = conditions;
     }
 
-    protected override void OnStart()
-    {
-        //GenerationFinished = false;
-    }
 
     public override float GetFitness()
     {
-        GenerationFinished = false;
-        if (stats.Count == 0)
-            return 0;
+        List<Statistics> myStats = stats.GetMyStats(role);
 
         int kills = 0;
         int dealtDamage = 0;
         int receivedDamage = 0;
+        float fitness = 0;
 
-        foreach (Statistics stat in stats)
+        if (stats.Winner == role)
+            fitness += 10000;
+
+        foreach (Statistics stat in myStats)
         {
             kills += stat.killedEnemies;
             dealtDamage += stat.dealtDamage;
@@ -41,14 +39,8 @@ public class NeatAI : NeatPlayer
 
         }
 
-        float fitness = kills * 100 + dealtDamage * 50 - receivedDamage/2;
-
+        fitness += kills * 1000 + dealtDamage;
         return fitness;
-    }
-
-    protected override void HandleIsActiveChanged(bool newIsActive)
-    {
-        
     }
 
     protected override void UpdateBlackBoxInputs(ISignalArray inputSignalArray, Attacker attacker)
@@ -78,21 +70,16 @@ public class NeatAI : NeatPlayer
 
     protected override void RunOver(GameStats stats)
     {
-        //GenerationFinished = true;
-        //List<IRecruitable> dead = OwnArmy.GetDead();
-
-        //stats.Clear();
-        //for (int i = 0; i < dead.Count; i++)
-        //    stats.Add(new Statistics(dead[i].GetStats()));
+        this.stats = stats;
     }
 
     public override AIPlayer Clone()
     {
-        throw new NotImplementedException();
+        return this;
     }
 
     protected override int PickToBuy()
     {
-        throw new NotImplementedException();
+        return UnitFinder.PickOnBudget(OwnArmy.Money);
     }
 }

@@ -48,24 +48,17 @@ namespace SharpNeat.Core
         TGenome CurrentChampGenome { get; }
 
         /// <summary>
-        /// Gets a value indicating whether some goal fitness has been achieved and that the algorithm has therefore stopped.
-        /// </summary>
-        bool StopConditionSatisfied { get; }
-
-        /// <summary>
         /// Initializes the evolution algorithm with the provided IGenomeListEvaluator, IGenomeFactory
         /// and an initial population of genomes.
         /// </summary>
-        void Initialize(IGenomeListEvaluator<TGenome> genomeListEvaluator,
-                        IGenomeFactory<TGenome> genomeFactory,
+        void Initialize(IGenomeFactory<TGenome> genomeFactory,
                         List<TGenome> genomeList);
 
         /// <summary>
         /// Initializes the evolution algorithm with the provided IGenomeListEvaluator
         /// and an IGenomeFactory that can be used to create an initial population of genomes.
         /// </summary>
-        void Initialize(IGenomeListEvaluator<TGenome> genomeListEvaluator,
-                        IGenomeFactory<TGenome> genomeFactory,
+        void Initialize(IGenomeFactory<TGenome> genomeFactory,
                         int populationSize);
 
         /// <summary>

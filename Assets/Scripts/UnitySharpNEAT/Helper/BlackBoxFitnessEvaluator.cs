@@ -51,7 +51,7 @@ namespace UnitySharpNEAT
         {
             if (_neatSupervisor != null)
             {
-                float fit = _neatSupervisor.GetFitness(box);
+                float fit = 5; //_neatSupervisor.GetFitness(box);
 
                 FitnessInfo fitness = new FitnessInfo(fit, fit);
                 _fitnessByBox.Add(box, fitness);

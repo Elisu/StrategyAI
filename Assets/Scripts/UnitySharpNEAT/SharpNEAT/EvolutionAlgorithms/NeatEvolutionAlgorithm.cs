@@ -27,6 +27,8 @@ using SharpNeat.SpeciationStrategies;
 using SharpNeat.Utility;
 using System.Collections;
 using UnityEngine;
+using UnitySharpNEAT;
+using SharpNeat.Phenomes;
 
 namespace SharpNeat.EvolutionAlgorithms
 {
@@ -39,8 +41,9 @@ namespace SharpNeat.EvolutionAlgorithms
     /// <typeparam name="TGenome">The genome type that the algorithm will operate on.</typeparam>
     /// 
 
-    public class NeatEvolutionAlgorithm<TGenome> : AbstractGenerationalAlgorithm<TGenome>
+    public class NeatEvolutionAlgorithm<TGenome, TPhenome> : AbstractGenerationalAlgorithm<TGenome, TPhenome>
         where TGenome : class, IGenome<TGenome>
+        where TPhenome : class
     {
         NeatEvolutionAlgorithmParameters _eaParams;
         readonly NeatEvolutionAlgorithmParameters _eaParamsComplexifying;
@@ -55,6 +58,10 @@ namespace SharpNeat.EvolutionAlgorithms
 
         ComplexityRegulationMode _complexityRegulationMode;
         readonly IComplexityRegulationStrategy _complexityRegulationStrategy;
+
+        List<Tuple<INeatPlayer, TGenome>> genomeMapping = new List<Tuple<INeatPlayer, TGenome>>();
+        ulong evaluationCount = 0;
+        bool evaluationDone = false;
 
         #region Constructors
 
@@ -140,11 +147,11 @@ namespace SharpNeat.EvolutionAlgorithms
         /// <param name="genomeListEvaluator">The genome evaluation scheme for the evolution algorithm.</param>
         /// <param name="genomeFactory">The factory that was used to create the genomeList and which is therefore referenced by the genomes.</param>
         /// <param name="genomeList">An initial genome population.</param>
-        public override void Initialize(IGenomeListEvaluator<TGenome> genomeListEvaluator,
+        public override void Initialize(IGenomeDecoder<TGenome, TPhenome> genomeDecoder,
                                         IGenomeFactory<TGenome> genomeFactory,
                                         List<TGenome> genomeList)
         {
-            base.Initialize(genomeListEvaluator, genomeFactory, genomeList);
+            base.Initialize(genomeDecoder, genomeFactory, genomeList);
             Initialize();
         }
 
@@ -155,11 +162,11 @@ namespace SharpNeat.EvolutionAlgorithms
         /// <param name="genomeListEvaluator">The genome evaluation scheme for the evolution algorithm.</param>
         /// <param name="genomeFactory">The factory that was used to create the genomeList and which is therefore referenced by the genomes.</param>
         /// <param name="populationSize">The number of genomes to create for the initial population.</param>
-        public override void Initialize(IGenomeListEvaluator<TGenome> genomeListEvaluator,
+        public override void Initialize(IGenomeDecoder<TGenome, TPhenome> genomeDecoder,
                                         IGenomeFactory<TGenome> genomeFactory,
                                         int populationSize)
         {
-            base.Initialize(genomeListEvaluator, genomeFactory, populationSize);
+            base.Initialize(genomeDecoder, genomeFactory, populationSize);
             Initialize();
         }
 
@@ -169,7 +176,7 @@ namespace SharpNeat.EvolutionAlgorithms
         private void Initialize()
         {
             // Evaluate the genomes.
-            _genomeListEvaluator.Evaluate(_genomeList);
+            Evaluate();
 
             // Speciate the genomes.
             _specieList = _speciationStrategy.InitializeSpeciation(_genomeList, _eaParams.SpecieCount);
@@ -184,12 +191,44 @@ namespace SharpNeat.EvolutionAlgorithms
 
         #endregion
 
+
+        public void SetPopulation(List<INeatPlayer> population)
+        {            
+            for (int i = 0; i < population.Count; i++)
+            {
+                population[i].SetBlackBox((IBlackBox)_genomeDecoder.Decode(_genomeList[i]));
+                genomeMapping.Add(new Tuple<INeatPlayer, TGenome>(population[i], _genomeList[i]));
+            }
+        }
+
+        public void Evaluate()
+        {
+            double best = 0;
+
+            foreach (Tuple<INeatPlayer,TGenome> individual in genomeMapping)
+            {
+                double fitness = individual.Item1.GetFitness();
+                individual.Item2.EvaluationInfo.SetFitness(fitness);
+
+                if (fitness > best)
+                    best = fitness;
+            }
+
+            UnityEngine.Debug.LogWarning(string.Format("Best: {0}", best));
+            evaluationDone = true;
+           
+        }
+
+        private bool EvaluationFinished() => evaluationDone;
+
+
         #region Evolution Algorithm Main Method [PerformOneGeneration]
 
+        
         /// <summary>
         /// Progress forward by one generation. Perform one generation/iteration of the evolution algorithm.
         /// </summary>
-        protected override IEnumerator PerformOneGeneration()
+        public override IEnumerator PerformOneGeneration()
         {
             // Calculate statistics for each specie (mean fitness, target size, number of offspring to produce etc.)
             int offspringCount;
@@ -211,7 +250,10 @@ namespace SharpNeat.EvolutionAlgorithms
 
             // wait until the Units finished performing and have been evaluated
             // _genomeListEvaluator is created in Experiment.CreateEvolutionAlgorithm() => innerEvaluator of type UnityListEvaluator
-            yield return _genomeListEvaluator.Evaluate(_genomeList);
+            //yield return _genomeListEvaluator.Evaluate(_genomeList);
+            yield return new WaitUntil(EvaluationFinished);
+
+            evaluationDone = false;
 
             // Integrate offspring into species.
             if (emptySpeciesFlag)
@@ -694,7 +736,7 @@ namespace SharpNeat.EvolutionAlgorithms
         private void UpdateStats()
         {
             _stats._generation = _currentGeneration;
-            _stats._totalEvaluationCount = _genomeListEvaluator.EvaluationCount;
+            _stats._totalEvaluationCount = evaluationCount;
 
             // Evaluation per second.
             DateTime now = DateTime.Now;
@@ -704,11 +746,11 @@ namespace SharpNeat.EvolutionAlgorithms
             // since it was last updated.
             if(duration.Ticks > 9999)
             {
-                long evalsSinceLastUpdate = (long)(_genomeListEvaluator.EvaluationCount - _stats._evalsCountAtLastUpdate);
+                long evalsSinceLastUpdate = (long)(evaluationCount - _stats._evalsCountAtLastUpdate);
                 _stats._evaluationsPerSec = (int)((evalsSinceLastUpdate*1e7) / duration.Ticks);
 
                 // Reset working variables.
-                _stats._evalsCountAtLastUpdate = _genomeListEvaluator.EvaluationCount;
+                _stats._evalsCountAtLastUpdate = evaluationCount;
                 _stats._evalsPerSecLastSampleTime = now;
             }
 

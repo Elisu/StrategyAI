@@ -8,7 +8,6 @@ public class BasicTower : TowerUnit
     {
         Health = BasicTowerSetup.Health;
         Damage = BasicTowerSetup.Damage;
-        Defense = BasicTowerSetup.Defense;
         Range = BasicTowerSetup.Range;
         //UnitPrefab = SwordsmenSetup.UnitPrefab;
     }

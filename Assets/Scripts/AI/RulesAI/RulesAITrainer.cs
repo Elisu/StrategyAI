@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Genetic;
 
-public class RulesAITrainer : AITrainingHandler
+public class RulesAITrainer : AITrainer
 {
     public int PopulationSize;
     public int IndividualLength;
@@ -28,9 +28,9 @@ public class RulesAITrainer : AITrainingHandler
     {
         int bestFitness = 0;
 
-        for (int i = 0; i < population.Count; i++)
+        for (int i = 0; i < Population.Count; i++)
         {
-            all[i].Fitness = ((RulesAI)population[i]).GetFitnessMean();
+            all[i].Fitness = ((RulesAI)Population[i]).GetFitnessMean();
             if (bestFitness < all[i].Fitness)
                 bestFitness = all[i].Fitness;
         }

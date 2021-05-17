@@ -32,7 +32,7 @@ public class Army : IEnumerable<Attacker>
     public bool TryBuying(int toBuy, Instance instance)
     {
         Type unitType = UnitFinder.unitTypes[toBuy];
-        int price = UnitFinder.prices[toBuy];
+        int price = UnitFinder.unitStats[toBuy].Price;
 
         //Attacker can't buy towers
         if (Side == Role.Attacker && !(unitType.IsSubclassOf(typeof(HumanUnit))))

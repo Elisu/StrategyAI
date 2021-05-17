@@ -6,8 +6,8 @@ using UnityEngine;
 internal class GameLoop : MonoBehaviour
 {
     public GameInstance game;
-    public AITrainingHandler attacker;
-    public AITrainingHandler defender;
+    public AITrainer attacker;
+    public AITrainer defender;
 
     private void Start()
     {

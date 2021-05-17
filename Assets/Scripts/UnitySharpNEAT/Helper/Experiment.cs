@@ -137,19 +137,19 @@ namespace UnitySharpNEAT
             return new NeatGenomeFactory(InputCount, OutputCount, _neatGenomeParams);
         }
 
-        public NeatEvolutionAlgorithm<NeatGenome> CreateEvolutionAlgorithm(string fileName)
+        public NeatEvolutionAlgorithm<NeatGenome, IBlackBox> CreateEvolutionAlgorithm(string fileName)
         {
             List<NeatGenome> genomeList = LoadPopulation();
             IGenomeFactory<NeatGenome> genomeFactory = CreateGenomeFactory();
             return CreateEvolutionAlgorithm(genomeFactory, genomeList);
         }
 
-        public NeatEvolutionAlgorithm<NeatGenome> CreateEvolutionAlgorithm()
+        public NeatEvolutionAlgorithm<NeatGenome, IBlackBox> CreateEvolutionAlgorithm()
         {
             return CreateEvolutionAlgorithm(_populationSize);
         }
 
-        public NeatEvolutionAlgorithm<NeatGenome> CreateEvolutionAlgorithm(int populationSize)
+        public NeatEvolutionAlgorithm<NeatGenome, IBlackBox> CreateEvolutionAlgorithm(int populationSize)
         {
             IGenomeFactory<NeatGenome> genomeFactory = CreateGenomeFactory();
 
@@ -158,27 +158,27 @@ namespace UnitySharpNEAT
             return CreateEvolutionAlgorithm(genomeFactory, genomeList);
         }
 
-        public NeatEvolutionAlgorithm<NeatGenome> CreateEvolutionAlgorithm(IGenomeFactory<NeatGenome> genomeFactory, List<NeatGenome> genomeList)
+        public NeatEvolutionAlgorithm<NeatGenome, IBlackBox> CreateEvolutionAlgorithm(IGenomeFactory<NeatGenome> genomeFactory, List<NeatGenome> genomeList)
         {
             IDistanceMetric distanceMetric = new ManhattanDistanceMetric(1.0, 0.0, 10.0);
             ISpeciationStrategy<NeatGenome> speciationStrategy = new KMeansClusteringStrategy<NeatGenome>(distanceMetric);
 
             IComplexityRegulationStrategy complexityRegulationStrategy = ExperimentUtils.CreateComplexityRegulationStrategy(_complexityRegulationStr, _complexityThreshold);
 
-            NeatEvolutionAlgorithm<NeatGenome> ea = new NeatEvolutionAlgorithm<NeatGenome>(_eaParams, speciationStrategy, complexityRegulationStrategy);
+            NeatEvolutionAlgorithm<NeatGenome, IBlackBox> ea = new NeatEvolutionAlgorithm<NeatGenome, IBlackBox>(_eaParams, speciationStrategy, complexityRegulationStrategy);
 
             // Create black box evaluator       
-            BlackBoxFitnessEvaluator evaluator = new BlackBoxFitnessEvaluator(_neatSupervisor);
+            //BlackBoxFitnessEvaluator evaluator = new BlackBoxFitnessEvaluator(_neatSupervisor);
 
             IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder = CreateGenomeDecoder();
 
-            IGenomeListEvaluator<NeatGenome> innerEvaluator = new CoroutinedListEvaluator<NeatGenome, IBlackBox>(genomeDecoder, evaluator, _neatSupervisor);
+            //IGenomeListEvaluator<NeatGenome> innerEvaluator = new CoroutinedListEvaluator<NeatGenome, IBlackBox>(genomeDecoder, evaluator, _neatSupervisor);
 
-            IGenomeListEvaluator<NeatGenome> selectiveEvaluator = new SelectiveGenomeListEvaluator<NeatGenome>(innerEvaluator,
-                SelectiveGenomeListEvaluator<NeatGenome>.CreatePredicate_OnceOnly());
+            //IGenomeListEvaluator<NeatGenome> selectiveEvaluator = new SelectiveGenomeListEvaluator<NeatGenome>(innerEvaluator,
+                //SelectiveGenomeListEvaluator<NeatGenome>.CreatePredicate_OnceOnly());
 
             //ea.Initialize(selectiveEvaluator, genomeFactory, genomeList);
-            ea.Initialize(innerEvaluator, genomeFactory, genomeList);
+            ea.Initialize(genomeDecoder, genomeFactory, genomeList);
 
             return ea;
         }

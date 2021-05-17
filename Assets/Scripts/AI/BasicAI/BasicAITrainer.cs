@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BasicAITrainer : AITrainingHandler
+public class BasicAITrainer : AITrainer
 {
     protected override List<AIPlayer> CreatPopulation()
     {

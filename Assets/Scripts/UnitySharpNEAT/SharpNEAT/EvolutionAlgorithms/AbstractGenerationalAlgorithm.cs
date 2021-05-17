@@ -33,15 +33,16 @@ namespace SharpNeat.EvolutionAlgorithms
     /// <typeparam name="TGenome">The genome type that the algorithm will operate on.</typeparam>
 
     [Serializable]
-    public abstract class AbstractGenerationalAlgorithm<TGenome> : IEvolutionAlgorithm<TGenome>
+    public abstract class AbstractGenerationalAlgorithm<TGenome, TPhenome> 
         where TGenome : class, IGenome<TGenome>
+        where TPhenome : class
     {
         #region Instance Fields
-        [SerializeField] protected IGenomeListEvaluator<TGenome> _genomeListEvaluator;
         [SerializeField] protected IGenomeFactory<TGenome> _genomeFactory;
         [SerializeField] protected List<TGenome> _genomeList;
         [SerializeField] protected int _populationSize;
         [SerializeField] protected TGenome _currentBestGenome;
+        [SerializeField] protected IGenomeDecoder<TGenome, TPhenome> _genomeDecoder;
 
         // Algorithm state data.
         [SerializeField] RunState _runState = RunState.NotReady;
@@ -112,26 +113,18 @@ namespace SharpNeat.EvolutionAlgorithms
         }
 
         /// <summary>
-        /// Gets a value indicating whether some goal fitness has been achieved and that the algorithm has therefore stopped.
-        /// </summary>
-        public bool StopConditionSatisfied 
-        { 
-            get { return _genomeListEvaluator.StopConditionSatisfied; }
-        }
-
-        /// <summary>
         /// Initializes the evolution algorithm with the provided IGenomeListEvaluator, IGenomeFactory
         /// and an initial population of genomes.
         /// </summary>
         /// <param name="genomeListEvaluator">The genome evaluation scheme for the evolution algorithm.</param>
         /// <param name="genomeFactory">The factory that was used to create the genomeList and which is therefore referenced by the genomes.</param>
         /// <param name="genomeList">An initial genome population.</param>
-        public virtual void Initialize(IGenomeListEvaluator<TGenome> genomeListEvaluator,
+        public virtual void Initialize(IGenomeDecoder<TGenome, TPhenome> genomeDecoder,
                                        IGenomeFactory<TGenome> genomeFactory,
                                        List<TGenome> genomeList)
         {
+            _genomeDecoder = genomeDecoder;
             _currentGeneration = 0;
-            _genomeListEvaluator = genomeListEvaluator;
             _genomeFactory = genomeFactory;
             _genomeList = genomeList;
             _populationSize = _genomeList.Count;
@@ -146,12 +139,12 @@ namespace SharpNeat.EvolutionAlgorithms
         /// <param name="genomeListEvaluator">The genome evaluation scheme for the evolution algorithm.</param>
         /// <param name="genomeFactory">The factory that was used to create the genomeList and which is therefore referenced by the genomes.</param>
         /// <param name="populationSize">The number of genomes to create for the initial population.</param>
-        public virtual void Initialize(IGenomeListEvaluator<TGenome> genomeListEvaluator,
+        public virtual void Initialize(IGenomeDecoder<TGenome, TPhenome> genomeDecoder,
                                        IGenomeFactory<TGenome> genomeFactory,
                                        int populationSize)
         {
+            _genomeDecoder = genomeDecoder;
             _currentGeneration = 0;
-            _genomeListEvaluator = genomeListEvaluator;
             _genomeFactory = genomeFactory;
             _genomeList = genomeFactory.CreateGenomeList(populationSize, _currentGeneration);
             _populationSize = populationSize;
@@ -250,7 +243,7 @@ namespace SharpNeat.EvolutionAlgorithms
                 UnitySharpNEAT.Utility.Log("Begin performing generation " + _currentGeneration);
 
                 // Progress forward by one generation. Perform one generation/iteration of the evolution algorithm. 
-                yield return PerformOneGeneration();
+                yield return null; //PerformOneGeneration();
 
                 UnitySharpNEAT.Utility.Log("Performed generation " + _currentGeneration);
 
@@ -262,7 +255,7 @@ namespace SharpNeat.EvolutionAlgorithms
                 }
 
                 // Check if a pause has been requested. 
-                if (_pauseRequestFlag || _genomeListEvaluator.StopConditionSatisfied)
+                if (_pauseRequestFlag )
                 {
                     // Reset the flag. Update RunState and notify any listeners of the state change.
                     _pauseRequestFlag = false;
@@ -317,7 +310,7 @@ namespace SharpNeat.EvolutionAlgorithms
         /// <summary>
         /// Progress forward by one generation. Perform one generation/cycle of the evolution algorithm.
         /// </summary>
-        protected abstract IEnumerator PerformOneGeneration();
+        public abstract IEnumerator PerformOneGeneration();
 
         #endregion
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,5 +30,21 @@ public struct GameStats
             return AttackerStats;
         else
             return DefenderStats;
+    }
+
+    public GameStats FilterStatistics (Func<Statistics, bool> filter)
+    {
+        List<Statistics> attacker = new List<Statistics>();
+        List<Statistics> defender = new List<Statistics>();
+
+        foreach (Statistics stat in AttackerStats)
+            if (filter.Invoke(stat))
+                attacker.Add(stat);
+
+        foreach (Statistics stat in DefenderStats)
+            if (filter.Invoke(stat))
+                defender.Add(stat);
+
+        return new GameStats(attacker, defender, Winner);
     }
 }

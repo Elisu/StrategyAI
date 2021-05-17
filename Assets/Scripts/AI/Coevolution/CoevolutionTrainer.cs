@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Genetic;
 
-public class CoevolutionTrainer : AITrainingHandler
+public class CoevolutionTrainer : AITrainer
 {
     public int PopulationSize;
     public int IndividualLength;
@@ -33,7 +33,7 @@ public class CoevolutionTrainer : AITrainingHandler
         for (int i = 0; i < towers.PopulationSize; i++)
             for (int j = 0; j < meleeUnits.PopulationSize; j++)
                 for (int k = 0; k < rangedUnits.PopulationSize; k++)
-                    pop.Add(new CoevolutionAI(towers[i], meleeUnits[j], rangedUnits[k]));
+                    pop.Add(new CoevolutionAI(towers[i], meleeUnits[j], rangedUnits[k], new List<TryAction[]>() { actions, actions2, actions3}));
 
         return pop;
     }

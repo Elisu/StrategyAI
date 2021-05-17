@@ -8,10 +8,10 @@ using UnityEngine;
 
 internal class TraningLoop : MonoBehaviour
 {
-    public AITrainingHandler attacker;
-    public AITrainingHandler defender;
+    public AITrainer attacker;  //TrainingSettings.selectedAttacker;
+    public AITrainer defender; //TrainingSettings.selectedDefender;
 
-    public int gameInstancesCount;
+    public int gameInstancesCount = 5;
     public TrainingInstance gameInstance;
 
     public int GenerationCount;
@@ -29,6 +29,10 @@ internal class TraningLoop : MonoBehaviour
         attacker = Instantiate(attacker);
         defender = Instantiate(defender);
 
+        //Initializes the AI handlers
+        attacker.OnStart();
+        defender.OnStart();
+
         for (int i = 0; i < gameInstancesCount; i++)
             instances[i] = Instantiate(gameInstance);
     }
@@ -40,15 +44,22 @@ internal class TraningLoop : MonoBehaviour
             Debug.Log("Traning Finished");
             return;
         }
-           
+
 
         if (RunOneGeneration())
         {
             attacker.GenerationDone();
             defender.GenerationDone();
             GenerationCount--;
+
+            if (GenerationCount > 0)
+            {
+                attacker.BeforeEachGeneration();
+                defender.BeforeEachGeneration();
+            }
+
         }
-                  
+
 
         //Debug.Log("Done");
 
@@ -58,8 +69,8 @@ internal class TraningLoop : MonoBehaviour
 
     private bool RunOneGeneration()
     {
-        List<AIPlayer> attackerPop = attacker.GetPopulation();
-        List<AIPlayer> defenderPop = defender.GetPopulation();
+        List<AIPlayer> attackerPop = attacker.Population;
+        List<AIPlayer> defenderPop = defender.Population;
 
         List<Task> runningTasks = new List<Task>();
 
@@ -82,7 +93,7 @@ internal class TraningLoop : MonoBehaviour
             if (i >= gameInstancesCount)
                 break;
         }
-            
+
 
         //Debug.Log("Waiting");
         Task.WaitAll(runningTasks.ToArray());
