@@ -6,46 +6,69 @@ internal class IObjectMap : Map<Field>
     public float SizeMultiplier { get; protected set; }
 
     private List<Field> spawns;
+    Dictionary<Vector2Int, Transform> structureObjects;
+    Dictionary<Vector2Int, string> structureTags;
 
-    List<List<Transform>> MapPrefab;
-
-    public IObjectMap(int height, int width, List<List<Transform>> realMap = null) : base(width, height)
+    public IObjectMap(int height, int width, List<List<Transform>> realMap, float scale) : base(width, height)
     {
-        if (realMap == null)
-            return;
-
-        SizeMultiplier = realMap[0][0].localScale.x;
+        SizeMultiplier = scale;
         spawns = new List<Field>();
-        MapPrefab = realMap;
-        ReloadMap();
+        structureObjects = new Dictionary<Vector2Int, Transform>();
+        structureTags = new Dictionary<Vector2Int, string>();
+        LoadMap(realMap);
     }
 
-    public void ReloadMap()
+    private void LoadMap(List<List<Transform>> realMap)
     {
-        spawns.Clear();
-
         for (int i = 0; i < Width; i++)
             for (int j = 0; j < Height; j++)
             {
-                Field field = MapPrefab[j][i].GetComponent<Field>();
-                field.Position = new Vector2Int(i, j);
+                FieldInfo fieldInfo = realMap[j][i].GetComponent<FieldInfo>();
+                Vector2Int position = new Vector2Int(i, j);
+                Field field = new Field(fieldInfo,position);
+
                 map[i, j] = field;
 
                 if (field != null)
                 {
-                    if (field.OnField != null && field.OnField is TroopBase)
-                        field.OnField = null;
+                    if (field.Square == SquareType.Building)
+                    {
+                        Transform child = fieldInfo.transform.GetChild(0);
+                        structureObjects.Add(position, child);
+                        structureTags.Add(position, child.tag);
+                    }
 
-                    if (field.square == SquareType.Spawn)
+                    if (field.Square == SquareType.Spawn)
                         spawns.Add(map[i, j]);
                 }
                     
             }
     }
 
+    public void ReloadMap(Instance instance)
+    {
+        for (int i = 0; i < Width; i++)
+            for (int j = 0; j < Height; j++)
+            {
+                if (map[i, j].OnField is TroopBase)
+                    map[i, j].OnField = null;
+
+                if (instance.IsTraining)
+                {
+                    if (structureTags.TryGetValue(map[i, j].Position, out string tag))                
+                        map[i, j].OnField = instance.GetArmy(Role.Defender).AddStructure(tag, map[i, j].Position, instance);
+                }
+                else
+                {
+                    if (structureObjects.TryGetValue(map[i, j].Position, out Transform structure))
+                        map[i, j].OnField = instance.GetArmy(Role.Defender).AddStructure(structure, map[i, j].Position, instance);
+                }
+            }
+    }
+
     public bool GetFreeSpawn(Role role, out Vector2Int spawnPos)
     {
-        IObject spawn = spawns.Find(x => x.Side == role && x.Passable == true);
+        IObject spawn = spawns.Find(x => x.Side == role && x.CanPass(role) == true);
 
         if (spawn != null)
         {

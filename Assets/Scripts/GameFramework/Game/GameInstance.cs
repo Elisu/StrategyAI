@@ -8,6 +8,8 @@ internal class GameInstance : Instance
 {
     public override bool IsTraining => false;
 
+    public Role winner { get; private set; }
+
     public override void Run(IPlayer attack, IPlayer defend)
     {
         SetPlayers(attack, defend);
@@ -22,21 +24,22 @@ internal class GameInstance : Instance
         if (IsRunning)
         {
             RunGameStep();
-        }
-        else
-        {
-            if (defender.OwnArmy.Count == 0)
-                Debug.Log("Attacker won");
-            else
-                Debug.Log("Defender won");
-        }
-        
+        }        
     }
 
     protected void RunGameStep()
     {
         if (defender.OwnArmy.Count == 0 || attacker.OwnArmy.Count == 0)
+        {
+            if (defender.OwnArmy.Count == 0)
+                winner = Role.Attacker;
+            else
+                winner = Role.Defender;
+
             IsRunning = false;
+            GameOverHandler();
+        }
+            
 
         scheduler.Shopping(this);
         scheduler.ScheduleActions();

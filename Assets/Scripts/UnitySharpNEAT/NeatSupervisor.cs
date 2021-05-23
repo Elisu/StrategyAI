@@ -16,7 +16,7 @@ using System.Xml;
 using System.IO;
 using System.Linq;
 using SharpNeat.Core;
-using static Genetic;
+using Genetic;
 
 namespace UnitySharpNEAT
 {
@@ -74,6 +74,8 @@ namespace UnitySharpNEAT
         public NeatEvolutionAlgorithm<NeatGenome, IBlackBox> EvolutionAlgorithm { get; private set; }
 
         public Experiment Experiment { get; private set; }
+
+        public override Type AIPlayerType => typeof(NeatAI);
 
         #endregion
 
@@ -138,20 +140,21 @@ namespace UnitySharpNEAT
 
         protected override List<AIPlayer> CreatPopulation()
         {
-            StartEvolution();
+            //StartEvolution();
 
-            var possibleActions = new TryAction[5] { MacroActions.AttackClosest, MacroActions.AttackWithLowestHealth, MacroActions.AttackWithLowestDamage, MacroActions.AttackInRange, MacroActions.DoNothing };
-            var inputs = new Condition[2] { Conditions.Damaged, Conditions.Free };
+            //var possibleActions = new TryAction[5] { MacroActions.AttackClosest, MacroActions.AttackWithLowestHealth, MacroActions.AttackWithLowestDamage, MacroActions.AttackInRange, MacroActions.DoNothing };
+            //var inputs = new ICondition[2] { new Conditions.Damaged(), new Conditions.Free() };
 
-            List<INeatPlayer> pop = new List<INeatPlayer>();
+            //List<INeatPlayer> pop = new List<INeatPlayer>();
 
-            for (int i = 0; i < PopulationSize; i++)
-            {
-                pop.Add(new NeatAI(possibleActions, inputs));
-            }
+            //for (int i = 0; i < PopulationSize; i++)
+            //{
+            //    pop.Add(new NeatAI(possibleActions, inputs));
+            //}
 
-            EvolutionAlgorithm.SetPopulation(pop);
-            return new List<AIPlayer>(pop);
+            //EvolutionAlgorithm.SetPopulation(pop);
+            //return new List<AIPlayer>(pop);
+            return null;
         }
 
         protected override void BeforeEachGeneration()
@@ -167,6 +170,11 @@ namespace UnitySharpNEAT
         public override AIPlayer GetRepresentative()
         {
             return null;
+        }
+
+        public override AIPlayer ToSave()
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }

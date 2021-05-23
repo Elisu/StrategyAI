@@ -6,7 +6,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
-internal class TraningLoop : MonoBehaviour
+internal class TraningLoop : Loop
 {
     public AITrainer attacker;  //TrainingSettings.selectedAttacker;
     public AITrainer defender; //TrainingSettings.selectedDefender;
@@ -20,7 +20,7 @@ internal class TraningLoop : MonoBehaviour
     private int currentAttacker = 0;
     private int currentDefender = 0;
 
-    int run = 0;
+    private bool trainingFinished = false;
 
     private void Start()
     {
@@ -33,15 +33,26 @@ internal class TraningLoop : MonoBehaviour
         attacker.OnStart();
         defender.OnStart();
 
+        List<List<Transform>> map = LoadMap();
         for (int i = 0; i < gameInstancesCount; i++)
+        {
             instances[i] = Instantiate(gameInstance);
+            instances[i].SetMap(map);
+        }
+
     }
 
     private void Update()
     {
+        if (trainingFinished)
+            return;
+
+
         if (GenerationCount <= 0)
         {
-            Debug.Log("Traning Finished");
+            trainingFinished = true;
+            attacker.SaveGiven();
+            defender.SaveGiven();
             return;
         }
 
@@ -57,14 +68,7 @@ internal class TraningLoop : MonoBehaviour
                 attacker.BeforeEachGeneration();
                 defender.BeforeEachGeneration();
             }
-
         }
-
-
-        //Debug.Log("Done");
-
-        foreach (TrainingInstance ins in instances)
-            ins.Restart();
     }
 
     private bool RunOneGeneration()
@@ -94,7 +98,6 @@ internal class TraningLoop : MonoBehaviour
                 break;
         }
 
-
         //Debug.Log("Waiting");
         Task.WaitAll(runningTasks.ToArray());
         //Debug.Log("Finished Waiting");
@@ -107,5 +110,5 @@ internal class TraningLoop : MonoBehaviour
         }
 
         return false;
-    }
+    }    
 }

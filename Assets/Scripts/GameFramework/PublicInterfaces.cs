@@ -24,7 +24,8 @@ public enum SquareType
     Grass,
     Water,
     Debris,
-    Spawn,    
+    Spawn, 
+    Building,
 }
 
 public delegate bool SelectionPredicate(TroopBase selected, TroopBase current);
@@ -36,9 +37,7 @@ public interface IMappable
 
 public interface IObject : IMappable
 {
-    bool Passable {get;}
-
-    int Size { get; }
+    bool CanPass(Role role);
 }
 
 public interface IDamageable : IObject
@@ -65,14 +64,13 @@ public abstract class Damageable : IDamageable
 
     public State CurrentState { get; protected set; }
 
-    public bool Passable { get; protected set; }
-
-    public abstract int Size { get; }
+    public GameObject Visual { get; protected set; }
 
     public abstract Vector2Int Position { get; }
     public abstract Type type { get; }
     internal Instance CurrentInstance { get; private protected set; }
 
+    public virtual bool CanPass(Role role) => false;
 
     internal virtual bool TakeDamage(int damage)
     {

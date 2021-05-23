@@ -27,7 +27,7 @@ public class Node : IMappable
 public class Pathfinding
 { 
 
-    public static List<Vector2Int> FindPath(Vector2Int start, Vector2Int target, Instance instance)
+    public static List<Vector2Int> FindPath(Vector2Int start, Vector2Int target, Role role, Instance instance)
     {
         IObjectMap gameMap = instance.Map;
 
@@ -60,7 +60,7 @@ public class Pathfinding
                 {
                     if (i == currentNode.Position.x || j == currentNode.Position.y)
                     {
-                        if (gameMap[i, j].Passable == true)
+                        if (gameMap[i, j].CanPass(role) == true)
                         {
                             if (pathMap[i, j].visited == false)
                             {

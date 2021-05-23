@@ -4,15 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnitySharpNEAT;
-using static Genetic;
+using Genetic;
 
 public class NeatAI : INeatPlayer
 {
-    TryAction[] possibleActions;
-    Condition[] inputs;
+    IMacroAction[] possibleActions;
+    ICondition[] inputs;
     GameStats stats;
 
-    public NeatAI(TryAction[] actions, Condition[] conditions)
+    public NeatAI(IMacroAction[] actions, ICondition[] conditions)
     {
         possibleActions = actions;
         inputs = conditions;
@@ -46,7 +46,7 @@ public class NeatAI : INeatPlayer
     protected override void UpdateBlackBoxInputs(ISignalArray inputSignalArray, Attacker attacker)
     {
         for (int i = 0; i < inputSignalArray.Length; i++)
-            inputSignalArray[i] = Convert.ToDouble(inputs[i].Invoke(attacker));
+            inputSignalArray[i] = Convert.ToDouble(inputs[i].Evaluate(attacker));
     }
 
     protected override IAction UseBlackBoxOutpts(ISignalArray outputSignalArray, Attacker attacker)
@@ -63,7 +63,7 @@ public class NeatAI : INeatPlayer
                 bestAction = i;
             }
 
-        possibleActions[bestAction].Invoke(attacker, out resultAction);
+        possibleActions[bestAction].TryAction(attacker, out resultAction);
 
         return resultAction;
     }

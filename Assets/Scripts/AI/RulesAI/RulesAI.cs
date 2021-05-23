@@ -2,24 +2,29 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
-using static Genetic;
+using Genetic;
 
+[DataContract]
 public class RulesAI : AIPlayer
 {
-    Individual individual;
-    TryAction[] possibleActions;
+    [DataMember]
+    public Individual individual;
+
+    [DataMember]
+    public IMacroAction[] possibleActions;
 
     ConcurrentQueue<int> AccumulatedFitnesses;
 
-    public RulesAI(Individual ind, TryAction[] actions)
+    public RulesAI(Individual ind, IMacroAction[] actions)
     {
         possibleActions = actions;
         individual = ind;
         AccumulatedFitnesses = new ConcurrentQueue<int>();
     }
 
-    private RulesAI(Individual ind, TryAction[] actions, ref ConcurrentQueue<int> fitnesses)
+    private RulesAI(Individual ind, IMacroAction[] actions, ref ConcurrentQueue<int> fitnesses)
     {
         possibleActions = actions;
         individual = ind;
@@ -61,7 +66,7 @@ public class RulesAI : AIPlayer
                 indexOfBest = i;
         }
 
-        possibleActions[indexOfBest].Invoke(attacker, out resultAction);
+        possibleActions[indexOfBest].TryAction(attacker, out resultAction);
 
         return resultAction;
     }

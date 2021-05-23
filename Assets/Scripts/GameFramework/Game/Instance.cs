@@ -8,10 +8,7 @@ public abstract class Instance : MonoBehaviour
     public event Action GameOver;
 
     protected IPlayer attacker;
-    protected IPlayer defender;
-
-    [SerializeField]
-    GameObject mapObject;
+    protected IPlayer defender;    
 
     internal IObjectMap Map { get; private set; }
 
@@ -22,12 +19,6 @@ public abstract class Instance : MonoBehaviour
     public abstract bool IsTraining { get; }
 
     public abstract void Run(IPlayer attack, IPlayer defend);
-
-    private void Awake()
-    {
-        mapObject = Instantiate(mapObject);
-        LoadMap();
-    }
 
     protected void SetPlayers(IPlayer attack, IPlayer defend)
     {
@@ -40,31 +31,14 @@ public abstract class Instance : MonoBehaviour
         attacker.OwnArmy.SetEnemy(this);
         defender.OwnArmy.SetEnemy(this);
 
+        Map.ReloadMap(this);
+
         scheduler.Set(attacker, defender);
     }
 
-
-    public void Restart()
+    internal void SetMap(List<List<Transform>> mapPrefab)
     {
-        Map.ReloadMap();
-
-    }
-
-    private void LoadMap()
-    {
-        List<List<Transform>> mapPrefab = new List<List<Transform>>();
-
-        foreach (Transform row in mapObject.transform)
-        {
-            List<Transform> fields = new List<Transform>();
-
-            foreach (Transform field in row.gameObject.transform)
-                fields.Add(field);
-
-            mapPrefab.Add(fields);
-        }
-
-        Map = new IObjectMap(mapPrefab.Count, mapPrefab[0].Count, mapPrefab);
+        Map = new IObjectMap(mapPrefab.Count, mapPrefab[0].Count, mapPrefab, mapPrefab[0][0].transform.localScale.x);
     }
 
 

@@ -44,7 +44,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
     internal virtual void MoveForAttack(Vector2Int targetPos)
     {
-        if (CurrentState != State.Moving || !CurrentInstance.Map[targetPosition].Passable || rnd.Next(0, 21) < 1)
+        if (CurrentState != State.Moving || !CurrentInstance.Map[targetPosition].CanPass(Side) || rnd.Next(0, 201) < 1)
         {
             CurrentState = State.Moving;
             Target = null;
@@ -54,14 +54,13 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
                 RecomputeRoute(inRange);
         }
 
-        Move();
-        
+        Move();     
         
     }
 
     private void RecomputeRoute(Vector2Int targetPos)
     {
-        List<Vector2Int> path = Pathfinding.FindPath(Position, targetPos, CurrentInstance);
+        List<Vector2Int> path = Pathfinding.FindPath(Position, targetPos, Side, CurrentInstance);
 
         if (path == null)
         {
@@ -83,7 +82,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
         for (int i = Mathf.Max(0, target.x - this.Range); i < Mathf.Min(CurrentInstance.Map.Width, target.x + this.Range + 1); i++)
             for (int j = Mathf.Max(0, target.y - this.Range); j < Mathf.Min(CurrentInstance.Map.Height, target.y + this.Range + 1); j++)
             {
-                if (CurrentInstance.Map[i, j].Passable)
+                if (CurrentInstance.Map[i, j].CanPass(Side))
                 {
                     int diffX = Mathf.Abs(Position.x - i);
                     int diffY = Mathf.Abs(Position.y - j);
@@ -110,7 +109,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
         Vector2Int nextPos = route.Peek();
 
-        if (CurrentInstance.Map[nextPos] == null || CurrentInstance.Map[nextPos].Passable == true)
+        if (CurrentInstance.Map[nextPos] == null || CurrentInstance.Map[nextPos].CanPass(Side) == true)
         {
             CurrentInstance.Map[Position] = null;
             Vector2 next = new Vector2(nextPos.x - ActualPosition.x, nextPos.y - ActualPosition.y);
@@ -163,7 +162,6 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
     public override int Damage => unit.Damage * Count;
     public override int Range => unit.Range;
     public override int Health { get; protected set; }
-    public override int Size => unit.Size * Count;
 
     public override Type type => typeof(T);
 
@@ -195,7 +193,6 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
         if (visual != null)
         {
             visual = UnityEngine.Object.Instantiate(visual, visual.transform.position, Quaternion.identity);
-            CurrentInstance.GameOver += GameOver;
 
             if (Side == Role.Defender)
                 visual.GetComponent<Renderer>().material.color = new Color(0, 0, 255);

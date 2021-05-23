@@ -8,6 +8,7 @@
 using SharpNeat.Phenomes;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace UnitySharpNEAT
@@ -16,10 +17,11 @@ namespace UnitySharpNEAT
     /// Abstract representation of a Unit, which is equipped with a Neural Net (IBlackBox).
     /// The IBlackBox gets fed with inputs and computes an output, which can be used to control the Unit.
     /// </summary>
+    [DataContract]
     public abstract class INeatPlayer : AIPlayer
     {
+        [DataMember]
         public IBlackBox BlackBox { get; private set; }
-
 
         protected override IAction FindAction(Attacker attacker)
         {

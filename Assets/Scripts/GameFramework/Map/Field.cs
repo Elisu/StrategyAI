@@ -2,16 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-internal class Field : MonoBehaviour, IObject
+public class Field : IObject
 {
-    public SquareType square;
+    public Vector2Int Position { get; private set; }
 
-    [SerializeField]
-    private Role side;
-
-    public Vector2Int Position { get; internal set; }
+    public SquareType Square { get; private set; }
 
     public IObject OnField { get; internal set; }
+
+    private Role side;
+
+    public Field (FieldInfo info, Vector2Int position)
+    {
+        Square = info.Square;
+        side = info.Side;
+        Position = position;
+    }
 
     public Role Side
     {
@@ -29,16 +35,11 @@ internal class Field : MonoBehaviour, IObject
         }
     }
 
-    public bool Passable
+    public bool CanPass(Role role)
     {
-        get
-        {
-            if (OnField != null)
-                return OnField.Passable;
-            else
-                return true;
-        }
+        if (OnField != null)
+            return OnField.CanPass(role);
+        else
+            return true;
     }
-
-    public int Size { get; }
 }

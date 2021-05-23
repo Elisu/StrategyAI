@@ -1,16 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 /// <summary>
 /// Common base class for AIPlayer and HumanPlayer
 /// </summary>
+[DataContract]
 public abstract class IPlayer
 {
     /// <summary>
     /// The side the player is on - defender/attacker
     /// </summary>
+    [DataMember]
     public Role role;
 
     /// <summary>
@@ -22,9 +25,6 @@ public abstract class IPlayer
     {
         this.role = role;
         OwnArmy = new Army(role);
-
-        //OwnArmy.Add(new Troop<Swordsmen>(50, role, game));
-        //OwnArmy.Add(new Troop<Cavalry>(10, role, game));
     }
 
     protected internal abstract Tuple<Attacker, IAction> GetActions();

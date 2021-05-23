@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
 using UnityEngine;
 
 public abstract class AITrainer : MonoBehaviour
@@ -8,6 +11,8 @@ public abstract class AITrainer : MonoBehaviour
     public List<AIPlayer> Population { get; private set; }
 
     public int PopulationCount => Population.Count;
+
+    public abstract Type AIPlayerType { get; }
 
     protected internal virtual void OnStart()
     {
@@ -45,6 +50,20 @@ public abstract class AITrainer : MonoBehaviour
         return;
     }
 
+    protected internal virtual void SaveGiven()
+    {
+        AIPlayer player = ToSave();
+
+        if (player == null)
+            return;
+
+        using (var stream = new FileStream("neco.xml", FileMode.Create))
+        {
+            DataContractSerializer serializer = new DataContractSerializer(player.GetType());
+            serializer.WriteObject(stream, player);
+        }
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -56,4 +75,6 @@ public abstract class AITrainer : MonoBehaviour
     public abstract void GenerationDone();
 
     public abstract AIPlayer GetRepresentative();
+
+    public abstract AIPlayer ToSave();
 }

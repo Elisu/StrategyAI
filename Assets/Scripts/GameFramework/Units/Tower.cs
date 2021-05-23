@@ -10,17 +10,18 @@ public abstract class TowerBase : Attacker, IRecruitable
 
 public class Tower<T> : TowerBase where T : TowerUnit, new()
 {
-    public override int Damage { get;  }
-    public override int Range { get; }
+    public override int Damage => unit.Damage;
+    public override int Range => unit.Range;
     public override int Health { get; protected set; }
-    public override int Size { get; }
-    public override Vector2Int Position { get; }
+    public override Vector2Int Position => position;
 
     public override Type type => typeof(T);
 
     public override Statistics GetStats() => new Statistics(DealtDamage, ReceivedDamage, EnemiesKilled, BuildingsDestroyed, type);
 
     protected T unit = new T();
+
+    private Vector2Int position;
 
     internal override bool GiveDamage(Damageable enemy)
     {
@@ -33,11 +34,39 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
         return enemy.TakeDamage(damage);
     }
 
+    internal override bool TakeDamage(int totalDamage)
+    {
+        ReceivedDamage += totalDamage;
+
+        if (base.TakeDamage(totalDamage))
+        {
+            Destroy();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void Destroy()
+    {
+        CurrentInstance.GetArmy(Side).Remove(this);
+        CurrentInstance.Map[Position] = null;
+
+        if (Visual != null)
+            GameObject.Destroy(Visual);            
+    }
+
     protected Tower() { }
 
-    public Tower(Role role)
+    public Tower(Vector2Int pos, Instance instance, GameObject vis = null)
     {
         CurrentState = State.Free;
-        Side = role;
+        Side = Role.Defender;
+        CurrentInstance = instance;
+        Health = unit.Health;
+        position = pos;
+
+        if (!CurrentInstance.IsTraining)
+            Visual = vis;
     }
 }

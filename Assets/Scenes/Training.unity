@@ -802,14 +802,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81fd8269ca3b75343bf1f6d64436a397, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapObject: {fileID: 8290190061793899004, guid: a45069545bc712c4ab6b8b56cdf10206,
+    type: 3}
   attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
     type: 3}
   defender: {fileID: 7067290049789075546, guid: 186f7a5ee06e88740a263c80a4cc45a0,
     type: 3}
-  gameInstancesCount: 15
+  gameInstancesCount: 10
   gameInstance: {fileID: 6862441489602338825, guid: 852759d35db7ab54a8e80f3f364d295e,
     type: 3}
-  GenerationCount: 200
+  GenerationCount: 1
 --- !u!1 &387431730
 GameObject:
   m_ObjectHideFlags: 0
@@ -3530,7 +3532,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 250
   speed: 0.05
-  defense: 1
   damage: 1
   range: 1
   price: 8000

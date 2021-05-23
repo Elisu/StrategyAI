@@ -8,8 +8,8 @@ public class Grass : IObject
 
     public Role Side => Role.Neutral;
 
-    public bool Passable { get => true; }
-
-    public int Size { get => 50; }
-
+    public bool CanPass(Role role)
+    {
+        return true;
+    }
 }

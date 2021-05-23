@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 public class MacroActions
@@ -29,9 +30,9 @@ public class MacroActions
         Army army = attacker.CurrentInstance.GetEnemyArmy(attacker.Side);
         resultAction = null;
 
-        TroopBase inRange = null;
+        Attacker inRange = null;
 
-        foreach (TroopBase troop in army)
+        foreach (Attacker troop in army)
         {
             if (Mathf.Abs(attacker.Position.x - troop.Position.x) < attacker.Range || Mathf.Abs(attacker.Position.y - troop.Position.y) < attacker.Range)
                 inRange = troop;
@@ -77,7 +78,7 @@ public class MacroActions
 
         if (attacker is TroopBase troop)
             if (troop.FindSpotInRange(target, out Vector2Int inRange))
-                if (Pathfinding.FindPath(attacker.Position, inRange, attacker.CurrentInstance) != null)
+                if (Pathfinding.FindPath(attacker.Position, inRange, attacker.Side, attacker.CurrentInstance) != null)
                      return true;
 
         return false;
@@ -107,5 +108,64 @@ public class MacroActions
         return true;
     }
 
+}
+
+public class SerializableMacroActions
+{
+    [DataContract]
+    public class AttackClosest : IMacroAction
+    {
+        public override bool TryAction(Attacker a, out IAction resultAction)
+        {
+            return MacroActions.AttackClosest(a, out resultAction);
+        }
+    }
+
+    [DataContract]
+    public class AttackInRange : IMacroAction
+    {
+        public override bool TryAction(Attacker a, out IAction resultAction)
+        {
+            return MacroActions.AttackInRange(a, out resultAction);
+        }
+    }
+
+    [DataContract]
+    public class AttackWithLowestHealth : IMacroAction
+    {
+        public override bool TryAction(Attacker a, out IAction resultAction)
+        {
+            return MacroActions.AttackWithLowestHealth(a, out resultAction);
+        }
+    }
+
+    [DataContract]
+    public class AttackWithLowestDamage : IMacroAction
+    {
+        public override bool TryAction(Attacker a, out IAction resultAction)
+        {
+            return MacroActions.AttackWithLowestDamage(a, out resultAction);
+        }
+    }
+
+    [DataContract]
+    public class DoNothing : IMacroAction
+    {
+        public override bool TryAction(Attacker a, out IAction resultAction)
+        {
+            return MacroActions.DoNothing(a, out resultAction);
+        }
+    }
+}
+
+[DataContract]
+[KnownType(typeof(SerializableMacroActions.AttackClosest))]
+[KnownType(typeof(SerializableMacroActions.AttackInRange))]
+[KnownType(typeof(SerializableMacroActions.AttackWithLowestHealth))]
+[KnownType(typeof(SerializableMacroActions.AttackWithLowestDamage))]
+[KnownType(typeof(SerializableMacroActions.DoNothing))]
+public abstract class IMacroAction
+{
+    public abstract bool TryAction(Attacker a, out IAction resultAction);
 }
 

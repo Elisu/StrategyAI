@@ -31,9 +31,7 @@ public class Swordsmen : HumanUnit
 
     internal override bool GiveDamage(Damageable enemy, int totalDamage)
     {
-        if (enemy is Building building)
-            return building.TakeDamage(totalDamage);
-        else
+        if (enemy is TroopBase)
         {
             TroopBase enemyTroop = (TroopBase)enemy;
             int index = 0;
@@ -42,12 +40,13 @@ public class Swordsmen : HumanUnit
             {
                 if (enemyTroop.TakeDamage(Damage, index, 1))
                     return true;
-                
+
                 totalDamage -= Damage;
                 index++;
             }
-
-        }
+        }            
+        else
+            return enemy.TakeDamage(totalDamage);
 
         //IDamagable not killed
         return false;

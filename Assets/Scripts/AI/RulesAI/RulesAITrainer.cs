@@ -1,20 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Genetic;
+using Genetic;
+using System;
 
 public class RulesAITrainer : AITrainer
 {
     public int PopulationSize;
     public int IndividualLength;
 
-    StrategyGroup all;
+    Strategy all;
+
+    public override Type AIPlayerType => typeof(RulesAI);
 
     protected override List<AIPlayer> CreatPopulation()
     {
-        TryAction[] actions = new TryAction[5] { MacroActions.AttackClosest, MacroActions.AttackWithLowestHealth, MacroActions.AttackWithLowestDamage, MacroActions.AttackInRange, MacroActions.DoNothing };
-        Condition[] conditions = new Condition[2] { Conditions.Damaged, Conditions.Free };
-        all = new StrategyGroup(PopulationSize, IndividualLength, actions, conditions);
+        ICondition damaged = new Conditions.Damaged();
+        ICondition free = new Conditions.Free();
+
+        IMacroAction[] actions = new IMacroAction[5] { new SerializableMacroActions.AttackClosest(), 
+                                                       new SerializableMacroActions.AttackWithLowestHealth(), 
+                                                       new SerializableMacroActions.AttackWithLowestDamage(), 
+                                                       new SerializableMacroActions.AttackInRange(), 
+                                                       new SerializableMacroActions.DoNothing() };
+        ICondition[] conditions = new ICondition[2] { damaged, free };
+        all = new Strategy(PopulationSize, IndividualLength, actions, conditions);
 
         List<AIPlayer> pop = new List<AIPlayer>();
 
@@ -37,11 +47,22 @@ public class RulesAITrainer : AITrainer
 
         Debug.LogWarning(string.Format("Best individual: {0}", bestFitness));
 
-        all.GeneticOperations(Genetic.RouletteWheel, Genetic.UniformCrossover, Genetic.ActionMutation);
+        all.GeneticOperations(Operators.RouletteWheel, Operators.UniformCrossover, Operators.ActionMutation);
     }
 
     public override AIPlayer GetRepresentative()
     {
         throw new System.NotImplementedException();
+    }
+
+    public override AIPlayer ToSave()
+    {
+        AIPlayer best = Population[0];
+
+        foreach (AIPlayer player in Population)
+            if (((RulesAI)player).GetFitnessMean() > ((RulesAI)best).GetFitnessMean())
+                best = player;
+
+        return best;
     }
 }

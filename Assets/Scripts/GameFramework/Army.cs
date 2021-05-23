@@ -24,12 +24,26 @@ public class Army : IEnumerable<Attacker>
         Money = 10000;
     }
 
-    public void SetEnemy(Instance instance)
+    internal void SetEnemy(Instance instance)
     {
         enemyTroops = instance.GetEnemyArmy(Side);
     }
 
-    public bool TryBuying(int toBuy, Instance instance)
+    internal IRecruitable AddStructure(string tag, Vector2Int position, Instance instance)
+    {
+        IRecruitable structure = UnitFactory.CreateStructure(tag, position, instance);
+        Add(structure);
+        return structure;
+    }
+
+    internal IRecruitable AddStructure(Transform structureObject, Vector2Int position, Instance instance)
+    {
+        IRecruitable structure = UnitFactory.CreateStructure(structureObject, position, instance);
+        Add(structure);
+        return structure;
+    }
+
+    internal bool TryBuying(int toBuy, Instance instance)
     {
         Type unitType = UnitFinder.unitTypes[toBuy];
         int price = UnitFinder.unitStats[toBuy].Price;
@@ -52,7 +66,10 @@ public class Army : IEnumerable<Attacker>
 
     public void MoneyGain()
     {
-        Money += 5;
+        if (Side == Role.Defender)
+            Money += 5;
+        else
+            Money += 10;
     }
 
     public Attacker this[int index]

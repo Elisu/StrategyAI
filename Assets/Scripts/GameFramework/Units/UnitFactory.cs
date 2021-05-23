@@ -17,4 +17,34 @@ public static class UnitFactory
             return null;
         }
     }
+
+    public static IRecruitable CreateStructure(string tag, Vector2Int position, Instance instance)
+    {
+        switch (tag)
+        {
+            case "Tower":
+                return new Tower<BasicTower>(position, instance);
+            case "Gate":
+                return new Gate(position, instance);
+            case "Wall":
+                return new Wall(position, instance);
+        }
+
+        return null;
+    }
+
+    public static IRecruitable CreateStructure(Transform structure, Vector2Int position, Instance instance)
+    {
+        switch (structure.tag)
+        {
+            case "Tower":
+                return new Tower<BasicTower>(position, instance, structure.gameObject);
+            case "Gate":
+                return new Gate(position, instance, structure.gameObject);
+            case "Wall":
+                return new Wall(position, instance, structure.gameObject);
+        }
+
+        return null;
+    }
 }

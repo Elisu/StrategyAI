@@ -1,35 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 /// <summary>
 /// Base class to every AI has to inherit from and implement required methods
 /// </summary>
+[DataContract]
 public abstract class AIPlayer : IPlayer
 {
-    public virtual int RunsPerGenerations => runsPerGen;
-
-    protected int runsPerGen = 1;
-
-    int currentToSchedule = 0;
-
-    public void Run()
-    {
-        
-        OwnArmy.ClearGraveyard();
-        OnStart();
-    }
-
-
-    /// <summary>
-    /// Called at the start of every generation
-    /// </summary>
-    protected virtual void OnStart()
-    {
-        return;
-    } 
-    
+    int currentToSchedule = 0;    
 
     protected internal override Tuple<Attacker, IAction> GetActions()
     {
@@ -55,5 +36,6 @@ public abstract class AIPlayer : IPlayer
     /// <typeparam name="AIType">Your AI class</typeparam>
     /// <returns>deep copy of this instance of your child of AIPlayer</returns>
     public abstract AIPlayer Clone();
+
 
 }

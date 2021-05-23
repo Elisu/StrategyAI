@@ -10,21 +10,18 @@ internal abstract class Setup<T> : MonoBehaviour where T: Unit
     [SerializeField]
     private float speed;
     [SerializeField]
-    private int defense;
-    [SerializeField]
     private int damage;
     [SerializeField]
     private int range;
     [SerializeField]
     private int price;
     [SerializeField]
-    public GameObject unitPrefab;
+    private GameObject unitPrefab;
 
     private static Setup<T> instance;
     
     public static int Health { get => instance.health; }
     public static float Speed { get => instance.speed; }
-    public static int Defense { get => instance.defense; }
     public static int Damage { get => instance.damage; }
     public static int Range { get => instance.range; }
     public static int Price { get => instance.price; }

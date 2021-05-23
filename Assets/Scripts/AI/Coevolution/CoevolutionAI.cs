@@ -1,29 +1,32 @@
+using Genetic;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
-using static Genetic;
 
+[DataContract]
 public class CoevolutionAI : AIPlayer
 {
-    public int populationSize;
-    public int individualLength;
-
+    [DataMember]
     Individual towers;
+    [DataMember]
     Individual meleeUnits;
+    [DataMember]
     Individual rangedUnits;
 
     /// <summary>
     /// order Towers, Melee, Ranged
     /// </summary>
-    readonly List<TryAction[]> possibleActions;
+    [DataMember]
+    readonly List<IMacroAction[]> possibleActions;
 
     ConcurrentQueue<int> AccumulatedFitnessesTowers;
     ConcurrentQueue<int> AccumulatedFitnessesMelee;
     ConcurrentQueue<int> AccumulatedFitnessesRanged;
 
-    public CoevolutionAI(Individual tw, Individual melee, Individual ranged, List<TryAction[]> actions)
+    public CoevolutionAI(Individual tw, Individual melee, Individual ranged, List<IMacroAction[]> actions)
     {
         towers = tw;
         meleeUnits = melee;
@@ -53,7 +56,7 @@ public class CoevolutionAI : AIPlayer
     protected override IAction FindAction(Attacker attacker)
     {
         IAction resultAction = null;
-        TryAction[] actions;
+        IMacroAction[] actions;
         Individual current;
 
         if (attacker is TowerBase)
@@ -89,7 +92,7 @@ public class CoevolutionAI : AIPlayer
         }
 
 
-        actions[indexOfBest].Invoke(attacker, out resultAction);
+        actions[indexOfBest].TryAction(attacker, out resultAction);
         return resultAction;
     }
 
