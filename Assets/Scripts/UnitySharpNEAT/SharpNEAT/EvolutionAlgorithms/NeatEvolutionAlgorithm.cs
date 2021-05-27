@@ -191,6 +191,7 @@ namespace SharpNeat.EvolutionAlgorithms
 
         #endregion
 
+        #region Public Methods [For handling NEAT]
 
         public void SetPopulation(List<INeatPlayer> population)
         {            
@@ -218,6 +219,8 @@ namespace SharpNeat.EvolutionAlgorithms
             evaluationDone = true;
            
         }
+
+        #endregion
 
         private bool EvaluationFinished() => evaluationDone;
 
@@ -295,6 +298,7 @@ namespace SharpNeat.EvolutionAlgorithms
                     break;
             }
         }
+
 
         #endregion
 

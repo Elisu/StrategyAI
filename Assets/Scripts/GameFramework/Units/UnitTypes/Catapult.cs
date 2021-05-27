@@ -3,33 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Archers : HumanUnit
+public class Catapult : HumanUnit
 {
-    public Archers()
+    public Catapult()
     {
-        Health = ArchersSetup.Health;
-        Speed = ArchersSetup.Speed;
-        Damage = ArchersSetup.Damage;
-        Range = ArchersSetup.Range;
-        UnitPrefab = ArchersSetup.UnitPrefab;
-        BundleCount = 30;
+        Health = CatapultSetup.Health;
+        Speed = CatapultSetup.Speed;
+        Damage = CatapultSetup.Damage;
+        Range = CatapultSetup.Range;
+        UnitPrefab = CatapultSetup.UnitPrefab;
+        BundleCount = 1;
     }
     public override float GetDefenseAgainst(Type unitType)
     {
-        switch(unitType.Name)
-        {
-            case nameof(Archers):
-                return 1;
-            case nameof(Cavalry):
-                return 0.8f;
-            case nameof(Swordsmen):
-                return 0.75f;
-        }
-
         if (unitType.IsSubclassOf(typeof(TowerBase)))
-            return 0.4f;
-
-        return 0.7f;
+            return 0.85f;
+        else
+            return 1f;
     }
 
     internal override bool GiveDamage(Damageable enemy, int totalDamage)
@@ -41,10 +31,11 @@ public class Archers : HumanUnit
             while (totalDamage > 0)
             {
                 int index = rnd.Next(0, enemyTroop.Count);
-                if (enemyTroop.TakeDamage(Damage, index, 1))
+                int hitCount = rnd.Next(1, enemyTroop.Count - index);
+                if (enemyTroop.TakeDamage(Damage, index, hitCount))
                     return true;
 
-                totalDamage -= Damage;                
+                totalDamage -= Damage;
             }
         }
         else

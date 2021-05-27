@@ -1,32 +1,33 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
-public class Army : IEnumerable<Attacker>
+public class Army : IEnumerable<IRecruitable>
 {
     public Role Side { get; private set; }
 
-    public int Count => troops.Count + towers.Count;
+    public int Count => troops.Count + towers.Count + buildings.Count;
 
     public int Money { get; private set; }
+    public int MoneySpent { get; private set; }
+    public int MoneyAll => Money + MoneySpent;
 
-    private List<TroopBase> troops = new List<TroopBase>();
-    private List<Building> buildings = new List<Building>();
-    private List<TowerBase> towers = new List<TowerBase>();
-    private Army enemyTroops;
+    private readonly List<TroopBase> troops = new List<TroopBase>();
+    private readonly List<Building> buildings = new List<Building>();
+    private readonly List<TowerBase> towers = new List<TowerBase>();
+
+    public ReadOnlyCollection<TroopBase> Troops => troops.AsReadOnly();
+    public ReadOnlyCollection<TowerBase> Towers => towers.AsReadOnly();
+    public ReadOnlyCollection<Building> Buildings => buildings.AsReadOnly();
 
     private List<IRecruitable> graveyard = new List<IRecruitable>();
 
-    public Army(Role side)
+    internal Army(Role side)
     {
         Side = side;
         Money = 10000;
-    }
-
-    internal void SetEnemy(Instance instance)
-    {
-        enemyTroops = instance.GetEnemyArmy(Side);
     }
 
     internal IRecruitable AddStructure(string tag, Vector2Int position, Instance instance)
@@ -55,7 +56,7 @@ public class Army : IEnumerable<Attacker>
         if (price <= Money && instance.Map.GetFreeSpawn(Side, out Vector2Int spawnPos))
         {
             Money -= price;
-
+            MoneySpent += price;
             
             Add(UnitFactory.CreateUnit(unitType, Side, spawnPos, instance));
             return true;
@@ -64,22 +65,24 @@ public class Army : IEnumerable<Attacker>
         return false;
     }
 
-    public void MoneyGain()
+    internal void MoneyGain()
     {
         if (Side == Role.Defender)
-            Money += 5;
-        else
             Money += 10;
+        else
+            Money += 15;
     }
 
-    public Attacker this[int index]
+    public IRecruitable this[int index]
     {
         get
         {
             if (index < troops.Count)
                 return troops[index];
-            else
+            else if (index - troops.Count < towers.Count)
                 return towers[index - troops.Count];
+            else
+                return buildings[index - troops.Count - towers.Count];
         }
     }
 
@@ -99,14 +102,16 @@ public class Army : IEnumerable<Attacker>
         graveyard.Clear();
     }
 
-    public IEnumerator<Attacker> GetEnumerator()
+    public IEnumerator<IRecruitable> GetEnumerator()
     {
         foreach (TroopBase unit in troops)
-            yield return unit;
-        
+            yield return unit;        
 
         foreach (TowerBase tower in towers)
             yield return tower;
+
+        foreach (Building building in buildings)
+            yield return building;
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -114,7 +119,7 @@ public class Army : IEnumerable<Attacker>
         return GetEnumerator();
     }
 
-    public void Add(IRecruitable recruit)
+    private void Add(IRecruitable recruit)
     {
         if (recruit is TroopBase troop)
             troops.Add(troop);
@@ -124,7 +129,7 @@ public class Army : IEnumerable<Attacker>
             buildings.Add((Building)recruit);
     }
 
-    public void Remove(IRecruitable recruit)
+    internal void Remove(IRecruitable recruit)
     {
         graveyard.Add(recruit);
 
@@ -136,26 +141,26 @@ public class Army : IEnumerable<Attacker>
             buildings.Remove((Building)recruit);
     }
 
-    public TroopBase SenseEnemyLowestHealth() => enemyTroops.GetTrooOnCondition((x, y) => x.Health > y.Health);
+    public TroopBase SenseLowestHealth() => GetTrooOnCondition((x, y) => x.Health > y.Health);
 
-    public TroopBase SenseEnemyHighestHealth() => enemyTroops.GetTrooOnCondition((x, y) => x.Health < y.Health);
+    public TroopBase SenseHighestHealth() => GetTrooOnCondition((x, y) => x.Health < y.Health);
 
-    public TroopBase SenseEnemyLowestDamage() => enemyTroops.GetTrooOnCondition((x, y) => x.Damage > y.Damage);
+    public TroopBase SenseLowestDamage() => GetTrooOnCondition((x, y) => x.Damage > y.Damage);
            
-    public TroopBase SeneseEnemyHighestDamage() => enemyTroops.GetTrooOnCondition((x, y) => x.Damage < y.Damage);
+    public TroopBase SeneseHighestDamage() => GetTrooOnCondition((x, y) => x.Damage < y.Damage);
      
-    public TroopBase SenseEnemyLowestSpeed() => enemyTroops.GetTrooOnCondition((x, y) => x.Speed > y.Speed);
+    public TroopBase SenseLowestSpeed() => GetTrooOnCondition((x, y) => x.Speed > y.Speed);
 
-    public TroopBase SenseEnemyHighestSpeed() => enemyTroops.GetTrooOnCondition((x, y) => x.Speed < y.Speed);
+    public TroopBase SenseEnemySpeed() => GetTrooOnCondition((x, y) => x.Speed < y.Speed);
 
-    public IAttack SenseClosestEnemy(IAttack attacker)
+    public IRecruitable SenseClosestTo(Attacker attacker)
     {
-        if (enemyTroops.Count == 0)
+        if (Count == 0)
             return null;
 
-        IAttack closest = enemyTroops[0];
+        IRecruitable closest = this[0];
 
-        foreach (IAttack troop in enemyTroops)
+        foreach (IRecruitable troop in this)
         {
             if (Vector2Int.Distance(attacker.Position, closest.Position) > Vector2Int.Distance(attacker.Position, troop.Position))
                 closest = troop;

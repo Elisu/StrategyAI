@@ -90,7 +90,12 @@ internal class IObjectMap : Map<Field>
                 return map[index.x, index.y];
         }
 
-        set => map[index.x, index.y].OnField = value;
+        set
+        {
+            if (!(map[index.x, index.y].OnField is Gate))
+                map[index.x, index.y].OnField = value;
+                    
+        }
     }
 
     public new IObject this[int x, int y]
@@ -103,7 +108,11 @@ internal class IObjectMap : Map<Field>
                 return map[x, y];
         }
 
-        set => map[x, y].OnField = value;
+        set
+        {
+            if (!(map[x, y].OnField is Gate))
+                map[x, y].OnField = value;
+        }
     }
 
 }

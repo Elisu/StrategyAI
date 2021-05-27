@@ -23,7 +23,6 @@ namespace UnitySharpNEAT
     /// <summary>
     /// This class acts as the entry point for the NEAT evolution.
     /// It manages the UnitController's being evolved and handles the creation of the NeatEvolutionAlgorithm.
-    /// It is also responsible for managing the lifecycle of the evolution, e.g. by starting/stopping it.
     /// </summary>
     public class NeatSupervisor : AITrainer
     {
@@ -33,43 +32,22 @@ namespace UnitySharpNEAT
         [SerializeField]
         private string _experimentConfigFileName = "experiment.config";
 
-        [SerializeField]
-        private int _networkInputCount = 5;
-
-        [SerializeField]
-        private int _networkOutputCount = 2;
-
         public int PopulationSize;
-  
 
+        private readonly IMacroAction[] outputActions = new IMacroAction[5] { new SerializableMacroActions.AttackClosest(),
+                                                                               new SerializableMacroActions.AttackWithLowestHealth(),
+                                                                               new SerializableMacroActions.AttackWithLowestDamage(),
+                                                                               new SerializableMacroActions.AttackInRange(),
+                                                                               new SerializableMacroActions.DoNothing() };
 
-        [Header("Evaluation Settings")]
+        private readonly ICondition[] inputConditions = new ICondition[] { new Conditions.Damaged(), new Conditions.Free() };
 
-        [Tooltip("How many times per generation the generation gets evaluated.")]
-        public int Trials = 1;
-
-        public bool GenerationFinished = false;
-
-        [Header("Debug")]
-
-        [SerializeField]
-        private bool _enableDebugLogging = false;
-
+        private int _networkInputCount => inputConditions.Length;
+        private int _networkOutputCount => outputActions.Length;
 
         // Object pooling and Unit management
         private Dictionary<IBlackBox, INeatPlayer> _blackBoxMap = new Dictionary<IBlackBox, INeatPlayer>();
-
-        private DateTime _startTime;
         #endregion
-
-        #region PROPERTIES
-        public int NetworkInputCount { get => _networkInputCount; }
-
-        public int NetworkOutputCount { get => _networkOutputCount; }
-
-        public uint CurrentGeneration { get; private set; }
-
-        public double CurrentBestFitness { get; private set; }
 
         public NeatEvolutionAlgorithm<NeatGenome, IBlackBox> EvolutionAlgorithm { get; private set; }
 
@@ -77,12 +55,9 @@ namespace UnitySharpNEAT
 
         public override Type AIPlayerType => typeof(NeatAI);
 
-        #endregion
-
         #region UNTIY FUNCTIONS
         protected override void BeforePopCreation()
         {
-            Utility.DebugLog = _enableDebugLogging;
 
             // load experiment config file and use it to create an Experiment
             XmlDocument xmlConfig = new XmlDocument();
@@ -109,72 +84,43 @@ namespace UnitySharpNEAT
         /// </summary>
         public void StartEvolution()
         {
-            if (EvolutionAlgorithm != null && EvolutionAlgorithm.RunState == SharpNeat.Core.RunState.Running)
-                return;
-
-            //DeactivateAllUnits();
-
-            Utility.Log("Starting Experiment.");
-            _startTime = DateTime.Now;
-
             EvolutionAlgorithm = Experiment.CreateEvolutionAlgorithm(ExperimentIO.GetSaveFilePath(Experiment.Name, ExperimentFileType.Population));
-            EvolutionAlgorithm.UpdateEvent += new EventHandler(HandleUpdateEvent);
-
-            //StartCoroutine(EvolutionAlgorithm.PerformOneGeneration());
-        }
-
-        #endregion
-       
-
-        #region EVENT HANDLER
-        /// <summary>
-        /// Event callback which gets called at the end of each generation.
-        /// </summary>
-        void HandleUpdateEvent(object sender, EventArgs e)
-        {
-            Utility.Log(string.Format("Generation={0:N0} BestFitness={1:N6}", EvolutionAlgorithm.CurrentGeneration, EvolutionAlgorithm.Statistics._maxFitness));
-
-            CurrentBestFitness = EvolutionAlgorithm.Statistics._maxFitness;
-            CurrentGeneration = EvolutionAlgorithm.CurrentGeneration;
         }
 
         protected override List<AIPlayer> CreatPopulation()
         {
-            //StartEvolution();
+            StartEvolution();
 
-            //var possibleActions = new TryAction[5] { MacroActions.AttackClosest, MacroActions.AttackWithLowestHealth, MacroActions.AttackWithLowestDamage, MacroActions.AttackInRange, MacroActions.DoNothing };
-            //var inputs = new ICondition[2] { new Conditions.Damaged(), new Conditions.Free() };
+            List<INeatPlayer> pop = new List<INeatPlayer>();
 
-            //List<INeatPlayer> pop = new List<INeatPlayer>();
+            for (int i = 0; i < PopulationSize; i++)
+            {
+                pop.Add(new NeatAI(outputActions, inputConditions));
+            }
 
-            //for (int i = 0; i < PopulationSize; i++)
-            //{
-            //    pop.Add(new NeatAI(possibleActions, inputs));
-            //}
+            EvolutionAlgorithm.SetPopulation(pop);
+            return new List<AIPlayer>(pop);
+        }
 
-            //EvolutionAlgorithm.SetPopulation(pop);
-            //return new List<AIPlayer>(pop);
+        protected override void BeforeEachGeneration() => EvolutionAlgorithm.PerformOneGeneration();        
+
+        public override void GenerationDone() => EvolutionAlgorithm.Evaluate();     
+
+
+        protected override void SaveChampion()
+        {
+            ExperimentIO.WriteChampion(Experiment, EvolutionAlgorithm.CurrentChampGenome);
+        }
+
+        public override AIPlayer LoadChampion()
+        {
+            NeatGenome championBrain = Experiment.LoadChampion();
+            return new NeatAI(outputActions, inputConditions, Experiment.CreateGenomeDecoder().Decode(championBrain));
+        }
+
+        public override AIPlayer GetChampion()
+        {
             return null;
-        }
-
-        protected override void BeforeEachGeneration()
-        {
-            EvolutionAlgorithm.PerformOneGeneration();
-        }
-
-        public override void GenerationDone()
-        {
-            EvolutionAlgorithm.Evaluate();
-        }
-
-        public override AIPlayer GetRepresentative()
-        {
-            return null;
-        }
-
-        public override AIPlayer ToSave()
-        {
-            throw new NotImplementedException();
         }
         #endregion
     }

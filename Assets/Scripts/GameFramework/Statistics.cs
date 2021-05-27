@@ -28,15 +28,4 @@ public struct Statistics
         destroyedBuildings = s.destroyedBuildings;
         UnitType = s.UnitType;
     }
-
-    //public static Statistics operator+ (Statistics a, Statistics b)
-    //{
-    //    Statistics sum = new Statistics(a.dealtDamage + b.dealtDamage,
-    //                                    a.receivedDamage + b.receivedDamage,
-    //                                    a.killedEnemies + b.killedEnemies,
-    //                                    a.destroyedBuildings + b.destroyedBuildings);
-
-    //    return sum;
-    //}
-
 }

@@ -13,6 +13,12 @@ public class CoevolutionTrainer : AITrainer
     Strategy meleeUnits;
     Strategy rangedUnits;
 
+    IMacroAction[] towerActions;
+    IMacroAction[] meleeActions;
+    IMacroAction[] rangedActions;
+
+    CoevolutionAI champion;
+
     public override Type AIPlayerType => typeof(CoevolutionAI);
 
     protected override List<AIPlayer> CreatPopulation()
@@ -26,45 +32,59 @@ public class CoevolutionTrainer : AITrainer
         IMacroAction attackInRange = new SerializableMacroActions.AttackInRange();
         IMacroAction doNothing = new SerializableMacroActions.DoNothing();
 
-        IMacroAction[] actions = new IMacroAction[4] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth };
+        towerActions = new IMacroAction[4] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth };
         ICondition[] conditions = new ICondition[2] { damaged, free };
-        towers = new Strategy(PopulationSize, IndividualLength, actions, conditions);
+        towers = new Strategy(PopulationSize, IndividualLength, towerActions, conditions);
 
         //Melee
-        IMacroAction[] actions2 = new IMacroAction[5] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth, doNothing };
+        meleeActions = new IMacroAction[5] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth, doNothing };
         ICondition[] conditions2 = conditions;
-        meleeUnits = new Strategy(PopulationSize, IndividualLength, actions2, conditions2);
+        meleeUnits = new Strategy(PopulationSize, IndividualLength, meleeActions, conditions2);
 
         //Ranged
-        IMacroAction[] actions3 = new IMacroAction[5] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth, doNothing };
+        rangedActions = new IMacroAction[5] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth, doNothing };
         ICondition[] conditions3 = conditions;
-        rangedUnits = new Strategy(PopulationSize, IndividualLength, actions3, conditions3);
+        rangedUnits = new Strategy(PopulationSize, IndividualLength, rangedActions, conditions3);
 
+        List<AIPlayer> pop = new List<AIPlayer>();
+        return GetPop();
+    }
+
+    private List<AIPlayer> GetPop()
+    {
         List<AIPlayer> pop = new List<AIPlayer>();
 
         for (int i = 0; i < towers.PopulationSize; i++)
             for (int j = 0; j < meleeUnits.PopulationSize; j++)
                 for (int k = 0; k < rangedUnits.PopulationSize; k++)
-                    pop.Add(new CoevolutionAI(towers[i], meleeUnits[j], rangedUnits[k], new List<IMacroAction[]>() { actions, actions2, actions3 }));
+                    pop.Add(new CoevolutionAI(towers[i], meleeUnits[j], rangedUnits[k], new List<IMacroAction[]>() {towerActions, rangedActions, meleeActions }));
 
         return pop;
     }
 
     public override void GenerationDone()
     {
-        towers.GeneticOperations(Operators.RouletteWheel, Operators.UniformCrossover, Operators.ActionMutation);
-        meleeUnits.GeneticOperations(Operators.RouletteWheel, Operators.UniformCrossover, Operators.ActionMutation);
-        rangedUnits.GeneticOperations(Operators.RouletteWheel, Operators.UniformCrossover, Operators.ActionMutation);
+        foreach (AIPlayer player in population)
+            ((CoevolutionAI)player).SetIndividualFitness();
 
+        champion = (CoevolutionAI)FindChampion();
+        Debug.LogWarning(string.Format("Coevolution best: {0}", ((CoevolutionAI)GetChampion()).Fitness));
+
+        towers.Evolve();
+        meleeUnits.Evolve();
+        rangedUnits.Evolve();
+        population = GetPop();
     }
 
-    public override AIPlayer GetRepresentative()
+    private AIPlayer FindChampion()
     {
-        throw new System.NotImplementedException();
-    }
+        AIPlayer best = population[0];
 
-    public override AIPlayer ToSave()
-    {
-        throw new System.NotImplementedException();
+        foreach (AIPlayer player in population)
+            if (((CoevolutionAI)player).Fitness > ((CoevolutionAI)best).Fitness)
+                best = player;
+
+        return best;
     }
+    public override AIPlayer GetChampion() => champion;
 }

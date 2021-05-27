@@ -5,46 +5,48 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
 using Genetic;
+using System.Linq;
 
 [DataContract]
 public class RulesAI : AIPlayer
 {
-    [DataMember]
-    public Individual individual;
+    public int Fitness { get; private set; }
 
     [DataMember]
-    public IMacroAction[] possibleActions;
+    readonly StrategyIndividual individual;
 
-    ConcurrentQueue<int> AccumulatedFitnesses;
+    [DataMember]
+    readonly ShopperIndividual shopper;
 
-    public RulesAI(Individual ind, IMacroAction[] actions)
+    [DataMember]
+    readonly IMacroAction[] possibleActions;
+
+    [DataMember]
+    const int lowUnitTreshold = 1;
+
+    ConcurrentQueue<GameStats> accumulatedResults;
+
+    public RulesAI(StrategyIndividual ind, IMacroAction[] actions, ShopperIndividual shopperInd)
     {
         possibleActions = actions;
         individual = ind;
-        AccumulatedFitnesses = new ConcurrentQueue<int>();
+        accumulatedResults = new ConcurrentQueue<GameStats>();
+        shopper = shopperInd;
     }
 
-    private RulesAI(Individual ind, IMacroAction[] actions, ref ConcurrentQueue<int> fitnesses)
+    private RulesAI(StrategyIndividual ind, IMacroAction[] actions, ShopperIndividual shopperInd, ConcurrentQueue<GameStats> fitnesses)
     {
         possibleActions = actions;
         individual = ind;
-        AccumulatedFitnesses = fitnesses;
+        accumulatedResults = fitnesses;
+        shopper = shopperInd;
+        
     }
+
 
     public override AIPlayer Clone()
     {
-        return new RulesAI(new Individual(individual), possibleActions, ref AccumulatedFitnesses);
-    }
-
-    public int GetFitnessMean()
-    {
-        int[] fitnessArray = AccumulatedFitnesses.ToArray();
-
-        if (fitnessArray.Length == 1)
-            return fitnessArray[0];
-
-        Array.Sort(fitnessArray);
-        return fitnessArray[Mathf.CeilToInt(fitnessArray.Length / 2)];
+        return new RulesAI(new StrategyIndividual(individual), possibleActions, shopper, accumulatedResults);
     }
 
     protected override IAction FindAction(Attacker attacker)
@@ -54,7 +56,7 @@ public class RulesAI : AIPlayer
 
         foreach (Rule rule in individual)
         {
-            if (rule.AllTrue(attacker))
+            if (rule.AllTrue(attacker, Info))
                 votes[rule.ActionIndex]++;
         }
 
@@ -73,12 +75,37 @@ public class RulesAI : AIPlayer
 
     protected override int PickToBuy()
     {
-        return UnitFinder.PickOnBudget(OwnArmy.Money);
+        return shopper.GetNext(Info.OwnArmy.Money);
     }
 
     protected override void RunOver(GameStats stats)
     {
-        individual.SetFtiness(stats, role);
-        AccumulatedFitnesses.Enqueue(individual.Fitness);
+        accumulatedResults.Enqueue(stats);
     }
+
+    public void EvaluateFitness(FitnessCalculation fitnessFunction = null)
+    {
+        GameStats[] stats = accumulatedResults.ToArray();
+
+        if (fitnessFunction != null)
+            Fitness = fitnessFunction(stats, Side);
+        else
+            Fitness = GetMeanFitness(stats, Side);
+
+        individual.AddFitness(Fitness);
+        shopper.AddFitness(Fitness);
+
+    }
+
+    private int GetMeanFitness(GameStats[] stats, Role role)
+    {
+        List<int> fitnesses = new List<int>();
+
+        foreach (GameStats gameStat in stats)
+           fitnesses.Add(EvolutionFunctions.ComputeFitness(gameStat, role));
+
+        return fitnesses[fitnesses.Count / 2];
+    }
+
+    
 }

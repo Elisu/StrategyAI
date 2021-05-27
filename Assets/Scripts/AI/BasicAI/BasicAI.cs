@@ -1,9 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using System.Runtime.Serialization;
+
 
 public class BasicAI : AIPlayer
 {
+    const int lowUnitTresholt = 1;
+
     public override AIPlayer Clone()
     {
         return new BasicAI();
@@ -17,12 +22,12 @@ public class BasicAI : AIPlayer
         {
             if (!MacroActions.AttackInRange(attacker, out resultAction))
             {
-                TroopBase enemy = OwnArmy.SenseEnemyLowestHealth();
+                TroopBase enemy = Info.EnemyArmy.SenseLowestHealth();
                 if (enemy != null && enemy.Health < attacker.Health)
                     MacroActions.AttackGiven(enemy, attacker, out resultAction);
                 else
                 {
-                    enemy = OwnArmy.SenseEnemyLowestDamage();
+                    enemy = Info.EnemyArmy.SenseLowestDamage();
                     if (enemy != null && enemy.Damage < attacker.Damage)
                         MacroActions.AttackGiven(enemy, attacker, out resultAction);
                     else
@@ -50,6 +55,20 @@ public class BasicAI : AIPlayer
 
     protected override int PickToBuy()
     {
-        return UnitFinder.PickOnBudget(OwnArmy.Money);
+        if (Info.OwnArmy.Count <= lowUnitTresholt)
+            return UnitFinder.LowestPriceIndex;
+
+        if (Side == Role.Defender && !Info.OwnArmy.Troops.Any(x => x.Range > 1))
+        {
+            for (int i = 0; i < UnitFinder.unitStats.Count; i++)
+            {
+                if (UnitFinder.unitStats[i].Range > 1 && UnitFinder.unitStats[i].Price <= Info.OwnArmy.Money)
+                    return i;
+
+            }
+        }
+
+        return UnitFinder.PickOnBudget(Info.OwnArmy.Money);
+
     }
 }

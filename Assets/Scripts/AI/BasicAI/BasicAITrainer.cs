@@ -19,12 +19,12 @@ public class BasicAITrainer : AITrainer
         return;
     }
 
-    public override AIPlayer GetRepresentative()
+    public override AIPlayer LoadChampion()
     {
         return new BasicAI();
     }
 
-    public override AIPlayer ToSave()
+    public override AIPlayer GetChampion()
     {
         return null;
     }

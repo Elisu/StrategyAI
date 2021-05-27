@@ -11,6 +11,8 @@ internal class Scheduler
     //Queue<Attacker> inProgress = new Queue<Attacker>();
     Queue<Attacker> inProgress = new Queue<Attacker>();
 
+    public int RunningActionsCount => inProgress.Count;
+
     public void ScheduleActions()
     {
         Schedule(attacker);
@@ -19,7 +21,7 @@ internal class Scheduler
 
     private void Schedule(IPlayer player)
     {
-        if (player.OwnArmy.Count == 0)
+        if (player.Info.OwnArmy.Count == 0)
             return;
 
         Tuple<Attacker, IAction> action = player.GetActions();
@@ -44,7 +46,7 @@ internal class Scheduler
     {
         int count = inProgress.Count;
 
-        Debug.Log(string.Format("Number of running action: {0}", inProgress.Count));
+        //Debug.Log(string.Format("Number of running action: {0}", inProgress.Count));
         for (int i = 0; i < count; i++)
         {
             Attacker attacker = inProgress.Dequeue();            
@@ -58,11 +60,11 @@ internal class Scheduler
 
     public void Shopping(Instance instance)
     {
-        attacker.OwnArmy.MoneyGain();
-        defender.OwnArmy.MoneyGain();
+        attacker.Info.OwnArmy.MoneyGain();
+        defender.Info.OwnArmy.MoneyGain();
 
-        attacker.OwnArmy.TryBuying(attacker.PickToBuy(), instance);
-        defender.OwnArmy.TryBuying(defender.PickToBuy(), instance);
+        attacker.Info.OwnArmy.TryBuying(attacker.PickToBuy(), instance);
+        defender.Info.OwnArmy.TryBuying(defender.PickToBuy(), instance);
     }
 
     public void Set(IPlayer attacker, IPlayer defender)

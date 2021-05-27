@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
@@ -8,9 +9,9 @@ using UnityEngine;
 
 public abstract class AITrainer : MonoBehaviour
 {
-    public List<AIPlayer> Population { get; private set; }
+    protected List<AIPlayer> population = new List<AIPlayer>();
 
-    public int PopulationCount => Population.Count;
+    public ReadOnlyCollection<AIPlayer> Population => population.AsReadOnly();
 
     public abstract Type AIPlayerType { get; }
 
@@ -18,8 +19,8 @@ public abstract class AITrainer : MonoBehaviour
     {
         InitializeVariables();
         BeforePopCreation();
-        Population = CreatPopulation();
-        AfterStart();
+        population = CreatPopulation();
+        AfterPopCreation();
         BeforeEachGeneration();
     }
 
@@ -37,7 +38,7 @@ public abstract class AITrainer : MonoBehaviour
     /// Method called once after the instantiation of the class, right after CreatePopulation -
     /// override if needed
     /// </summary>
-    protected virtual void AfterStart()
+    protected virtual void AfterPopCreation()
     {
         return;
     }
@@ -50,17 +51,26 @@ public abstract class AITrainer : MonoBehaviour
         return;
     }
 
-    protected internal virtual void SaveGiven()
+    protected internal virtual void SaveChampion()
     {
-        AIPlayer player = ToSave();
+        AIPlayer player = GetChampion();
 
         if (player == null)
             return;
 
-        using (var stream = new FileStream("neco.xml", FileMode.Create))
+        using (var stream = new FileStream(string.Format("{0}", player.ToString()), FileMode.Create))
         {
             DataContractSerializer serializer = new DataContractSerializer(player.GetType());
             serializer.WriteObject(stream, player);
+        }
+    }
+
+    public virtual AIPlayer LoadChampion()
+    {
+        using (var stream = new FileStream(string.Format("{0}", AIPlayerType.Name), FileMode.Open))
+        {
+            DataContractSerializer serializer = new DataContractSerializer(AIPlayerType);
+            return (AIPlayer)serializer.ReadObject(stream);
         }
     }
 
@@ -74,7 +84,9 @@ public abstract class AITrainer : MonoBehaviour
     /// </summary>
     public abstract void GenerationDone();
 
-    public abstract AIPlayer GetRepresentative();
-
-    public abstract AIPlayer ToSave();
+    /// <summary>
+    /// Called at the end of the training to retreive the player to save
+    /// </summary>
+    /// <returns>Player to be saved at the end of the training - null means nothing saved</returns>
+    public abstract AIPlayer GetChampion();
 }

@@ -14,25 +14,20 @@ public abstract class IPlayer
     /// The side the player is on - defender/attacker
     /// </summary>
     [DataMember]
-    public Role role;
+    public Role Side { get; private set; }
 
     /// <summary>
     /// Represents all the troops, buildings and towers of the player
     /// </summary>
-    protected internal Army OwnArmy { get; internal set; }
+    protected internal GameInfo Info { get; private set; }
 
-    internal void Start(Instance game, Role role)
+    internal void Start(GameInfo game, Role side)
     {
-        this.role = role;
-        OwnArmy = new Army(role);
+        this.Side = side;
+        this.Info = game;
     }
 
     protected internal abstract Tuple<Attacker, IAction> GetActions();
-
-    /// <summary>
-    /// Called at the end of a run
-    /// </summary>
-    protected internal abstract void RunOver(GameStats stats);
 
 
     /// <summary>

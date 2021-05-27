@@ -9,12 +9,14 @@ using UnityEngine;
 [DataContract]
 public class CoevolutionAI : AIPlayer
 {
+    public int Fitness { get; private set; }
+
     [DataMember]
-    Individual towers;
+    StrategyIndividual towers;
     [DataMember]
-    Individual meleeUnits;
+    StrategyIndividual meleeUnits;
     [DataMember]
-    Individual rangedUnits;
+    StrategyIndividual rangedUnits;
 
     /// <summary>
     /// order Towers, Melee, Ranged
@@ -22,30 +24,33 @@ public class CoevolutionAI : AIPlayer
     [DataMember]
     readonly List<IMacroAction[]> possibleActions;
 
-    ConcurrentQueue<int> AccumulatedFitnessesTowers;
-    ConcurrentQueue<int> AccumulatedFitnessesMelee;
-    ConcurrentQueue<int> AccumulatedFitnessesRanged;
+    ConcurrentQueue<GameStats> accumulatedResults;
 
-    public CoevolutionAI(Individual tw, Individual melee, Individual ranged, List<IMacroAction[]> actions)
+    public CoevolutionAI(StrategyIndividual tw, StrategyIndividual melee, StrategyIndividual ranged, List<IMacroAction[]> actions)
     {
         towers = tw;
         meleeUnits = melee;
         rangedUnits = ranged;
-
         possibleActions = actions;
+        accumulatedResults = new ConcurrentQueue<GameStats>();
+    }
 
-        AccumulatedFitnessesTowers = new ConcurrentQueue<int>();
-        AccumulatedFitnessesMelee = new ConcurrentQueue<int>();
-        AccumulatedFitnessesRanged = new ConcurrentQueue<int>();
+    private CoevolutionAI(StrategyIndividual tw, StrategyIndividual melee, StrategyIndividual ranged, List<IMacroAction[]> actions, ConcurrentQueue<GameStats> fitnesses)
+    {
+        towers = tw;
+        meleeUnits = melee;
+        rangedUnits = ranged;
+        possibleActions = actions;
+        accumulatedResults = fitnesses;
     }
 
     private CoevolutionAI DeepCopy()
     {
-        Individual tw = new Individual(this.towers);
-        Individual melee = new Individual(this.meleeUnits);
-        Individual ranged = new Individual(this.rangedUnits);
+        StrategyIndividual tw = new StrategyIndividual(this.towers);
+        StrategyIndividual melee = new StrategyIndividual(this.meleeUnits);
+        StrategyIndividual ranged = new StrategyIndividual(this.rangedUnits);
 
-        return new CoevolutionAI(tw, melee, ranged, possibleActions);
+        return new CoevolutionAI(tw, melee, ranged, possibleActions, accumulatedResults);
     }
 
     public override AIPlayer Clone()
@@ -57,7 +62,7 @@ public class CoevolutionAI : AIPlayer
     {
         IAction resultAction = null;
         IMacroAction[] actions;
-        Individual current;
+        StrategyIndividual current;
 
         if (attacker is TowerBase)
         {
@@ -79,7 +84,7 @@ public class CoevolutionAI : AIPlayer
 
         foreach (Rule rule in current)
         {
-            if (rule.AllTrue(attacker))
+            if (rule.AllTrue(attacker, Info))
                 votes[rule.ActionIndex]++;
         }
 
@@ -96,43 +101,22 @@ public class CoevolutionAI : AIPlayer
         return resultAction;
     }
 
-    public Tuple<int,int,int> GetFitnessMean()
-    {
-        int towers = MeanFitness(AccumulatedFitnessesTowers.ToArray());
-        int melee = MeanFitness(AccumulatedFitnessesMelee.ToArray());
-        int ranged = MeanFitness(AccumulatedFitnessesRanged.ToArray());
-
-        return new Tuple<int, int, int>(towers, melee, ranged);
-    }
-
-    private int MeanFitness(int[] fitnessArray)
-    {
-        if (fitnessArray.Length == 1)
-            return fitnessArray[0];
-
-        Array.Sort(fitnessArray);
-        return fitnessArray[Mathf.CeilToInt(fitnessArray.Length / 2)];
-    }
-
-
     protected override void RunOver(GameStats stats)
     {
-        GameStats towerStats = stats.FilterStatistics((x) => x.UnitType.IsSubclassOf(typeof(TowerBase)));
-        GameStats meleeStats = stats.FilterStatistics((x) => x.UnitType.IsSubclassOf(typeof(HumanUnit)) && x.UnitType != typeof(Archers));
-        GameStats rangedStats = stats.FilterStatistics((x) => x.UnitType == typeof(Archers));
-
-        towers.SetFtiness(towerStats, role);
-        meleeUnits.SetFtiness(meleeStats, role);
-        rangedUnits.SetFtiness(rangedStats, role);
-
-        AccumulatedFitnessesTowers.Enqueue(towers.Fitness);
-        AccumulatedFitnessesMelee.Enqueue(meleeUnits.Fitness);
-        AccumulatedFitnessesRanged.Enqueue(rangedUnits.Fitness);
-            
+        accumulatedResults.Enqueue(stats);            
     }
 
     protected override int PickToBuy()
     {
-        return UnitFinder.PickOnBudget(OwnArmy.Money);
+        return UnitFinder.PickOnBudget(Info.OwnArmy.Money);
+    }
+
+    public void SetIndividualFitness()
+    {
+        //towers.AddFitness(accumulatedResults.ToArray(), Side);
+        //meleeUnits.AddFitness(accumulatedResults.ToArray(), Side);
+        //rangedUnits.AddFitness(accumulatedResults.ToArray(), Side);
+
+        //Fitness = towers.Fitness;
     }
 }

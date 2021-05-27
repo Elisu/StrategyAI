@@ -7,8 +7,8 @@ using UnityEngine.UI;
 internal class GameLoop : Loop
 {
     public GameInstance game;
-    public AITrainer humanPlayer;
-    public AITrainer aiPlayer;
+    public AITrainer attacker;
+    public AITrainer defender;
     public Text winnerText;
     public string fileToLoad = null;
 
@@ -18,14 +18,9 @@ internal class GameLoop : Loop
         game.SetMap(LoadMap());
         game.GameOver += GameOver;
 
-        AIPlayer player;
-        if (string.IsNullOrEmpty(fileToLoad))
-            player = aiPlayer.GetRepresentative();
-        else
-            player = LoadPlayerFromFile(fileToLoad, aiPlayer.AIPlayerType);
-
-
-        game.Run(player, humanPlayer.GetRepresentative());
+        AIPlayer playerDefender = defender.LoadChampion();
+        AIPlayer playerAttacker = attacker.LoadChampion();
+        game.Run(playerAttacker, playerDefender);
     }
 
     private void GameOver()

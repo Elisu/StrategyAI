@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Cavalry : HumanUnit
 {
-    System.Random rnd = new System.Random();
-
     public Cavalry()
     {
         Health = CavalrySetup.Health;
@@ -14,6 +12,7 @@ public class Cavalry : HumanUnit
         Damage = CavalrySetup.Damage;
         Range = CavalrySetup.Range;
         UnitPrefab = CavalrySetup.UnitPrefab;
+        BundleCount = 20;
     }
     public override float GetDefenseAgainst(Type unitType)
     {
@@ -30,11 +29,8 @@ public class Cavalry : HumanUnit
 
     internal override bool GiveDamage(Damageable enemy, int totalDamage)
     {
-        if (enemy is Building building)
-            return building.TakeDamage(totalDamage);
-        else
+        if (enemy is TroopBase enemyTroop)
         {
-            TroopBase enemyTroop = (TroopBase)enemy;
             int index = rnd.Next(0, enemyTroop.Count);
 
             while (totalDamage > 0)
@@ -45,8 +41,11 @@ public class Cavalry : HumanUnit
                 totalDamage -= Damage;
                 index = rnd.Next(0, enemyTroop.Count);
             }
-
         }
+        else
+            enemy.TakeDamage(totalDamage);
+
+
 
         //IDamagable not killed
         return false;

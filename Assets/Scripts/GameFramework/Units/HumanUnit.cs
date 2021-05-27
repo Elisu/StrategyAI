@@ -23,6 +23,8 @@ public abstract class HumanUnit : Unit
 
     public GameObject UnitPrefab { get; protected set; }
 
+    protected System.Random rnd = new System.Random();
+
     internal virtual bool GiveDamage(Damageable enemy, int totalDamage)
     {
         return enemy.TakeDamage(totalDamage);

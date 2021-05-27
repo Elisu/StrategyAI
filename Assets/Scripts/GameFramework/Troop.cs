@@ -20,8 +20,8 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
             actualPosition = value;
 
             if (!CurrentInstance.IsTraining)
-                if (visual != null)
-                    visual.transform.position = new Vector3(actualPosition.x * CurrentInstance.Map.SizeMultiplier,
+                if (Visual != null)
+                    Visual.transform.position = new Vector3(actualPosition.x * CurrentInstance.Map.SizeMultiplier,
                                                             1.5f,
                                                             actualPosition.y * CurrentInstance.Map.SizeMultiplier);
         }
@@ -32,8 +32,6 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
     public abstract float Speed { get; }
 
-    protected GameObject visual;
-
     protected int MaxHealth;
 
     protected Queue<Vector2Int> route;
@@ -42,7 +40,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
     protected System.Random rnd = new System.Random();
 
-    internal virtual void MoveForAttack(Vector2Int targetPos)
+    internal void MoveForAttack(Vector2Int targetPos)
     {
         if (CurrentState != State.Moving || !CurrentInstance.Map[targetPosition].CanPass(Side) || rnd.Next(0, 201) < 1)
         {
@@ -56,6 +54,19 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
         Move();     
         
+    }
+
+    internal bool MoveTo(Vector2Int targetPos)
+    {
+        if (CurrentState != State.Moving || !CurrentInstance.Map[targetPosition].CanPass(Side) || rnd.Next(0, 201) < 1)
+        {
+            CurrentState = State.Moving;
+            Target = null;
+            route = null;
+            RecomputeRoute(targetPos);
+        }
+
+        return Move();
     }
 
     private void RecomputeRoute(Vector2Int targetPos)
@@ -101,8 +112,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
         return found;
     }
 
-
-    public bool Move()
+    private bool Move()
     {
         if (route == null)
             return false;
@@ -177,7 +187,7 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
             troopHealth.Add(unit.Health);
 
         if (!CurrentInstance.IsTraining)
-            visual = unit.UnitPrefab;
+            Visual = unit.UnitPrefab;
 
         Health = Count * unit.Health;
         MaxHealth = Health;
@@ -190,12 +200,12 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
         if (CurrentInstance.IsTraining)
             return;
 
-        if (visual != null)
+        if (Visual != null)
         {
-            visual = UnityEngine.Object.Instantiate(visual, visual.transform.position, Quaternion.identity);
+            Visual = UnityEngine.Object.Instantiate(Visual, Visual.transform.position, Quaternion.identity);
 
             if (Side == Role.Defender)
-                visual.GetComponent<Renderer>().material.color = new Color(0, 0, 255);
+                Visual.GetComponent<Renderer>().material.color = new Color(0, 0, 255);
         }         
         
     }
@@ -294,8 +304,8 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
         CurrentInstance.GetArmy(Side).Remove(this);
         CurrentInstance.Map[Position] = null;
 
-        if (visual != null)
-            UnityEngine.Object.Destroy(visual);
+        if (Visual != null)
+            UnityEngine.Object.Destroy(Visual);
     }
 
     //public void StopAction()

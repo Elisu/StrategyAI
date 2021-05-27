@@ -1,14 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace Genetic
 {
-    public delegate Individual[] Selection(Individual[] pop);
-    public delegate Individual MutateFunc(Individual ind);
-    public delegate Tuple<Individual, Individual> CrossFunc(Individual a, Individual b);
-
     //public delegate bool TryAction(Attacker recruit, out IAction action);
 
     public class Strategy
@@ -18,75 +15,105 @@ namespace Genetic
 
         public int GenerationRunCount => population.Length * 1;
 
-        public IMacroAction[] possibleActions;
-        public ICondition[] usedConditions;
-        public Individual[] population;
+        public ReadOnlyCollection<StrategyIndividual> Population => Array.AsReadOnly<StrategyIndividual>(population);
+
+        public StrategyIndividual Champion { get; private set; }
+        private StrategyIndividual[] population;
 
         public Strategy(int popSize, int indLength, IMacroAction[] actions, ICondition[] conditions)
-        {
-            possibleActions = actions;
-            usedConditions = conditions;
-            population = Individual.CreatePopulation(popSize, indLength, actions.Length, conditions);
+        { 
+            population = StrategyIndividual.CreatePopulation(popSize, indLength, actions.Length, conditions);
+            Champion = population[0];
         }
 
-        public Individual this[int index]
+        public StrategyIndividual this[int index]
         {
             get => population[index];
         }
 
-        public void GeneticOperations(Selection selection, CrossFunc cross, MutateFunc mutate)
+        public void Evolve()
         {
-            //Debug.LogWarning("GENETIC");
-            Individual[] selected = selection(population);
+            foreach (StrategyIndividual ind in population)
+                ind.Evaluate();
+
+            SetChampion();
+            StrategyIndividual[] selected = EvolutionFunctions.RouletteWheelSelection(population);
 
             if (selected == null)
                 return;
 
-            selected = Crossover(selected, cross);
-            selected = Mutation(selected, mutate);
+            selected = EvolutionFunctions.Crossover(selected, UniformCrossover);
+            selected = EvolutionFunctions.Mutation(selected, ActionMutation);
             population = selected;
         }
 
-        private Individual[] Crossover(Individual[] pop, CrossFunc cross)
+        private void SetChampion()
         {
-            Individual[] crossed = new Individual[pop.Length];
+            StrategyIndividual best = population[0];
 
-            for (int i = 1; i < pop.Length; i += 2)
+            foreach (var ind in population)
+                if (ind.Fitness > best.Fitness)
+                    best = ind;
+
+            Champion = best;
+        }       
+
+
+        private StrategyIndividual ActionMutation(StrategyIndividual ind)
+        {
+            StrategyIndividual mutated = new StrategyIndividual(ind);
+
+            foreach (Rule rule in mutated)
             {
-                if (UnityEngine.Random.value < 0.4)
-                {
-                    Tuple<Individual, Individual> offs = cross(pop[i - 1], pop[i]);
-                    crossed[i - 1] = offs.Item1;
-                    crossed[i] = offs.Item2;
-                }
-                else
-                {
-                    crossed[i - 1] = pop[i - 1];
-                    crossed[i] = pop[i];
-                }
-
+                if (UnityEngine.Random.value < 0.5)
+                    rule.ActionIndex = UnityEngine.Random.Range(0, rule.ActionCount);
             }
 
-            //If length not even add last individual
-            if (pop.Length % 2 == 1)
-                crossed[pop.Length - 1] = pop[pop.Length - 1];
-
-            return crossed;
+            return mutated;
         }
 
-        private Individual[] Mutation(Individual[] pop, MutateFunc mutate)
+        private Tuple<StrategyIndividual, StrategyIndividual> UniformCrossover(StrategyIndividual a, StrategyIndividual b)
         {
-            List<Individual> mutated = new List<Individual>();
+            List<Rule> first = new List<Rule>();
+            List<Rule> second = new List<Rule>();
 
-            foreach (Individual ind in pop)
+            for (int i = 0; i < Mathf.Min(a.Length, b.Length); i++)
             {
-                if (UnityEngine.Random.value < 0.25)
-                    mutated.Add(mutate(ind));
+                if (UnityEngine.Random.value > 0.5)
+                {
+                    first.Add(new Rule(a[i]));
+                    second.Add(new Rule(b[i]));
+                }
                 else
-                    mutated.Add(new Individual(ind));
+                {
+                    first.Add(new Rule(b[i]));
+                    second.Add(new Rule(a[i]));
+                }
             }
 
-            return mutated.ToArray();
+            int end;
+            StrategyIndividual rest;
+
+            if (a.Length < b.Length)
+            {
+                end = a.Length;
+                rest = b;
+            }
+            else
+            {
+                end = b.Length;
+                rest = a;
+            }
+
+            for (int i = end; i < rest.Length; i++)
+            {
+                if (UnityEngine.Random.value > 0.5)
+                    first.Add(new Rule(rest[i]));
+                else
+                    second.Add(new Rule(rest[i]));
+            }
+
+            return new Tuple<StrategyIndividual, StrategyIndividual>(new StrategyIndividual(first), new StrategyIndividual(second));
         }
 
     }

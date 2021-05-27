@@ -6,7 +6,7 @@ public abstract class IController<PlayerType> : MonoBehaviour where PlayerType :
 {
     protected PlayerType player;
 
-    public Army OwnArmy => player.OwnArmy;
+    public Army OwnArmy => player.Info.OwnArmy;
 
     public virtual void Activate(PlayerType player, Instance game)
     {

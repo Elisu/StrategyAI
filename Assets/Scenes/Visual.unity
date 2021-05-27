@@ -636,12 +636,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapObject: {fileID: 1980576903}
   game: {fileID: 3868471417579026627, guid: e0fd41c53e981154096a5f042f57c12b, type: 3}
-  humanPlayer: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
+  attacker: {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa,
     type: 3}
-  aiPlayer: {fileID: 7067290049789075546, guid: 186f7a5ee06e88740a263c80a4cc45a0,
+  defender: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
     type: 3}
   winnerText: {fileID: 497692512}
-  fileToLoad: neco.xml
+  fileToLoad: 
 --- !u!4 &1435923424
 Transform:
   m_ObjectHideFlags: 0
@@ -781,6 +781,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2910188563505198574, guid: a45069545bc712c4ab6b8b56cdf10206,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6757889779662185614, guid: a45069545bc712c4ab6b8b56cdf10206,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -855,6 +860,11 @@ PrefabInstance:
         type: 3}
       propertyPath: square
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 9011976382068812592, guid: a45069545bc712c4ab6b8b56cdf10206,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a45069545bc712c4ab6b8b56cdf10206, type: 3}

@@ -10,8 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 7171948027913415863}
   - component: {fileID: 7171948027913415860}
-  - component: {fileID: 7171948027913415862}
   - component: {fileID: 409651050}
+  - component: {fileID: 2186815627403369354}
+  - component: {fileID: 4402882959786940195}
+  - component: {fileID: 7171948027913415862}
   m_Layer: 0
   m_Name: UnitSetup
   m_TagString: Untagged
@@ -47,11 +49,67 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 400
   speed: 0.03
-  defense: 1
-  damage: 1
+  damage: 2
   range: 1
   price: 5000
   unitPrefab: {fileID: 3092250751406926663, guid: 2cafa296b392dad4d8cba96d365b20b1,
+    type: 3}
+--- !u!114 &409651050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7171948027913415861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88501309b6fbf4458bbe03f3e2b3167, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 500
+  speed: 0.055
+  damage: 3
+  range: 1
+  price: 8000
+  unitPrefab: {fileID: 79413847425938234, guid: 93b32194e12c46f4485d613f8cf2c8bc,
+    type: 3}
+--- !u!114 &2186815627403369354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7171948027913415861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 992c2260250042d42b081e56e47d2513, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 200
+  speed: 0.04
+  damage: 1
+  range: 5
+  price: 5500
+  unitPrefab: {fileID: 5761984030114095444, guid: 82b956aa2b7b55d4aa603a36c39a0ff3,
+    type: 3}
+--- !u!114 &4402882959786940195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7171948027913415861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b7d12ae1cf69cf4d9c56dcbeaa2543c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 50000
+  speed: 0.005
+  damage: 3000
+  range: 15
+  price: 15000
+  unitPrefab: {fileID: 769084251093826395, guid: c005297b908441445a2a86413ae43683,
     type: 3}
 --- !u!114 &7171948027913415862
 MonoBehaviour:
@@ -67,29 +125,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 30000
   speed: 0
-  defense: 50
   damage: 10
   range: 5
   price: 20000
   unitPrefab: {fileID: 8013575570939275799, guid: a12d0b024fa6c514d8f2b411285774e5,
-    type: 3}
---- !u!114 &409651050
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7171948027913415861}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d88501309b6fbf4458bbe03f3e2b3167, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 500
-  speed: 0.24
-  defense: 1
-  damage: 2
-  range: 1
-  price: 8000
-  unitPrefab: {fileID: 5761984030114095444, guid: 82b956aa2b7b55d4aa603a36c39a0ff3,
     type: 3}

@@ -6,10 +6,15 @@ internal class TrainingInstance : Instance
 {
     public override bool IsTraining => true;
 
-    public override void Run(IPlayer attack, IPlayer defend)
+    int loopsWithoutAction;
+    int loops;
+
+    public void Run(AIPlayer attack, AIPlayer defend)
     {
         SetPlayers(attack, defend);
         IsRunning = true;
+        loops = 0;
+        loopsWithoutAction = 0;
 
         RunGameTrainingLoop();
     }
@@ -20,37 +25,48 @@ internal class TrainingInstance : Instance
         scheduler.Shopping(this);
         scheduler.Shopping(this);
 
-        while (defender.OwnArmy.Count != 0 && attacker.OwnArmy.Count != 0)
+        while (defender.Info.OwnArmy.Troops.Count != 0 && attacker.Info.OwnArmy.Troops.Count != 0)
         {
             if (IsRunning)
             {
                 scheduler.Shopping(this);
                 scheduler.ScheduleActions();
-                scheduler.RunActions();                
+
+                if (scheduler.RunningActionsCount == 0)
+                    loopsWithoutAction++;
+                else
+                    loopsWithoutAction = 0;
+
+                scheduler.RunActions();
+                loops++;
             }
+
+            if (loopsWithoutAction > 10000 || loops > 100000)
+                break;
         }
 
         GameStats stats;
 
-        if (defender.OwnArmy.Count == 0 && attacker.OwnArmy.Count == 0)
-            stats = GetGameStats(Role.Neutral);
-        else if (attacker.OwnArmy.Count == 0)
+        if (attacker.Info.OwnArmy.Troops.Count == 0)
             stats = GetGameStats(Role.Defender);
-        else
+        else if (defender.Info.OwnArmy.Troops.Count == 0)
             stats = GetGameStats(Role.Attacker);
-        
-        defender.RunOver(stats);
-        attacker.RunOver(stats);
+        else
+            stats = GetGameStats(Role.Neutral);
 
-        GameOverHandler();
+        Debug.Log(string.Format("Winner is {0}", stats.Winner));
+        ((AIPlayer)defender).RunOver(stats);
+        ((AIPlayer)attacker).RunOver(stats);
+
+        //GameOverHandler();
     }
 
     private GameStats GetGameStats(Role winner)
     {
         //Debug.LogWarning(string.Format("The WINNER is: {0}", winner.ToString()));
 
-        List<Statistics> attackerStats = attacker.OwnArmy.GetAllStats();
-        List<Statistics> defenderStats = defender.OwnArmy.GetAllStats();
+        List<Statistics> attackerStats = attacker.Info.OwnArmy.GetAllStats();
+        List<Statistics> defenderStats = defender.Info.OwnArmy.GetAllStats();
 
         return new GameStats(attackerStats, defenderStats, winner); 
     }

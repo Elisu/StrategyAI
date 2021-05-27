@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnitySharpNEAT;
 using Genetic;
+using System.Runtime.Serialization;
 
 public class NeatAI : INeatPlayer
 {
@@ -12,23 +13,23 @@ public class NeatAI : INeatPlayer
     ICondition[] inputs;
     GameStats stats;
 
-    public NeatAI(IMacroAction[] actions, ICondition[] conditions)
+    public NeatAI(IMacroAction[] actions, ICondition[] conditions, IBlackBox brain = null)
     {
         possibleActions = actions;
         inputs = conditions;
+        SetBlackBox(brain);
     }
-
 
     public override float GetFitness()
     {
-        List<Statistics> myStats = stats.GetMyStats(role);
+        IList<Statistics> myStats = stats.GetMyStats(Side);
 
         int kills = 0;
         int dealtDamage = 0;
         int receivedDamage = 0;
         float fitness = 0;
 
-        if (stats.Winner == role)
+        if (stats.Winner == Side)
             fitness += 10000;
 
         foreach (Statistics stat in myStats)
@@ -46,7 +47,7 @@ public class NeatAI : INeatPlayer
     protected override void UpdateBlackBoxInputs(ISignalArray inputSignalArray, Attacker attacker)
     {
         for (int i = 0; i < inputSignalArray.Length; i++)
-            inputSignalArray[i] = Convert.ToDouble(inputs[i].Evaluate(attacker));
+            inputSignalArray[i] = Convert.ToDouble(inputs[i].Evaluate(attacker, Info));
     }
 
     protected override IAction UseBlackBoxOutpts(ISignalArray outputSignalArray, Attacker attacker)
@@ -80,6 +81,6 @@ public class NeatAI : INeatPlayer
 
     protected override int PickToBuy()
     {
-        return UnitFinder.PickOnBudget(OwnArmy.Money);
+        return UnitFinder.PickOnBudget(Info.OwnArmy.Money);
     }
 }

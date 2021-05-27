@@ -10,6 +10,10 @@ public class RulesAITrainer : AITrainer
     public int IndividualLength;
 
     Strategy all;
+    ShopperPopulation shoppers;
+    IMacroAction[] possibleActions;
+
+    AIPlayer champion;
 
     public override Type AIPlayerType => typeof(RulesAI);
 
@@ -17,52 +21,55 @@ public class RulesAITrainer : AITrainer
     {
         ICondition damaged = new Conditions.Damaged();
         ICondition free = new Conditions.Free();
+        ICondition strongest = new Conditions.Strongest();
+        ICondition closestIsTroop = new Conditions.ClosestIsTroopBase();
+        ICondition[] conditions = new ICondition[4] { damaged, free, strongest, closestIsTroop };
 
-        IMacroAction[] actions = new IMacroAction[5] { new SerializableMacroActions.AttackClosest(), 
-                                                       new SerializableMacroActions.AttackWithLowestHealth(), 
-                                                       new SerializableMacroActions.AttackWithLowestDamage(), 
-                                                       new SerializableMacroActions.AttackInRange(), 
-                                                       new SerializableMacroActions.DoNothing() };
-        ICondition[] conditions = new ICondition[2] { damaged, free };
-        all = new Strategy(PopulationSize, IndividualLength, actions, conditions);
+        possibleActions = new IMacroAction[5] { new SerializableMacroActions.AttackClosest(), 
+                                                new SerializableMacroActions.AttackWithLowestHealth(), 
+                                                new SerializableMacroActions.AttackWithLowestDamage(), 
+                                                new SerializableMacroActions.AttackInRange(), 
+                                                new SerializableMacroActions.DoNothing() };
+
+        all = new Strategy(PopulationSize, IndividualLength, possibleActions, conditions);
+
+        shoppers = new ShopperPopulation(PopulationSize);
 
         List<AIPlayer> pop = new List<AIPlayer>();
 
         for (int i = 0; i < all.PopulationSize; i++)
-            pop.Add(new RulesAI(all[i], actions));
+            pop.Add(new RulesAI(all[i], possibleActions, shoppers[i]));
 
         return pop;
     }
 
     public override void GenerationDone()
     {
-        int bestFitness = 0;
+        foreach (AIPlayer player in population)
+            ((RulesAI)player).EvaluateFitness();
 
-        for (int i = 0; i < Population.Count; i++)
-        {
-            all[i].Fitness = ((RulesAI)Population[i]).GetFitnessMean();
-            if (bestFitness < all[i].Fitness)
-                bestFitness = all[i].Fitness;
-        }
+        champion = FindChampion();
 
-        Debug.LogWarning(string.Format("Best individual: {0}", bestFitness));
+        population.Clear();
+ 
+        all.Evolve();
+        shoppers.Evolve();
 
-        all.GeneticOperations(Operators.RouletteWheel, Operators.UniformCrossover, Operators.ActionMutation);
+        for (int i = 0; i < all.PopulationSize; i++)
+            population.Add(new RulesAI(all[i], possibleActions, shoppers[i]));
+
+        Debug.LogWarning(string.Format("Best fitness: {0}", all.Champion.Fitness));
     }
 
-    public override AIPlayer GetRepresentative()
+    private AIPlayer FindChampion()
     {
-        throw new System.NotImplementedException();
-    }
+        AIPlayer best = population[0];
 
-    public override AIPlayer ToSave()
-    {
-        AIPlayer best = Population[0];
-
-        foreach (AIPlayer player in Population)
-            if (((RulesAI)player).GetFitnessMean() > ((RulesAI)best).GetFitnessMean())
+        foreach (AIPlayer player in population)
+            if (((RulesAI)player).Fitness > ((RulesAI)best).Fitness)
                 best = player;
 
         return best;
     }
+    public override AIPlayer GetChampion() => champion;
 }

@@ -14,9 +14,9 @@ public class MacroActions
         if (army.Count == 0)
             return false;
 
-        IAttack closest = army[0];
+        IRecruitable closest = army[0];
 
-        foreach (IAttack troop in army)
+        foreach (IRecruitable troop in army)
         {
             if (Vector2Int.Distance(attacker.Position, closest.Position) > Vector2Int.Distance(attacker.Position, troop.Position))
                 closest = troop;
@@ -30,9 +30,9 @@ public class MacroActions
         Army army = attacker.CurrentInstance.GetEnemyArmy(attacker.Side);
         resultAction = null;
 
-        Attacker inRange = null;
+        IRecruitable inRange = null;
 
-        foreach (Attacker troop in army)
+        foreach (IRecruitable troop in army)
         {
             if (Mathf.Abs(attacker.Position.x - troop.Position.x) < attacker.Range || Mathf.Abs(attacker.Position.y - troop.Position.y) < attacker.Range)
                 inRange = troop;
@@ -48,14 +48,14 @@ public class MacroActions
 
     public static bool AttackWithLowestHealth(Attacker attacker, out IAction resultAction)
     {
-        Army army = attacker.CurrentInstance.GetArmy(attacker.Side);
-        return AttackOnCondition(army.SenseEnemyLowestHealth, attacker, out resultAction);
+        Army army = attacker.CurrentInstance.GetEnemyArmy(attacker.Side);
+        return AttackOnCondition(army.SenseLowestHealth, attacker, out resultAction);
     }
 
     public static bool AttackWithLowestDamage(Attacker attacker, out IAction resultAction)
     {
-        Army army = attacker.CurrentInstance.GetArmy(attacker.Side);
-        return AttackOnCondition(army.SenseEnemyLowestDamage, attacker, out resultAction);
+        Army army = attacker.CurrentInstance.GetEnemyArmy(attacker.Side);
+        return AttackOnCondition(army.SenseLowestDamage, attacker, out resultAction);
     }
 
     private static bool AttackOnCondition(Func<TroopBase> Selection, Attacker attacker, out IAction resultAction)

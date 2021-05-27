@@ -9,12 +9,12 @@ namespace Genetic
     public class Rule
     {
         [DataMember]
-        ICondition[] conditions;
+        readonly ICondition[] conditions;
 
         [DataMember]
         public int ActionIndex { get; set; }
         [DataMember]
-        public int ActionCount { get; protected set; }
+        public int ActionCount { get; private set; }
 
         public Rule(int possibleActionsCount, ICondition[] possibleConditions)
         {
@@ -44,10 +44,10 @@ namespace Genetic
             ActionCount = rule.ActionCount;
         }
 
-        public bool AllTrue(Attacker recruit)
+        public bool AllTrue(Attacker recruit, GameInfo info)
         {
             foreach (ICondition cond in conditions)
-                if (!cond.Evaluate(recruit))
+                if (!cond.Evaluate(recruit, info))
                     return false;
 
             return true;

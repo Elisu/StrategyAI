@@ -5,16 +5,29 @@ using UnityEngine;
 
 namespace Genetic
 {
-    public class Operators
+    public delegate T[] Selection<T>(T[] pop) where T : Individual<T>;
+    public delegate T MutateFunc<T>(T ind) where T : Individual<T>;
+    public delegate Tuple<T, T> CrossFunc<T>(T a, T b) where T : Individual<T>;
+
+    public interface Individual<T>
     {
-        public static Individual[] RouletteWheel(Individual[] pop)
+        public T GetClone(); 
+
+        int Fitness { get; }
+    }
+
+    public class EvolutionFunctions
+    {
+        public static T[] RouletteWheelSelection<T>(T[] pop) where T : Individual<T>
         {
-            Individual[] selected = new Individual[pop.Length];
+            T[] selected = new T[pop.Length];
             double fitnessSum = 0;
             double[] fitnesses = new double[pop.Length];
 
             for (int i = 0; i < pop.Length; i++)
+            {
                 fitnessSum += pop[i].Fitness;
+            }
 
             if (fitnessSum == 0)
                 return null;
@@ -33,7 +46,7 @@ namespace Genetic
 
                     if (sum > ball)
                     {
-                        selected[i] = new Individual(pop[j]);
+                        selected[i] = pop[j].GetClone();
                         break;
                     }
                 }
@@ -43,61 +56,65 @@ namespace Genetic
             return selected;
         }
 
-        public static Individual ActionMutation(Individual ind)
+        public static T[] Crossover<T>(T[] pop, CrossFunc<T> cross) where T : Individual<T>
         {
-            Individual mutated = new Individual(ind);
+            T[] crossed = new T[pop.Length];
 
-            foreach (Rule rule in mutated)
+            for (int i = 1; i < pop.Length; i += 2)
             {
-                if (UnityEngine.Random.value < 0.5)
-                    rule.ActionIndex = UnityEngine.Random.Range(0, rule.ActionCount);
+                if (UnityEngine.Random.value < 0.4)
+                {
+                    Tuple<T, T> offs = cross(pop[i - 1], pop[i]);
+                    crossed[i - 1] = offs.Item1;
+                    crossed[i] = offs.Item2;
+                }
+                else
+                {
+                    crossed[i - 1] = pop[i - 1];
+                    crossed[i] = pop[i];
+                }
+
             }
 
-            return mutated;
+            //If length not even add last individual
+            if (pop.Length % 2 == 1)
+                crossed[pop.Length - 1] = pop[pop.Length - 1];
+
+            return crossed;
         }
 
-        public static Tuple<Individual, Individual> UniformCrossover(Individual a, Individual b)
+        public static T[] Mutation<T>(T[] pop, MutateFunc<T> mutate) where T : Individual<T>
         {
-            List<Rule> first = new List<Rule>();
-            List<Rule> second = new List<Rule>();
+            List<T> mutated = new List<T>();
 
-            for (int i = 0; i < Mathf.Min(a.Length, b.Length); i++)
+            foreach (T ind in pop)
             {
-                if (UnityEngine.Random.value > 0.5)
-                {
-                    first.Add(new Rule(a[i]));
-                    second.Add(new Rule(b[i]));
-                }
+                if (UnityEngine.Random.value < 0.25)
+                    mutated.Add(mutate(ind));
                 else
-                {
-                    first.Add(new Rule(b[i]));
-                    second.Add(new Rule(a[i]));
-                }
+                    mutated.Add(ind.GetClone());
             }
 
-            int end;
-            Individual rest;
+            return mutated.ToArray();
+        }
 
-            if (a.Length < b.Length)
-            {
-                end = a.Length;
-                rest = b;
-            }
-            else
-            {
-                end = b.Length;
-                rest = a;
-            }
+        public static int ComputeFitness(GameStats stats, Role role)
+        {
+            int fitnessResult = 0;
 
-            for (int i = end; i < rest.Length; i++)
-            {
-                if (UnityEngine.Random.value > 0.5)
-                    first.Add(new Rule(rest[i]));
-                else
-                    second.Add(new Rule(rest[i]));
-            }
+            IList<Statistics> ownStats = stats.GetMyStats(role);
 
-            return new Tuple<Individual, Individual>(new Individual(first), new Individual(second));
+            if (stats.Winner == role)
+                fitnessResult += 15000;
+
+            int statResults = 0;
+            foreach (Statistics stat in ownStats)
+                statResults += stat.dealtDamage + stat.destroyedBuildings * 100 + stat.killedEnemies * 1000;
+
+            if (ownStats.Count > 0)
+                statResults /= ownStats.Count;
+
+            return fitnessResult + statResults;
         }
     }
 }

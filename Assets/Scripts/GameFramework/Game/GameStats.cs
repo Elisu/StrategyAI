@@ -1,35 +1,37 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 public struct GameStats
 {
-    public List<Statistics> AttackerStats { get; private set; }
-    public List<Statistics>  DefenderStats { get; private set; }
     public Role Winner { get; private set; }
+
+    private readonly ReadOnlyCollection<Statistics> attackerStats;
+    private readonly ReadOnlyCollection<Statistics> defenderStats;
 
     public GameStats(List<Statistics> attacker, List<Statistics> defender, Role win)
     {
-        AttackerStats = attacker;
-        DefenderStats = defender;
+        attackerStats = attacker.AsReadOnly();
+        defenderStats = defender.AsReadOnly();
         Winner = win;
     }
 
-    public List<Statistics> GetMyStats(Role myRole)
+    public ReadOnlyCollection<Statistics> GetMyStats(Role myRole)
     {
         if (myRole == Role.Attacker)
-            return AttackerStats;
+            return attackerStats;
         else
-            return DefenderStats;
+            return defenderStats;
     }
 
-    public List<Statistics> GetEnemyStats(Role myRole)
+    public ReadOnlyCollection<Statistics> GetEnemyStats(Role myRole)
     {
         if (myRole == Role.Defender)
-            return AttackerStats;
+            return attackerStats;
         else
-            return DefenderStats;
+            return defenderStats;
     }
 
     public GameStats FilterStatistics (Func<Statistics, bool> filter)
@@ -37,11 +39,11 @@ public struct GameStats
         List<Statistics> attacker = new List<Statistics>();
         List<Statistics> defender = new List<Statistics>();
 
-        foreach (Statistics stat in AttackerStats)
+        foreach (Statistics stat in attackerStats)
             if (filter.Invoke(stat))
                 attacker.Add(stat);
 
-        foreach (Statistics stat in DefenderStats)
+        foreach (Statistics stat in defenderStats)
             if (filter.Invoke(stat))
                 defender.Add(stat);
 

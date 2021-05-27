@@ -21,6 +21,7 @@ internal class TraningLoop : Loop
     private int currentDefender = 0;
 
     private bool trainingFinished = false;
+    private bool generationRunning = false;
 
     private void Start()
     {
@@ -50,31 +51,92 @@ internal class TraningLoop : Loop
 
         if (GenerationCount <= 0)
         {
+            Debug.Log("FINISHED");
             trainingFinished = true;
-            attacker.SaveGiven();
-            defender.SaveGiven();
+            attacker.SaveChampion();
+            defender.SaveChampion();
             return;
         }
 
+        if (!generationRunning)
+            StartCoroutine(RunGeneration());
+        //if (RunOneGeneration())
+        //{
+        //    attacker.GenerationDone();
+        //    defender.GenerationDone();
+        //    GenerationCount--;
 
-        if (RunOneGeneration())
+        //    if (GenerationCount > 0)
+        //    {
+        //        attacker.BeforeEachGeneration();
+        //        defender.BeforeEachGeneration();
+        //    }
+        //}
+    }
+
+    IEnumerator RunGeneration()
+    {
+        generationRunning = true;
+
+        yield return new WaitUntil(PerformOneGeneration);
+
+        attacker.GenerationDone();
+        defender.GenerationDone();
+        GenerationCount--;
+
+        if (GenerationCount > 0)
         {
-            attacker.GenerationDone();
-            defender.GenerationDone();
-            GenerationCount--;
-
-            if (GenerationCount > 0)
-            {
-                attacker.BeforeEachGeneration();
-                defender.BeforeEachGeneration();
-            }
+            attacker.BeforeEachGeneration();
+            defender.BeforeEachGeneration();
         }
+
+        generationRunning = false;
+    }
+
+
+    private bool PerformOneGeneration()
+    {
+        IList<AIPlayer> attackerPop = attacker.Population;
+        IList<AIPlayer> defenderPop = defender.Population;
+
+        currentAttacker = 0;
+        currentDefender = 0;
+
+        while (currentAttacker != attackerPop.Count || currentDefender != defenderPop.Count)
+        {
+            List<Task> runningTasks = new List<Task>();
+            int i = 0;
+            for (; currentAttacker < attackerPop.Count; currentAttacker++)
+            {
+                for (; currentDefender < defenderPop.Count; currentDefender++, i++)
+                {
+                    if (i >= gameInstancesCount)
+                        break;
+
+                    int index = i;
+                    AIPlayer att = attackerPop[currentAttacker].Clone();
+                    AIPlayer def = defenderPop[currentDefender].Clone();
+
+                    runningTasks.Add(Task.Run(() => instances[index].Run(att, def)));
+                }
+
+                if (i >= gameInstancesCount)
+                    break;
+
+                if (currentAttacker < attackerPop.Count - 1)
+                    currentDefender = 0;
+            }
+
+            Task.WaitAll(runningTasks.ToArray());
+        }
+
+        return true;
     }
 
     private bool RunOneGeneration()
     {
-        List<AIPlayer> attackerPop = attacker.Population;
-        List<AIPlayer> defenderPop = defender.Population;
+        IList<AIPlayer> attackerPop = attacker.Population;
+        IList<AIPlayer> defenderPop = defender.Population;
 
         List<Task> runningTasks = new List<Task>();
 
@@ -96,11 +158,12 @@ internal class TraningLoop : Loop
 
             if (i >= gameInstancesCount)
                 break;
+
+            if (currentAttacker < attackerPop.Count - 1)
+                currentDefender = 0;
         }
 
-        //Debug.Log("Waiting");
         Task.WaitAll(runningTasks.ToArray());
-        //Debug.Log("Finished Waiting");
 
         if (currentAttacker == attackerPop.Count && currentDefender == defenderPop.Count)
         {

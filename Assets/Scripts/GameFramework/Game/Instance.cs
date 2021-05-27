@@ -18,18 +18,16 @@ public abstract class Instance : MonoBehaviour
 
     public abstract bool IsTraining { get; }
 
-    public abstract void Run(IPlayer attack, IPlayer defend);
-
     protected void SetPlayers(IPlayer attack, IPlayer defend)
     {
         attacker = attack;
         defender = defend;
 
-        attacker.Start(this, Role.Attacker);
-        defender.Start(this, Role.Defender);
+        Army attackerArmy = new Army(Role.Attacker);
+        Army defenderArmy = new Army(Role.Defender);
 
-        attacker.OwnArmy.SetEnemy(this);
-        defender.OwnArmy.SetEnemy(this);
+        attacker.Start(new GameInfo(attackerArmy, defenderArmy), Role.Attacker);
+        defender.Start(new GameInfo(defenderArmy, attackerArmy), Role.Defender);
 
         Map.ReloadMap(this);
 
@@ -45,17 +43,17 @@ public abstract class Instance : MonoBehaviour
     internal Army GetEnemyArmy(Role role)
     {
         if (role == Role.Attacker)
-            return defender.OwnArmy;
+            return defender.Info.OwnArmy;
         else
-            return attacker.OwnArmy;
+            return attacker.Info.OwnArmy;
     }
 
     internal Army GetArmy(Role role)
     {
         if (role == Role.Defender)
-            return defender.OwnArmy;
+            return defender.Info.OwnArmy;
         else
-            return attacker.OwnArmy;
+            return attacker.Info.OwnArmy;
     }
 
     protected void GameOverHandler()

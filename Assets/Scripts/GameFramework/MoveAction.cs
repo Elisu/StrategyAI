@@ -28,23 +28,17 @@ internal class Move : IAction
 
     public bool Execute()
     {
-        Debug.Log("Executing Move");
-        troop.MoveForAttack(target);
-        bool stillGoing = troop.Move();
+        if (troop.Health <= 0)
+        {
+            troop.StopAction();
+            return false;
+        }
+        
+        bool stillGoing = troop.MoveTo(target);
 
         if (!stillGoing)
             troop.StopAction();
 
         return stillGoing;
-    }
-
-    public void Schedule()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Start()
-    {
-        throw new NotImplementedException();
     }
 }

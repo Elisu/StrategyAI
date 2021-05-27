@@ -10,7 +10,7 @@ internal class GameInstance : Instance
 
     public Role winner { get; private set; }
 
-    public override void Run(IPlayer attack, IPlayer defend)
+    public void Run(IPlayer attack, IPlayer defend)
     {
         SetPlayers(attack, defend);
         IsRunning = true;
@@ -29,9 +29,9 @@ internal class GameInstance : Instance
 
     protected void RunGameStep()
     {
-        if (defender.OwnArmy.Count == 0 || attacker.OwnArmy.Count == 0)
+        if (defender.Info.OwnArmy.Troops.Count == 0 || attacker.Info.OwnArmy.Troops.Count == 0)
         {
-            if (defender.OwnArmy.Count == 0)
+            if (defender.Info.OwnArmy.Troops.Count == 0)
                 winner = Role.Attacker;
             else
                 winner = Role.Defender;
