@@ -10,7 +10,6 @@ public class BasicTower : TowerUnit
         Health = BasicTowerSetup.Health;
         Damage = BasicTowerSetup.Damage;
         Range = BasicTowerSetup.Range;
-        //UnitPrefab = SwordsmenSetup.UnitPrefab;
     }
 
     public override float GetDefenseAgainst(Type unitType)

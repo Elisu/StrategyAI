@@ -41,7 +41,7 @@ internal class TrainingInstance : Instance
                 loops++;
             }
 
-            if (loopsWithoutAction > 10000 || loops > 100000)
+            if (loopsWithoutAction > 1000 || loops > 10000)
                 break;
         }
 

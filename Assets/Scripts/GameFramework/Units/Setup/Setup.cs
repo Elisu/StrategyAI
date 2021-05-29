@@ -16,7 +16,7 @@ internal abstract class Setup<T> : MonoBehaviour where T: Unit
     [SerializeField]
     private int price;
     [SerializeField]
-    private GameObject unitPrefab;
+    private VisualController unitPrefab;
 
     private static Setup<T> instance;
     
@@ -25,7 +25,7 @@ internal abstract class Setup<T> : MonoBehaviour where T: Unit
     public static int Damage { get => instance.damage; }
     public static int Range { get => instance.range; }
     public static int Price { get => instance.price; }
-    public static GameObject UnitPrefab { get => instance.unitPrefab; }
+    public static VisualController UnitPrefab { get => instance.unitPrefab; }
 
 
     public Setup()

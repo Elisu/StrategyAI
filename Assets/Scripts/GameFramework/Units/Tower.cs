@@ -53,12 +53,12 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
         CurrentInstance.Map[Position] = null;
 
         if (Visual != null)
-            GameObject.Destroy(Visual);            
+            GameObject.Destroy(Visual.gameObject);            
     }
 
     protected Tower() { }
 
-    public Tower(Vector2Int pos, Instance instance, GameObject vis = null)
+    internal Tower(Vector2Int pos, Instance instance, VisualController vis = null)
     {
         CurrentState = State.Free;
         Side = Role.Defender;
@@ -67,6 +67,10 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
         position = pos;
 
         if (!CurrentInstance.IsTraining)
+        {
             Visual = vis;
+            Visual.Set(this);
+        }
+            
     }
 }

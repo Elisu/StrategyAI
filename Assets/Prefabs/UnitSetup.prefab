@@ -52,7 +52,7 @@ MonoBehaviour:
   damage: 2
   range: 1
   price: 5000
-  unitPrefab: {fileID: 3092250751406926663, guid: 2cafa296b392dad4d8cba96d365b20b1,
+  unitPrefab: {fileID: 5344744494389361972, guid: 2cafa296b392dad4d8cba96d365b20b1,
     type: 3}
 --- !u!114 &409651050
 MonoBehaviour:
@@ -67,11 +67,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 500
-  speed: 0.055
+  speed: 0.05
   damage: 3
   range: 1
   price: 8000
-  unitPrefab: {fileID: 79413847425938234, guid: 93b32194e12c46f4485d613f8cf2c8bc,
+  unitPrefab: {fileID: 3223163026237893155, guid: 93b32194e12c46f4485d613f8cf2c8bc,
     type: 3}
 --- !u!114 &2186815627403369354
 MonoBehaviour:
@@ -85,12 +85,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 992c2260250042d42b081e56e47d2513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 200
+  health: 300
   speed: 0.04
   damage: 1
   range: 5
   price: 5500
-  unitPrefab: {fileID: 5761984030114095444, guid: 82b956aa2b7b55d4aa603a36c39a0ff3,
+  unitPrefab: {fileID: 501703852416993974, guid: 82b956aa2b7b55d4aa603a36c39a0ff3,
     type: 3}
 --- !u!114 &4402882959786940195
 MonoBehaviour:
@@ -109,7 +109,7 @@ MonoBehaviour:
   damage: 3000
   range: 15
   price: 15000
-  unitPrefab: {fileID: 769084251093826395, guid: c005297b908441445a2a86413ae43683,
+  unitPrefab: {fileID: 1415161191751012375, guid: c005297b908441445a2a86413ae43683,
     type: 3}
 --- !u!114 &7171948027913415862
 MonoBehaviour:
@@ -126,7 +126,6 @@ MonoBehaviour:
   health: 30000
   speed: 0
   damage: 10
-  range: 5
+  range: 10
   price: 20000
-  unitPrefab: {fileID: 8013575570939275799, guid: a12d0b024fa6c514d8f2b411285774e5,
-    type: 3}
+  unitPrefab: {fileID: 0}

@@ -33,16 +33,16 @@ public static class UnitFactory
         return null;
     }
 
-    public static IRecruitable CreateStructure(Transform structure, Vector2Int position, Instance instance)
+    public static IRecruitable CreateStructure(VisualController structure, Vector2Int position, Instance instance)
     {
         switch (structure.tag)
         {
             case "Tower":
-                return new Tower<BasicTower>(position, instance, structure.gameObject);
+                return new Tower<BasicTower>(position, instance, structure);
             case "Gate":
-                return new Gate(position, instance, structure.gameObject);
+                return new Gate(position, instance, structure);
             case "Wall":
-                return new Wall(position, instance, structure.gameObject);
+                return new Wall(position, instance, structure);
         }
 
         return null;

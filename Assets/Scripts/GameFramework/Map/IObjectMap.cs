@@ -6,14 +6,14 @@ internal class IObjectMap : Map<Field>
     public float SizeMultiplier { get; protected set; }
 
     private List<Field> spawns;
-    Dictionary<Vector2Int, Transform> structureObjects;
+    Dictionary<Vector2Int, VisualController> structureObjects;
     Dictionary<Vector2Int, string> structureTags;
 
     public IObjectMap(int height, int width, List<List<Transform>> realMap, float scale) : base(width, height)
     {
         SizeMultiplier = scale;
         spawns = new List<Field>();
-        structureObjects = new Dictionary<Vector2Int, Transform>();
+        structureObjects = new Dictionary<Vector2Int, VisualController>();
         structureTags = new Dictionary<Vector2Int, string>();
         LoadMap(realMap);
     }
@@ -25,7 +25,7 @@ internal class IObjectMap : Map<Field>
             {
                 FieldInfo fieldInfo = realMap[j][i].GetComponent<FieldInfo>();
                 Vector2Int position = new Vector2Int(i, j);
-                Field field = new Field(fieldInfo,position);
+                Field field = new Field(fieldInfo, position);
 
                 map[i, j] = field;
 
@@ -34,14 +34,14 @@ internal class IObjectMap : Map<Field>
                     if (field.Square == SquareType.Building)
                     {
                         Transform child = fieldInfo.transform.GetChild(0);
-                        structureObjects.Add(position, child);
+                        structureObjects.Add(position, child.GetComponent<VisualController>());
                         structureTags.Add(position, child.tag);
                     }
 
                     if (field.Square == SquareType.Spawn)
                         spawns.Add(map[i, j]);
                 }
-                    
+
             }
     }
 
@@ -55,12 +55,12 @@ internal class IObjectMap : Map<Field>
 
                 if (instance.IsTraining)
                 {
-                    if (structureTags.TryGetValue(map[i, j].Position, out string tag))                
+                    if (structureTags.TryGetValue(map[i, j].Position, out string tag))
                         map[i, j].OnField = instance.GetArmy(Role.Defender).AddStructure(tag, map[i, j].Position, instance);
                 }
                 else
                 {
-                    if (structureObjects.TryGetValue(map[i, j].Position, out Transform structure))
+                    if (structureObjects.TryGetValue(map[i, j].Position, out VisualController structure))
                         map[i, j].OnField = instance.GetArmy(Role.Defender).AddStructure(structure, map[i, j].Position, instance);
                 }
             }
@@ -92,9 +92,7 @@ internal class IObjectMap : Map<Field>
 
         set
         {
-            if (!(map[index.x, index.y].OnField is Gate))
-                map[index.x, index.y].OnField = value;
-                    
+            map[index.x, index.y].OnField = value;
         }
     }
 
@@ -110,8 +108,7 @@ internal class IObjectMap : Map<Field>
 
         set
         {
-            if (!(map[x, y].OnField is Gate))
-                map[x, y].OnField = value;
+            map[x, y].OnField = value;
         }
     }
 

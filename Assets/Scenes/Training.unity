@@ -811,7 +811,7 @@ MonoBehaviour:
   gameInstancesCount: 20
   gameInstance: {fileID: 6862441489602338825, guid: 852759d35db7ab54a8e80f3f364d295e,
     type: 3}
-  GenerationCount: 50
+  GenerationCount: 200
 --- !u!1 &387431730
 GameObject:
   m_ObjectHideFlags: 0

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2108503372019210236}
   - component: {fileID: 3809331440258066918}
   - component: {fileID: 7505826078997829687}
+  - component: {fileID: 7783706203273000354}
   m_Layer: 0
   m_Name: BasicTower
   m_TagString: Tower
@@ -96,3 +97,16 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!114 &7783706203273000354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8013575570939275799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f77f19efb6274a448f5bdfa7ed15288, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lr: {fileID: 3474062884181267242, guid: fe0dfa78f17032e4ab5172ff6a4167a0, type: 3}

@@ -21,8 +21,8 @@ public abstract class AIPlayer : IPlayer
 
             if (recruit is Attacker attack)
             {
-                IAction action = FindAction((Attacker)attack);
-                return new Tuple<Attacker, IAction>((Attacker)attack, action);                
+                IAction action = FindAction(attack);
+                return new Tuple<Attacker, IAction>(attack, action);                
             }                
         }
 

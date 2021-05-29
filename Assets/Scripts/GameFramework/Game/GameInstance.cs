@@ -10,9 +10,9 @@ internal class GameInstance : Instance
 
     public Role winner { get; private set; }
 
-    public void Run(IPlayer attack, IPlayer defend)
+
+    public void Run()
     {
-        SetPlayers(attack, defend);
         IsRunning = true;
         scheduler.Shopping(this);
         scheduler.Shopping(this);
@@ -38,8 +38,8 @@ internal class GameInstance : Instance
 
             IsRunning = false;
             GameOverHandler();
-        }
-            
+            return;
+        }            
 
         scheduler.Shopping(this);
         scheduler.ScheduleActions();

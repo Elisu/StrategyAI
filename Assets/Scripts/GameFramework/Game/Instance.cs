@@ -5,7 +5,7 @@ using UnityEngine;
 
 public abstract class Instance : MonoBehaviour
 {
-    public event Action GameOver;
+    internal event Action GameOver;
 
     protected IPlayer attacker;
     protected IPlayer defender;    
@@ -18,7 +18,7 @@ public abstract class Instance : MonoBehaviour
 
     public abstract bool IsTraining { get; }
 
-    protected void SetPlayers(IPlayer attack, IPlayer defend)
+   internal void SetPlayers(IPlayer attack, IPlayer defend)
     {
         attacker = attack;
         defender = defend;

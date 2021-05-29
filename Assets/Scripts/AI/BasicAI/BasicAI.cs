@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 public class BasicAI : AIPlayer
 {
     const int lowUnitTresholt = 1;
+    int tobuy = 0;
 
     public override AIPlayer Clone()
     {
@@ -68,7 +69,8 @@ public class BasicAI : AIPlayer
             }
         }
 
-        return UnitFinder.PickOnBudget(Info.OwnArmy.Money);
+        tobuy = (tobuy + 1) % UnitFinder.unitStats.Count;
+        return tobuy;
 
     }
 }

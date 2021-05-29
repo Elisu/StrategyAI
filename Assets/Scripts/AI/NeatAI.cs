@@ -22,26 +22,7 @@ public class NeatAI : INeatPlayer
 
     public override float GetFitness()
     {
-        IList<Statistics> myStats = stats.GetMyStats(Side);
-
-        int kills = 0;
-        int dealtDamage = 0;
-        int receivedDamage = 0;
-        float fitness = 0;
-
-        if (stats.Winner == Side)
-            fitness += 10000;
-
-        foreach (Statistics stat in myStats)
-        {
-            kills += stat.killedEnemies;
-            dealtDamage += stat.dealtDamage;
-            receivedDamage += stat.receivedDamage;
-
-        }
-
-        fitness += kills * 1000 + dealtDamage;
-        return fitness;
+        return EvolutionFunctions.ComputeFitness(stats, Side);
     }
 
     protected override void UpdateBlackBoxInputs(ISignalArray inputSignalArray, Attacker attacker)

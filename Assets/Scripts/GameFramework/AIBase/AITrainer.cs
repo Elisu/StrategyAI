@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using UnityEngine;
 
-public abstract class AITrainer : MonoBehaviour
+public abstract class AITrainer : IPlayerController
 {
     protected List<AIPlayer> population = new List<AIPlayer>();
 
@@ -65,12 +65,12 @@ public abstract class AITrainer : MonoBehaviour
         }
     }
 
-    public virtual AIPlayer LoadChampion()
+    public override IPlayer LoadChampion()
     {
         using (var stream = new FileStream(string.Format("{0}", AIPlayerType.Name), FileMode.Open))
         {
             DataContractSerializer serializer = new DataContractSerializer(AIPlayerType);
-            return (AIPlayer)serializer.ReadObject(stream);
+            return (IPlayer)serializer.ReadObject(stream);
         }
     }
 

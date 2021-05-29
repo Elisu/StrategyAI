@@ -64,7 +64,7 @@ public abstract class Damageable : IDamageable
 
     public State CurrentState { get; protected set; }
 
-    internal GameObject Visual { get; private protected set; }
+    internal VisualController Visual { get; private protected set; }
 
     public abstract Vector2Int Position { get; }
     public abstract Type type { get; }

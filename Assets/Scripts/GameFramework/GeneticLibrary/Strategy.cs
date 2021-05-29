@@ -10,7 +10,6 @@ namespace Genetic
 
     public class Strategy
     {
-        public int IndividualLength { get; protected set; }
         public int PopulationSize => population.Length;
 
         public int GenerationRunCount => population.Length * 1;

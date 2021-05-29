@@ -58,8 +58,12 @@ namespace UnitySharpNEAT
         #region UNTIY FUNCTIONS
         protected override void BeforePopCreation()
         {
+            LoadExperiment();
+        }
+        #endregion
 
-            // load experiment config file and use it to create an Experiment
+        private void LoadExperiment()
+        {
             XmlDocument xmlConfig = new XmlDocument();
             TextAsset textAsset = (TextAsset)Resources.Load(_experimentConfigFileName);
 
@@ -76,8 +80,6 @@ namespace UnitySharpNEAT
 
             ExperimentIO.DebugPrintSavePaths(Experiment);
         }
-        #endregion
-
         #region NEAT LIFECYCLE
         /// <summary>
         /// Starts the NEAT algorithm.
@@ -102,7 +104,7 @@ namespace UnitySharpNEAT
             return new List<AIPlayer>(pop);
         }
 
-        protected override void BeforeEachGeneration() => EvolutionAlgorithm.PerformOneGeneration();        
+        protected override void BeforeEachGeneration() => StartCoroutine(EvolutionAlgorithm.PerformOneGeneration());        
 
         public override void GenerationDone() => EvolutionAlgorithm.Evaluate();     
 
@@ -112,8 +114,9 @@ namespace UnitySharpNEAT
             ExperimentIO.WriteChampion(Experiment, EvolutionAlgorithm.CurrentChampGenome);
         }
 
-        public override AIPlayer LoadChampion()
+        public override IPlayer LoadChampion()
         {
+            LoadExperiment();
             NeatGenome championBrain = Experiment.LoadChampion();
             return new NeatAI(outputActions, inputConditions, Experiment.CreateGenomeDecoder().Decode(championBrain));
         }

@@ -21,7 +21,7 @@ public abstract class HumanUnit : Unit
 
     public bool Passable => false;
 
-    public GameObject UnitPrefab { get; protected set; }
+    internal VisualController UnitPrefab { get; private protected set; }
 
     protected System.Random rnd = new System.Random();
 

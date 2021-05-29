@@ -2,32 +2,33 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class HumanPlayerController : AITrainer
+internal class HumanPlayerController : IPlayerController
 {
     HumanPlayer player = new HumanPlayer();
 
     Attacker selectedUnit;
 
-    public override Type AIPlayerType => throw new NotImplementedException();
+    IObjectMap gameMap;
 
-    public override void GenerationDone()
+    Text moneyText;
+
+    public override IPlayer LoadChampion()
     {
-        throw new NotImplementedException();
+        return player;
     }
 
-    public override AIPlayer GetChampion()
+    public void SetMap(IObjectMap map, Text text)
     {
-        throw new NotImplementedException();
-    }
-
-    protected override List<AIPlayer> CreatPopulation()
-    {
-        throw new NotImplementedException();
+        gameMap = map;
+        moneyText = text;
     }
 
     void Update()
     {
+        moneyText.text = player.Money.ToString();
+
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
@@ -37,12 +38,43 @@ public class HumanPlayerController : AITrainer
             {
                 if (hit.transform != null)
                 {
-                    //p   
-                    //player. new Move(hit.transform.position.x, hit.transform.position.z, troop);
-                    ////Scheduler.Attacker.Enqueue(move);
+                    Vector2 actualPos = new Vector2(hit.transform.position.x / gameMap.SizeMultiplier, hit.transform.position.z / gameMap.SizeMultiplier);
+                    Vector2Int pos = Vector2Int.RoundToInt(actualPos); 
+                    
+                    IObject objectInPosition = gameMap[pos];
+
+                    if (selectedUnit != null)
+                    {
+                        if (objectInPosition is Field)
+                            if (selectedUnit is TroopBase troop)
+                            {
+                                player.SetAction(selectedUnit, new Move(pos, troop));
+                                selectedUnit = null;
+                            }    
+                                
+
+                        if (objectInPosition is Damageable toDamage)
+                        {
+                            if (toDamage.Side != player.Side)
+                            {
+                                player.SetAction(selectedUnit, new Attack(toDamage, selectedUnit));
+                                selectedUnit = null;
+                            }                                
+                        }                            
+                    }
+                    else if (objectInPosition is Attacker unit)
+                        if (unit.Side == player.Side)
+                        {
+                            selectedUnit = unit;
+                            selectedUnit.Visual.HoverOverEnter();
+                        }
+                                         
+
                 }
             }
         }
 
     }
+
+    public void AddUnit(int type) => player.SetToBuy(type);
 }

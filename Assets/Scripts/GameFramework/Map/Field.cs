@@ -8,11 +8,30 @@ public class Field : IObject
 
     public SquareType Square { get; private set; }
 
-    public IObject OnField { get; internal set; }
+    public IObject OnField
+    {
+        get => onField;
+
+        internal set
+        {
+            if (onField is TroopBase && value == null)
+                onField = preserve;
+            else if (onField is Gate && value is TroopBase)
+            {
+                preserve = onField;
+                onField = value;
+            }
+            else
+                onField = value;
+            
+        }
+    }
 
     private Role side;
+    private IObject onField;
+    private IObject preserve;
 
-    public Field (FieldInfo info, Vector2Int position)
+    public Field(FieldInfo info, Vector2Int position)
     {
         Square = info.Square;
         side = info.Side;

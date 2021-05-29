@@ -101,10 +101,11 @@ internal class TraningLoop : Loop
 
         currentAttacker = 0;
         currentDefender = 0;
+        List<Task> runningTasks = new List<Task>();
 
         while (currentAttacker != attackerPop.Count || currentDefender != defenderPop.Count)
-        {
-            List<Task> runningTasks = new List<Task>();
+        {            
+            runningTasks.Clear();
             int i = 0;
             for (; currentAttacker < attackerPop.Count; currentAttacker++)
             {

@@ -7,9 +7,10 @@ using UnityEngine.UI;
 internal class GameLoop : Loop
 {
     public GameInstance game;
-    public AITrainer attacker;
-    public AITrainer defender;
+    public IPlayerController attacker;
+    public IPlayerController defender;
     public Text winnerText;
+    public Text moneyText;
     public string fileToLoad = null;
 
     private void Start()
@@ -18,9 +19,20 @@ internal class GameLoop : Loop
         game.SetMap(LoadMap());
         game.GameOver += GameOver;
 
-        AIPlayer playerDefender = defender.LoadChampion();
-        AIPlayer playerAttacker = attacker.LoadChampion();
-        game.Run(playerAttacker, playerDefender);
+        attacker = Instantiate(attacker);
+        defender = Instantiate(defender);
+
+        IPlayer playerDefender = defender.LoadChampion();
+        IPlayer playerAttacker = attacker.LoadChampion();
+
+        game.SetPlayers(playerAttacker, playerDefender);
+
+        if (attacker is HumanPlayerController humanAttacker)
+            humanAttacker.SetMap(game.Map, moneyText);
+        else if (defender is HumanPlayerController humanDefender)
+            humanDefender.SetMap(game.Map, moneyText);
+
+        game.Run();
     }
 
     private void GameOver()

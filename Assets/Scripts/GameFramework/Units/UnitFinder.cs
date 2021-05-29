@@ -19,8 +19,6 @@ public class UnitFinder : MonoBehaviour
     public static int LowestDamage { get; private set; }
     public static int HighestDamage { get; private set; }
 
-    internal static List<Type> unitTypes = new List<Type>();
-
     public struct UnitInfo
     {
         public int Price { get; private set; }
@@ -28,14 +26,16 @@ public class UnitFinder : MonoBehaviour
         public int Damage { get; private set; }
         public int Range { get; private set; }
         public float Speed { get; private set; }
+        public Type UnitType { get; private set; }
 
-        public UnitInfo(int price, int health, int damage, int range, float speed)
+        public UnitInfo(int price, int health, int damage, int range, float speed, Type type)
         {
             Price = price;
             Health = health;
             Damage = damage;
             Range = range;
             Speed = speed;
+            UnitType = type;
         }
     }
         
@@ -56,9 +56,9 @@ public class UnitFinder : MonoBehaviour
             int damageValue = GetValue<int>(unit, "Damage");
             int rangeValue = GetValue<int>(unit, "Range");
             float speedValue = GetValue<float>(unit, "Speed");
+            Type type = unit.BaseType.GetGenericArguments()[0];
 
-            unitStats.Add(new UnitInfo(priceValue, healthValue, damageValue, rangeValue, speedValue));
-            unitTypes.Add(unit.BaseType.GetGenericArguments()[0]);
+            unitStats.Add(new UnitInfo(priceValue, healthValue, damageValue, rangeValue, speedValue, type));
 
             if (unitStats[LowestPriceIndex].Price > priceValue)
                 LowestPriceIndex = unitStats.Count - 1;

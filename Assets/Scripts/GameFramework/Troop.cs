@@ -8,8 +8,6 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 {
     public abstract int Count { get;}
 
-    public abstract int Price { get; protected set; }
-
     private Vector2 actualPosition;
 
     public Vector2 ActualPosition
@@ -21,9 +19,9 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
             if (!CurrentInstance.IsTraining)
                 if (Visual != null)
-                    Visual.transform.position = new Vector3(actualPosition.x * CurrentInstance.Map.SizeMultiplier,
-                                                            1.5f,
-                                                            actualPosition.y * CurrentInstance.Map.SizeMultiplier);
+                    Visual.transform.position = new Vector3(actualPosition.x * mapMultiplier,
+                                                            Visual.transform.position.y,
+                                                            actualPosition.y * mapMultiplier);
         }
     }
 
@@ -40,6 +38,8 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
     protected System.Random rnd = new System.Random();
 
+    protected float mapMultiplier;
+
     internal void MoveForAttack(Vector2Int targetPos)
     {
         if (CurrentState != State.Moving || !CurrentInstance.Map[targetPosition].CanPass(Side) || rnd.Next(0, 201) < 1)
@@ -52,8 +52,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
                 RecomputeRoute(inRange);
         }
 
-        Move();     
-        
+        Move();        
     }
 
     internal bool MoveTo(Vector2Int targetPos)
@@ -114,7 +113,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
     private bool Move()
     {
-        if (route == null)
+        if (route == null || route.Count == 0)
             return false;
 
         Vector2Int nextPos = route.Peek();
@@ -143,9 +142,16 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
         {
             RecomputeRoute(targetPosition);
 
+            int k;
+            if (route != null)
+                if (route.Count == 0)
+                    k = 5;
+
             if (route != null)
                 return true;
         }
+
+
 
         return false;
     }
@@ -175,13 +181,12 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
 
     public override Type type => typeof(T);
 
-    public override int Price { get => throw new System.NotImplementedException(); protected set => throw new System.NotImplementedException(); }
-
     public override Statistics GetStats() => new Statistics(DealtDamage, ReceivedDamage, EnemiesKilled, BuildingsDestroyed, typeof(T));
 
     public Troop(Role side, Vector2Int spawnPos,  Instance instance)
     {
         CurrentInstance = instance;
+        mapMultiplier = instance.Map.SizeMultiplier;
 
         for (int i = 0; i < unit.BundleCount; i++)
             troopHealth.Add(unit.Health);
@@ -203,11 +208,8 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
         if (Visual != null)
         {
             Visual = UnityEngine.Object.Instantiate(Visual, Visual.transform.position, Quaternion.identity);
-
-            if (Side == Role.Defender)
-                Visual.GetComponent<Renderer>().material.color = new Color(0, 0, 255);
-        }         
-        
+            Visual.Set(this);
+        }        
     }
 
 
@@ -305,40 +307,8 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
         CurrentInstance.Map[Position] = null;
 
         if (Visual != null)
-            UnityEngine.Object.Destroy(Visual);
+            UnityEngine.Object.Destroy(Visual.gameObject);
     }
 
-    //public void StopAction()
-    //{
-    //    CurrentState = State.Free;
-    //    Target = null;
-    //    route = null;
-    //    Action = null;
-    //}
-
-    //public void PrepareForAttack(IDamageable enemy)
-    //{
-    //    ActualPosition = Position;
-    //    CurrentState = State.Fighting;
-    //    Target = enemy;
-    //    route = null;        
-    //}
-
-    //public void PrepareForMove(Vector2Int targetPos)
-    //{
-       
-    //}   
-
-    //public void SetAction(IAction action)
-    //{
-    //    CurrentState = State.PreparingForAction;
-    //    route = null;
-    //    Target = null;
-    //    Action = action;
-    //}
-
-    private void GameOver()
-    {
-        DestroyTroop();
-    }
+    
 }

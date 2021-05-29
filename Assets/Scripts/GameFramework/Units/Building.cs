@@ -11,7 +11,7 @@ public abstract class Building : Damageable, IRecruitable
         CurrentInstance.Map[Position] = null;
 
         if (Visual != null)
-            UnityEngine.Object.Destroy(Visual);
+            UnityEngine.Object.Destroy(Visual.gameObject);
     }
 
     internal override bool TakeDamage(int totalDamage)
@@ -41,7 +41,7 @@ public class Wall : Building
 
     private Vector2Int position;
 
-    public Wall(Vector2Int pos, Instance instance, GameObject vis = null)
+    public Wall(Vector2Int pos, Instance instance, VisualController vis = null)
     {
         position = pos;
         Side = Role.Defender;
@@ -55,7 +55,7 @@ public class Wall : Building
 
 public class Gate : Wall
 {
-    public Gate(Vector2Int pos, Instance instance, GameObject vis = null):base(pos, instance, vis) { }
+    public Gate(Vector2Int pos, Instance instance, VisualController vis = null):base(pos, instance, vis) { }
 
     public override bool CanPass(Role role)
     {

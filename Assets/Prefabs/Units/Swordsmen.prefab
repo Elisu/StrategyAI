@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3092250751406926660}
   - component: {fileID: 3092250751406926661}
   - component: {fileID: 3092250751406926662}
+  - component: {fileID: 5344744494389361972}
   m_Layer: 0
   m_Name: Swordsmen
   m_TagString: Untagged
@@ -27,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3092250751406926663}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalPosition: {x: 80, y: 1.5, z: 60}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -96,3 +97,16 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!114 &5344744494389361972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3092250751406926663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f77f19efb6274a448f5bdfa7ed15288, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lr: {fileID: 3474062884181267242, guid: fe0dfa78f17032e4ab5172ff6a4167a0, type: 3}

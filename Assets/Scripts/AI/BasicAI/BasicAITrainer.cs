@@ -19,7 +19,7 @@ public class BasicAITrainer : AITrainer
         return;
     }
 
-    public override AIPlayer LoadChampion()
+    public override IPlayer LoadChampion()
     {
         return new BasicAI();
     }

@@ -37,7 +37,7 @@ public class Army : IEnumerable<IRecruitable>
         return structure;
     }
 
-    internal IRecruitable AddStructure(Transform structureObject, Vector2Int position, Instance instance)
+    internal IRecruitable AddStructure(VisualController structureObject, Vector2Int position, Instance instance)
     {
         IRecruitable structure = UnitFactory.CreateStructure(structureObject, position, instance);
         Add(structure);
@@ -46,7 +46,10 @@ public class Army : IEnumerable<IRecruitable>
 
     internal bool TryBuying(int toBuy, Instance instance)
     {
-        Type unitType = UnitFinder.unitTypes[toBuy];
+        if (toBuy < 0 || toBuy >= UnitFinder.unitStats.Count)
+            return false;
+
+        Type unitType = UnitFinder.unitStats[toBuy].UnitType;
         int price = UnitFinder.unitStats[toBuy].Price;
 
         //Attacker can't buy towers

@@ -44,9 +44,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _experimentConfigFileName: experiment.config
-  _networkInputCount: 2
-  _networkOutputCount: 5
   PopulationSize: 10
-  Trials: 1
-  GenerationFinished: 0
-  _enableDebugLogging: 0
