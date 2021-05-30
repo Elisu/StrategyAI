@@ -21,25 +21,23 @@ namespace UnitySharpNEAT
     public abstract class INeatPlayer : AIPlayer
     {
         [DataMember]
-        public IBlackBox BlackBox { get; private set; }
+        protected readonly IBlackBox blackBox;
 
+        protected INeatPlayer (IBlackBox brain)
+        {
+            blackBox = brain;
+        }
         protected override IAction FindAction(Attacker attacker)
         {
             // feed the black box with input
-            UpdateBlackBoxInputs(BlackBox.InputSignalArray, attacker);
+            UpdateBlackBoxInputs(blackBox.InputSignalArray, attacker);
 
             // calculate the outputs
-            BlackBox.Activate();
+            blackBox.Activate();
 
             // do something with those outputs
-            return UseBlackBoxOutpts(BlackBox.OutputSignalArray, attacker);
+            return UseBlackBoxOutpts(blackBox.OutputSignalArray, attacker);
 
-        }
-
-        public void SetBlackBox(IBlackBox brain)
-        {
-            if (BlackBox == null)
-                BlackBox = brain;
         }
 
         /// <summary>

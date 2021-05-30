@@ -95,18 +95,21 @@ namespace UnitySharpNEAT
 
             List<INeatPlayer> pop = new List<INeatPlayer>();
 
-            for (int i = 0; i < PopulationSize; i++)
-            {
-                pop.Add(new NeatAI(outputActions, inputConditions));
-            }
+            List<IBlackBox> brains = EvolutionAlgorithm.GetIBlackBoxes(PopulationSize);
 
-            EvolutionAlgorithm.SetPopulation(pop);
+            for (int i = 0; i < PopulationSize; i++)
+                pop.Add(new NeatAI(outputActions, inputConditions, brains[i]));            
+
             return new List<AIPlayer>(pop);
         }
 
-        protected override void BeforeEachGeneration() => StartCoroutine(EvolutionAlgorithm.PerformOneGeneration());        
+        protected override void BeforeEachGeneration() => StartCoroutine(EvolutionAlgorithm.PerformOneGeneration());
 
-        public override void GenerationDone() => EvolutionAlgorithm.Evaluate();     
+        public override void GenerationDone()
+        {
+            EvolutionAlgorithm.Evaluate(population);
+            population = CreatPopulation();
+        }
 
 
         protected override void SaveChampion()

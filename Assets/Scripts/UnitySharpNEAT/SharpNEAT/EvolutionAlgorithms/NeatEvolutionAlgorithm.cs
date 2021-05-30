@@ -176,7 +176,7 @@ namespace SharpNeat.EvolutionAlgorithms
         private void Initialize()
         {
             // Evaluate the genomes.
-            Evaluate();
+            //Evaluate();
 
             // Speciate the genomes.
             _specieList = _speciationStrategy.InitializeSpeciation(_genomeList, _eaParams.SpecieCount);
@@ -193,23 +193,25 @@ namespace SharpNeat.EvolutionAlgorithms
 
         #region Public Methods [For handling NEAT]
 
-        public void SetPopulation(List<INeatPlayer> population)
-        {            
-            for (int i = 0; i < population.Count; i++)
+        public List<IBlackBox> GetIBlackBoxes(int count)
+        {
+            List<IBlackBox> brains = new List<IBlackBox>();
+
+            for (int i = 0; i < count; i++)
             {
-                population[i].SetBlackBox((IBlackBox)_genomeDecoder.Decode(_genomeList[i]));
-                genomeMapping.Add(new Tuple<INeatPlayer, TGenome>(population[i], _genomeList[i]));
+                brains.Add((IBlackBox)_genomeDecoder.Decode(_genomeList[i]));
             }
+            return brains;
         }
 
-        public void Evaluate()
+        public void Evaluate(List<AIPlayer> pop)
         {
             double best = 0;
 
-            foreach (Tuple<INeatPlayer,TGenome> individual in genomeMapping)
+            for (int i = 0; i < pop.Count; i++)
             {
-                double fitness = individual.Item1.GetFitness();
-                individual.Item2.EvaluationInfo.SetFitness(fitness);
+                double fitness = ((INeatPlayer)pop[i]).GetFitness();
+                _genomeList[i].EvaluationInfo.SetFitness(fitness);
 
                 if (fitness > best)
                     best = fitness;

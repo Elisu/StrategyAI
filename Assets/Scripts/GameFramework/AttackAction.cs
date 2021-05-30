@@ -40,7 +40,8 @@ internal class Attack : IAction
         else
         {
             //Debug.Log(string.Format("Attacker health: {0}\nDefender health {1}", attacker.Health, target.Health));
-            ((TroopBase)attacker).CorrectPosition();
+            if (attacker is TroopBase troop)
+                troop.CorrectPosition();
             attacker.PrepareForAttack(target);
             bool stillGoing = attacker.Attack();
 

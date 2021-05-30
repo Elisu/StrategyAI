@@ -6,23 +6,32 @@ using UnityEngine;
 using UnitySharpNEAT;
 using Genetic;
 using System.Runtime.Serialization;
+using System.Collections.Concurrent;
 
 public class NeatAI : INeatPlayer
 {
     IMacroAction[] possibleActions;
     ICondition[] inputs;
-    GameStats stats;
+    ConcurrentQueue<GameStats> accumulatedResults;
 
-    public NeatAI(IMacroAction[] actions, ICondition[] conditions, IBlackBox brain = null)
+    public NeatAI(IMacroAction[] actions, ICondition[] conditions, IBlackBox brain) : base(brain)
+    {
+        accumulatedResults = new ConcurrentQueue<GameStats>();
+        possibleActions = actions;
+        inputs = conditions;
+    }
+
+    private NeatAI(IMacroAction[] actions, ICondition[] conditions, ConcurrentQueue<GameStats> result, IBlackBox brain) : base(brain)
     {
         possibleActions = actions;
         inputs = conditions;
-        SetBlackBox(brain);
+        accumulatedResults = result;
     }
+
 
     public override float GetFitness()
     {
-        return EvolutionFunctions.ComputeFitness(stats, Side);
+        return EvolutionFunctions.ComputeFitness(accumulatedResults.ToArray()[0], Side);
     }
 
     protected override void UpdateBlackBoxInputs(ISignalArray inputSignalArray, Attacker attacker)
@@ -52,12 +61,12 @@ public class NeatAI : INeatPlayer
 
     protected override void RunOver(GameStats stats)
     {
-        this.stats = stats;
+        accumulatedResults.Enqueue(stats);
     }
 
     public override AIPlayer Clone()
     {
-        return this;
+        return new NeatAI(possibleActions, inputs, accumulatedResults, blackBox.Clone());
     }
 
     protected override int PickToBuy()

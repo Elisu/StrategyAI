@@ -115,6 +115,17 @@ namespace SharpNeat.Phenomes.NeuralNets
             _postActivationArray[0] = 1.0;
         }
 
+        public IBlackBox Clone()
+        {
+            FastConnection[] connectionArray = new FastConnection[_connectionArray.Length];
+            System.Array.Copy(_connectionArray, connectionArray, _connectionArray.Length);
+
+            IActivationFunction[] activtionFunctions = new IActivationFunction[_neuronActivationFnArray.Length];
+            System.Array.Copy(_neuronActivationFnArray, activtionFunctions, _neuronActivationFnArray.Length);
+
+            return new FastCyclicNetwork(connectionArray, activtionFunctions, _neuronAuxArgsArray, _preActivationArray.Length, _inputNeuronCount, _outputNeuronCount, _timestepsPerActivation);
+        }
+
         #endregion
 
         #region IBlackBox Members

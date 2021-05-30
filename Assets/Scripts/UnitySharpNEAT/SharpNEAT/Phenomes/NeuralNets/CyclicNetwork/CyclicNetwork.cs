@@ -177,6 +177,11 @@ namespace SharpNeat.Phenomes.NeuralNets
             }
         }
 
+        public IBlackBox Clone()
+        {
+            throw new System.NotImplementedException();
+        }
+
         /// <summary>
         /// Reset the network's internal state.
         /// </summary>

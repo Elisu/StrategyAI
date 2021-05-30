@@ -74,5 +74,7 @@ namespace SharpNeat.Phenomes
         /// Reset any internal state.
         /// </summary>
         void ResetState();
+
+        IBlackBox Clone();
     }
 }

@@ -82,6 +82,9 @@ namespace SharpNeat.Phenomes.NeuralNets
         readonly int _outputNodeCount;
         readonly int _inputAndBiasNodeCount;
 
+
+        private readonly int[] _outputArray;
+
         #region Constructor
 
         /// <summary>
@@ -124,6 +127,7 @@ namespace SharpNeat.Phenomes.NeuralNets
             // nodes can no longer be guaranteed to be in a contiguous segment at a fixed location. As such their
             // positions are indicated by outputNodeIdxArr, and so we package up this array with the node signal
             // array to abstract away the level of indirection described by outputNodeIdxArr.
+            _outputArray = outputNodeIdxArr;
             _outputSignalArrayWrapper = new MappingSignalArray(_activationArr, outputNodeIdxArr);
 
             // Store counts for use during activation.
@@ -133,6 +137,33 @@ namespace SharpNeat.Phenomes.NeuralNets
 
             // Initialise the bias neuron's fixed output value.
             _activationArr[0] = 1.0;
+        }
+
+        public IBlackBox Clone()
+        {
+
+            IActivationFunction[] activtionFunctions = new IActivationFunction[_nodeActivationFnArr.Length];
+            System.Array.Copy(_nodeActivationFnArr, activtionFunctions, _nodeActivationFnArr.Length);
+
+            double[][] nodeAux = new double[_nodeAuxArgsArr.Length][];
+            for (int i = 0; i < _nodeAuxArgsArr.Length; i++)
+            {
+                if (_nodeAuxArgsArr[i] != null)
+                    for (int j = 0; j < _nodeAuxArgsArr[i].Length; j++)
+                        nodeAux[i][j] = _nodeAuxArgsArr[i][j];
+            }
+
+            FastConnection[] connectionArray = new FastConnection[_connectionArr.Length];
+            System.Array.Copy(_connectionArr, connectionArray, _connectionArr.Length);
+
+            LayerInfo[] layers = new LayerInfo[_layerInfoArr.Length];
+            System.Array.Copy(_layerInfoArr, layers, _layerInfoArr.Length);
+
+            int[] outputNodes = new int[_outputArray.Length];
+            System.Array.Copy(_outputArray, outputNodes, outputNodes.Length);
+
+
+            return new FastAcyclicNetwork(activtionFunctions, nodeAux, connectionArray, layers, outputNodes, _activationArr.Length, _inputNodeCount, _outputNodeCount);
         }
 
         #endregion

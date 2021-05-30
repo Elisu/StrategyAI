@@ -14,6 +14,6 @@ public class BasicTower : TowerUnit
 
     public override float GetDefenseAgainst(Type unitType)
     {
-        throw new NotImplementedException();
+        return 1f;
     }
 }
