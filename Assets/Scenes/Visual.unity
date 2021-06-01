@@ -716,9 +716,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapObject: {fileID: 1980576903}
   game: {fileID: 3868471417579026627, guid: e0fd41c53e981154096a5f042f57c12b, type: 3}
-  attacker: {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa,
+  attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
     type: 3}
-  defender: {fileID: 7288964850949555319, guid: dcf14cd3829f65541afcc68521b06bef,
+  defender: {fileID: 6138801334774653003, guid: 560fa0612cee94d48ab784d6b24c2e30,
     type: 3}
   winnerText: {fileID: 497692512}
   moneyText: {fileID: 982364071}
@@ -932,6 +932,11 @@ PrefabInstance:
         type: 3}
       propertyPath: square
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8290190061775574912, guid: a45069545bc712c4ab6b8b56cdf10206,
+        type: 3}
+      propertyPath: square
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8290190061793899004, guid: a45069545bc712c4ab6b8b56cdf10206,
         type: 3}

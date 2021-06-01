@@ -42,8 +42,14 @@ public class VisualController : MonoBehaviour
         if (lr == null)
             return;
 
-        if (attacker.Target != null && attacker != null && attacker.Target.Health > 0)
+        if (attacker != null &&  attacker.Health > 0 && attacker.Target != null && attacker.Target.Health > 0)
         {
+            if (attacker.Target.Visual == null)
+            {
+                int k;
+                k = 0;
+            }
+
             lr.enabled = true;
             lr.SetPosition(0, this.transform.position);
             lr.SetPosition(1, attacker.Target.Visual.transform.position);

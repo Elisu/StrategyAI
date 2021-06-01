@@ -13,6 +13,8 @@ public class CoevolutionTrainer : AITrainer
     Strategy meleeUnits;
     Strategy rangedUnits;
 
+    ShopperPopulation shopperStrategy;
+
     IMacroAction[] towerActions;
     IMacroAction[] meleeActions;
     IMacroAction[] rangedActions;
@@ -25,6 +27,8 @@ public class CoevolutionTrainer : AITrainer
     {
         ICondition damaged = new Conditions.Damaged();
         ICondition free = new Conditions.Free();
+        ICondition strongest = new Conditions.Strongest();
+        ICondition clostestIsTroop = new Conditions.ClosestIsTroopBase();
 
         IMacroAction attackClosest = new SerializableMacroActions.AttackClosest();
         IMacroAction attackWithLowestHealth = new SerializableMacroActions.AttackWithLowestHealth();
@@ -33,18 +37,21 @@ public class CoevolutionTrainer : AITrainer
         IMacroAction doNothing = new SerializableMacroActions.DoNothing();
 
         towerActions = new IMacroAction[4] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth };
-        ICondition[] conditions = new ICondition[2] { damaged, free };
-        towers = new Strategy(PopulationSize, IndividualLength, towerActions, conditions);
+        ICondition[] conditions = new ICondition[2] { damaged, free};
+        towers = new Strategy(PopulationSize, IndividualLength, towerActions.Length, conditions);
 
         //Melee
         meleeActions = new IMacroAction[5] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth, doNothing };
-        ICondition[] conditions2 = conditions;
-        meleeUnits = new Strategy(PopulationSize, IndividualLength, meleeActions, conditions2);
+        ICondition[] conditions2 = new ICondition[4] { damaged, free, strongest, clostestIsTroop };
+        meleeUnits = new Strategy(PopulationSize, IndividualLength, meleeActions.Length, conditions2);
 
         //Ranged
         rangedActions = new IMacroAction[5] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth, doNothing };
-        ICondition[] conditions3 = conditions;
-        rangedUnits = new Strategy(PopulationSize, IndividualLength, rangedActions, conditions3);
+        ICondition[] conditions3 = conditions2;
+        rangedUnits = new Strategy(PopulationSize, IndividualLength, rangedActions.Length, conditions3);
+
+        //Shopper
+        shopperStrategy = new ShopperPopulation(PopulationSize);
 
         List<AIPlayer> pop = new List<AIPlayer>();
         return GetPop();
@@ -54,18 +61,36 @@ public class CoevolutionTrainer : AITrainer
     {
         List<AIPlayer> pop = new List<AIPlayer>();
 
-        for (int i = 0; i < towers.PopulationSize; i++)
-            for (int j = 0; j < meleeUnits.PopulationSize; j++)
-                for (int k = 0; k < rangedUnits.PopulationSize; k++)
-                    pop.Add(new CoevolutionAI(towers[i], meleeUnits[j], rangedUnits[k], new List<IMacroAction[]>() {towerActions, rangedActions, meleeActions }));
+        var actionList = new List<IMacroAction[]>() { towerActions, rangedActions, meleeActions };
 
+        for (int i = 0; i < towers.PopulationSize; i++)
+        {
+            var randomMelee = meleeUnits[UnityEngine.Random.Range(0, meleeUnits.PopulationSize)];
+            var randomRanged = rangedUnits[UnityEngine.Random.Range(0, rangedUnits.PopulationSize)];
+            pop.Add(new CoevolutionAI(towers[i], randomMelee, randomRanged, shopperStrategy[i], actionList));
+        }
+
+        for (int i = 0; i < meleeUnits.PopulationSize; i++)
+        {
+            var randomTower = towers[UnityEngine.Random.Range(0, towers.PopulationSize)];
+            var randomRanged = rangedUnits[UnityEngine.Random.Range(0, rangedUnits.PopulationSize)];
+            pop.Add(new CoevolutionAI(randomTower, meleeUnits[i], randomRanged, shopperStrategy[i], actionList));
+        }
+
+        for (int i = 0; i < rangedUnits.PopulationSize; i++)
+        {
+            var randomTower = towers[UnityEngine.Random.Range(0, towers.PopulationSize)];
+            var randomMelee = meleeUnits[UnityEngine.Random.Range(0, meleeUnits.PopulationSize)];
+            pop.Add(new CoevolutionAI(randomTower, randomMelee, rangedUnits[i], shopperStrategy[i], actionList));
+        }
         return pop;
     }
+
 
     public override void GenerationDone()
     {
         foreach (AIPlayer player in population)
-            ((CoevolutionAI)player).SetIndividualFitness();
+            ((CoevolutionAI)player).EvaluateFitness();
 
         champion = (CoevolutionAI)FindChampion();
         Debug.LogWarning(string.Format("Coevolution best: {0}", ((CoevolutionAI)GetChampion()).Fitness));
@@ -73,6 +98,8 @@ public class CoevolutionTrainer : AITrainer
         towers.Evolve();
         meleeUnits.Evolve();
         rangedUnits.Evolve();
+        shopperStrategy.Evolve();
+
         population = GetPop();
     }
 

@@ -19,9 +19,9 @@ namespace Genetic
         public StrategyIndividual Champion { get; private set; }
         private StrategyIndividual[] population;
 
-        public Strategy(int popSize, int indLength, IMacroAction[] actions, ICondition[] conditions)
+        public Strategy(int popSize, int indLength, int actionPossibilitiesCount, ICondition[] conditions)
         { 
-            population = StrategyIndividual.CreatePopulation(popSize, indLength, actions.Length, conditions);
+            population = StrategyIndividual.CreatePopulation(popSize, indLength, actionPossibilitiesCount, conditions);
             Champion = population[0];
         }
 

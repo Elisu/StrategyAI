@@ -23,26 +23,30 @@ public class BasicAI : AIPlayer
         {
             if (!MacroActions.AttackInRange(attacker, out resultAction))
             {
-                TroopBase enemy = Info.EnemyArmy.SenseLowestHealth();
-                if (enemy != null && enemy.Health < attacker.Health)
-                    MacroActions.AttackGiven(enemy, attacker, out resultAction);
-                else
+
+                IRecruitable enemy = Info.EnemyArmy.SenseLowestDefenseAgainst(attacker);
+                if (!MacroActions.AttackGiven(enemy, attacker, out resultAction))
                 {
-                    enemy = Info.EnemyArmy.SenseLowestDamage();
-                    if (enemy != null && enemy.Damage < attacker.Damage)
-                        MacroActions.AttackGiven(enemy, attacker, out resultAction);
-                    else
-                        MacroActions.AttackClosest(attacker, out resultAction);
+                    enemy = Info.EnemyArmy.SenseLowestHealth();
+                    if (enemy != null && enemy.Health < attacker.Health)
+                        if (!MacroActions.AttackGiven(enemy, attacker, out resultAction))
+                        {
+                            TroopBase troop = Info.EnemyArmy.SenseTroopLowestDamage();
+                            if (troop != null && troop.Damage < attacker.Damage)
+                                if (!MacroActions.AttackGiven(enemy, attacker, out resultAction))
+                                    MacroActions.AttackClosest(attacker, out resultAction);
+                        }
                 }
+
             }
         }
-        else 
+        else
         {
             if (attacker is TroopBase troop)
             {
                 if (troop.CurrentState == State.Fighting && troop.Target.Health >= troop.Health * 2)
-                    MacroActions.MoveToSafety(troop, out resultAction);                
-               
+                    MacroActions.MoveToSafety(troop, out resultAction);
+
             }
         }
 
@@ -56,20 +60,20 @@ public class BasicAI : AIPlayer
 
     protected override int PickToBuy()
     {
-        if (Info.OwnArmy.Count <= lowUnitTresholt)
+        if (Info.OwnArmy.Troops.Count <= lowUnitTresholt)
             return UnitFinder.LowestPriceIndex;
 
         if (Side == Role.Defender && !Info.OwnArmy.Troops.Any(x => x.Range > 1))
         {
-            for (int i = 0; i < UnitFinder.unitStats.Count; i++)
+            for (int i = 0; i < UnitFinder.UnitStats.Count; i++)
             {
-                if (UnitFinder.unitStats[i].Range > 1 && UnitFinder.unitStats[i].Price <= Info.OwnArmy.Money)
+                if (UnitFinder.UnitStats[i].Range > 1 && UnitFinder.UnitStats[i].Price <= Info.OwnArmy.Money)
                     return i;
 
             }
         }
 
-        tobuy = (tobuy + 1) % UnitFinder.unitStats.Count;
+        tobuy = (tobuy + 1) % UnitFinder.UnitStats.Count;
         return tobuy;
 
     }

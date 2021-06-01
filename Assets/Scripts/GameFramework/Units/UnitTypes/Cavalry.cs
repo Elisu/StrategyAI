@@ -14,18 +14,6 @@ public class Cavalry : HumanUnit
         UnitPrefab = CavalrySetup.UnitPrefab;
         BundleCount = 20;
     }
-    public override float GetDefenseAgainst(Type unitType)
-    {
-        switch (unitType.Name)
-        {
-            case nameof(Archers):
-                return 1;
-            case nameof(Swordsmen):
-                return 0.6f;
-            default:
-                return 0.5f;
-        }
-    }
 
     internal override bool GiveDamage(Damageable enemy, int totalDamage)
     {

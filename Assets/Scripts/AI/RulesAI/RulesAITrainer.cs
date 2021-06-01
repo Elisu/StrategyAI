@@ -31,7 +31,7 @@ public class RulesAITrainer : AITrainer
                                                 new SerializableMacroActions.AttackInRange(), 
                                                 new SerializableMacroActions.DoNothing() };
 
-        all = new Strategy(PopulationSize, IndividualLength, possibleActions, conditions);
+        all = new Strategy(PopulationSize, IndividualLength, possibleActions.Length, conditions);
 
         shoppers = new ShopperPopulation(PopulationSize);
 

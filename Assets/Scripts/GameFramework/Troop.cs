@@ -96,7 +96,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
                 {
                     int diffX = Mathf.Abs(Position.x - i);
                     int diffY = Mathf.Abs(Position.y - j);
-                    int min = Mathf.Min(diffX, diffY);
+                    int min = diffX + diffY;
 
                     if (distance > min)
                     {
@@ -118,7 +118,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
         Vector2Int nextPos = route.Peek();
 
-        if (CurrentInstance.Map[nextPos] == null || CurrentInstance.Map[nextPos].CanPass(Side) == true)
+        if (CurrentInstance.Map[nextPos] == null || CurrentInstance.Map[nextPos].CanPass(Side) == true || nextPos == Position)
         {
             CurrentInstance.Map[Position] = null;
             Vector2 next = new Vector2(nextPos.x - ActualPosition.x, nextPos.y - ActualPosition.y);
@@ -219,6 +219,7 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
 
         if (Health - damage <= 0)
         {
+            Health = 0;
             DestroyTroop();
             return true;
         }
@@ -281,7 +282,7 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
 
         if (!defenseCache.TryGetValue(enemy.type, out defense))
         {
-            defense = unit.GetDefenseAgainst(enemy.type);
+            defense = GetDefenseAgainstMe(enemy);
             defenseCache.TryAdd(enemy.type, defense);
         }
 
@@ -310,5 +311,8 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
             UnityEngine.Object.Destroy(Visual.gameObject);
     }
 
-    
+    public override float GetDefenseAgainstMe(Damageable enemy)
+    {
+        return DefenseModifiersMatrix.GetDefense(enemy.type, type);
+    }
 }

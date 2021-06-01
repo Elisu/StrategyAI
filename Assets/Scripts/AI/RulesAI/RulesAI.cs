@@ -52,7 +52,7 @@ public class RulesAI : AIPlayer
     protected override IAction FindAction(Attacker attacker)
     {
         IAction resultAction = null;
-        int[] votes = new int[individual.PossibleActions];
+        int[] votes = new int[individual.PossibleActionsCount];
 
         foreach (Rule rule in individual)
         {

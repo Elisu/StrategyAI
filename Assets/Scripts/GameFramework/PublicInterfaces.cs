@@ -28,7 +28,7 @@ public enum SquareType
     Building,
 }
 
-public delegate bool SelectionPredicate(TroopBase selected, TroopBase current);
+public delegate bool SelectionPredicate<UnitType>(UnitType selected, UnitType current) where UnitType : IRecruitable;
 
 public interface IMappable
 {
@@ -82,8 +82,6 @@ public abstract class Damageable : IDamageable
 
         return false;
     }
-
-
 }
 
 public abstract class Attacker : Damageable, IAttack
@@ -101,11 +99,6 @@ public abstract class Attacker : Damageable, IAttack
     public int BuildingsDestroyed { get; protected set; }
 
     internal IAction Action { get; private protected set; }
-
-    public IAttack SenseClosest()
-    {
-        throw new System.NotImplementedException();
-    }
 
     /// <summary>
     /// Function which attacks target set in object
@@ -149,6 +142,7 @@ public abstract class Attacker : Damageable, IAttack
         Action = null;
     }
 
+    public abstract float GetDefenseAgainstMe(Damageable enemy);
 }
 
 
@@ -173,8 +167,6 @@ public interface IAttack : IDamageable
     int BuildingsDestroyed { get; }
 
     Damageable Target { get; }
-
-    IAttack SenseClosest();
 
 }
 

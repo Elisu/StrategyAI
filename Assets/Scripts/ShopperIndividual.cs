@@ -20,7 +20,7 @@ public class ShopperIndividual : Genetic.Individual<ShopperIndividual>
     public ShopperIndividual()
     {
         next = -1;
-        shoppingOrder = new int[UnitFinder.unitStats.Count];
+        shoppingOrder = new int[UnitFinder.UnitStats.Count];
 
         for (int i = 0; i < shoppingOrder.Length; i++)
         {
@@ -58,7 +58,7 @@ public class ShopperIndividual : Genetic.Individual<ShopperIndividual>
         {
             next = (next + 1) % shoppingOrder.Length;
 
-            if (UnitFinder.unitStats[next].Price <= budget)
+            if (UnitFinder.UnitStats[next].Price <= budget)
                 return shoppingOrder[next];
         }
 

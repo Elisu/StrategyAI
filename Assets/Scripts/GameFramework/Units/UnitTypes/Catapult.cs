@@ -14,13 +14,6 @@ public class Catapult : HumanUnit
         UnitPrefab = CatapultSetup.UnitPrefab;
         BundleCount = 1;
     }
-    public override float GetDefenseAgainst(Type unitType)
-    {
-        if (unitType.IsSubclassOf(typeof(TowerBase)))
-            return 0.85f;
-        else
-            return 1f;
-    }
 
     internal override bool GiveDamage(Damageable enemy, int totalDamage)
     {

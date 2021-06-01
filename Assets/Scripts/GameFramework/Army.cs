@@ -46,11 +46,11 @@ public class Army : IEnumerable<IRecruitable>
 
     internal bool TryBuying(int toBuy, Instance instance)
     {
-        if (toBuy < 0 || toBuy >= UnitFinder.unitStats.Count)
+        if (toBuy < 0 || toBuy >= UnitFinder.UnitStats.Count)
             return false;
 
-        Type unitType = UnitFinder.unitStats[toBuy].UnitType;
-        int price = UnitFinder.unitStats[toBuy].Price;
+        Type unitType = UnitFinder.UnitStats[toBuy].UnitType;
+        int price = UnitFinder.UnitStats[toBuy].Price;
 
         //Attacker can't buy towers
         if (Side == Role.Attacker && !(unitType.IsSubclassOf(typeof(HumanUnit))))
@@ -144,17 +144,34 @@ public class Army : IEnumerable<IRecruitable>
             buildings.Remove((Building)recruit);
     }
 
-    public TroopBase SenseLowestHealth() => GetTrooOnCondition((x, y) => x.Health > y.Health);
+    public IRecruitable SenseLowestHealth() => GetOnConditionFromAll((x, y) => x.Health > y.Health);
 
-    public TroopBase SenseHighestHealth() => GetTrooOnCondition((x, y) => x.Health < y.Health);
+    public IRecruitable SenseHighestHealth() => GetOnConditionFromAll((x, y) => x.Health < y.Health);
 
-    public TroopBase SenseLowestDamage() => GetTrooOnCondition((x, y) => x.Damage > y.Damage);
+    public TroopBase SenseTroopLowestDamage() => GetOnConditionOfType((x, y) => x.Damage > y.Damage, troops);
            
-    public TroopBase SeneseHighestDamage() => GetTrooOnCondition((x, y) => x.Damage < y.Damage);
+    public TroopBase SeneseTroopHighestDamage() => GetOnConditionOfType((x, y) => x.Damage < y.Damage, troops);
      
-    public TroopBase SenseLowestSpeed() => GetTrooOnCondition((x, y) => x.Speed > y.Speed);
+    public TroopBase SenseTroopLowestSpeed() => GetOnConditionOfType((x, y) => x.Speed > y.Speed, troops);
 
-    public TroopBase SenseEnemySpeed() => GetTrooOnCondition((x, y) => x.Speed < y.Speed);
+    public TroopBase SenseTroopHighestSpeed() => GetOnConditionOfType((x, y) => x.Speed < y.Speed, troops);
+
+    public IRecruitable SenseLowestDefenseAgainst(Attacker attacker)
+    {
+        if (troops.Count + towers.Count == 0)
+            return null;
+
+        Damageable withLowest = troops[0];
+        float defense = attacker.GetDefenseAgainstMe(withLowest);
+
+        foreach (Attacker troop in troops)
+        {
+            if (attacker.GetDefenseAgainstMe(troop) > defense)
+                withLowest = troop;
+        }
+
+        return (IRecruitable)withLowest;
+    }
 
     public IRecruitable SenseClosestTo(Attacker attacker)
     {
@@ -178,13 +195,26 @@ public class Army : IEnumerable<IRecruitable>
 
     public TowerBase GetTowerUnderAttack() => towers.Find(x => x.CurrentState == State.UnderAttack);
 
-    private TroopBase GetTrooOnCondition(SelectionPredicate condition)
+    private UnitType GetOnConditionOfType<UnitType>(SelectionPredicate<UnitType> condition, IList<UnitType> source) where UnitType : class, IRecruitable
     {
-        if (troops.Count == 0)
+        if (source.Count == 0)
             return null;
 
-        TroopBase selected = troops[0];
-        foreach (TroopBase troop in troops)
+        UnitType selected = source[0];
+        foreach (UnitType troop in source)
+            if (condition(selected, troop))
+                selected = troop;
+
+        return selected;
+    }
+
+    private IRecruitable GetOnConditionFromAll(SelectionPredicate<IRecruitable> condition)
+    {
+        if (Count == 0)
+            return null;
+
+        IRecruitable selected = this[0];
+        foreach (IRecruitable troop in this)
             if (condition(selected, troop))
                 selected = troop;
 

@@ -55,12 +55,18 @@ public class MacroActions
     public static bool AttackWithLowestDamage(Attacker attacker, out IAction resultAction)
     {
         Army army = attacker.CurrentInstance.GetEnemyArmy(attacker.Side);
-        return AttackOnCondition(army.SenseLowestDamage, attacker, out resultAction);
+        return AttackOnCondition(army.SenseTroopLowestDamage, attacker, out resultAction);
     }
 
-    private static bool AttackOnCondition(Func<TroopBase> Selection, Attacker attacker, out IAction resultAction)
+    public static bool AttackWeakestAgainst(Attacker attacker, out IAction resultAction)
     {
-        TroopBase selected = Selection();
+        Army army = attacker.CurrentInstance.GetEnemyArmy(attacker.Side);
+        return AttackOnCondition(army.SenseTroopLowestDamage, attacker, out resultAction);
+    }
+
+    private static bool AttackOnCondition(Func<IRecruitable> Selection, Attacker attacker, out IAction resultAction)
+    {
+        IRecruitable selected = Selection();
         resultAction = null;
 
         if (selected == null)
@@ -73,8 +79,8 @@ public class MacroActions
     private static bool Reachable(Attacker attacker, Vector2Int target)
     {
         //Tower cant move and closest target beyond range
-        if (attacker is TowerBase && Vector2Int.Distance(attacker.Position, target) > attacker.Range)
-            return false;
+        if (attacker is TowerBase && Vector2Int.Distance(attacker.Position, target) <= attacker.Range)
+            return true;
 
         if (attacker is TroopBase troop)
             if (troop.FindSpotInRange(target, out Vector2Int inRange))

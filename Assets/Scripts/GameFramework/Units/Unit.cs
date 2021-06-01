@@ -15,6 +15,4 @@ public interface Unit
 
     public bool Passable { get;}
 
-    public float GetDefenseAgainst(Type unitType);
-
 }

@@ -56,6 +56,11 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
             GameObject.Destroy(Visual.gameObject);            
     }
 
+    public override float GetDefenseAgainstMe(Damageable enemy)
+    {
+        return unit.GetDefenseAgainst(enemy.type);
+    }
+
     protected Tower() { }
 
     internal Tower(Vector2Int pos, Instance instance, VisualController vis = null)

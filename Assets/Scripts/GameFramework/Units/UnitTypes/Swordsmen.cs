@@ -16,19 +16,6 @@ public class Swordsmen : HumanUnit
         BundleCount = 50;
     }
 
-    public override float GetDefenseAgainst(Type unitType)
-    {
-        switch (unitType.Name)
-        {
-            case nameof(Archers):
-                return 0.95f;
-            case nameof(Cavalry):
-                return 0.6f;
-            default:
-                return 0.7f;
-        }
-    }
-
     internal override bool GiveDamage(Damageable enemy, int totalDamage)
     {
         if (enemy is TroopBase)

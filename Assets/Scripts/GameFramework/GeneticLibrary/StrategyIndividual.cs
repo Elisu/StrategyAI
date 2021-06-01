@@ -16,7 +16,7 @@ namespace Genetic
         public int Length => rules.Length;
 
         [DataMember]
-        public readonly int PossibleActions;
+        public readonly int PossibleActionsCount;
 
         [DataMember]
         readonly Rule[] rules;
@@ -36,7 +36,7 @@ namespace Genetic
         public StrategyIndividual(int indLength, int possibleActionCount, ICondition[] conditions)
         {
             rules = new Rule[indLength];
-            PossibleActions = possibleActionCount;
+            PossibleActionsCount = possibleActionCount;
 
             for (int i = 0; i < indLength; i++)
             {
@@ -51,7 +51,7 @@ namespace Genetic
         public StrategyIndividual(StrategyIndividual ind)
         {
             rules = new Rule[ind.Length];
-            PossibleActions = ind.PossibleActions;
+            PossibleActionsCount = ind.PossibleActionsCount;
 
             for (int i = 0; i < ind.Length; i++)
                 rules[i] = new Rule(ind.rules[i]);
@@ -60,7 +60,7 @@ namespace Genetic
         public StrategyIndividual(List<Rule> rules)
         {
             this.rules = rules.ToArray();
-            PossibleActions = rules[0].ActionCount;
+            PossibleActionsCount = rules[0].ActionCount;
         }
 
         public StrategyIndividual GetClone()

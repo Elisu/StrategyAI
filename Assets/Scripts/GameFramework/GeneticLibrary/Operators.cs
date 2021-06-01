@@ -109,10 +109,7 @@ namespace Genetic
 
             int statResults = 0;
             foreach (Statistics stat in ownStats)
-                statResults += stat.dealtDamage + stat.destroyedBuildings * 100 + stat.killedEnemies * 1000;
-
-            if (ownStats.Count > 0)
-                statResults /= ownStats.Count;
+                statResults += stat.killedEnemies * 100;
 
             return fitnessResult + statResults;
         }

@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class UnitFinder : MonoBehaviour
 {
-    public static List<UnitInfo> unitStats = new List<UnitInfo>();
+    public static IReadOnlyList<UnitInfo> UnitStats { get; private set; }
 
     public static int LowestPriceIndex { get; private set; } = 0;
     public static int HighestPriceIndex { get; private set; }
@@ -45,7 +45,9 @@ public class UnitFinder : MonoBehaviour
         var types = Assembly.GetExecutingAssembly().GetTypes()
                                                    .Where(t => t.BaseType != null && t.BaseType.IsGenericType &&
                                                                t.BaseType.GetGenericTypeDefinition() == typeof(Setup<>));
-        
+
+        List<UnitInfo> unitStats = new List<UnitInfo>();
+
         foreach (Type unit in types)
         {
             if (unit.Equals(typeof(BasicTowerSetup)))
@@ -64,6 +66,8 @@ public class UnitFinder : MonoBehaviour
                 LowestPriceIndex = unitStats.Count - 1;
         }
 
+        UnitStats = unitStats.AsReadOnly();
+
     }
 
     private T GetValue<T>(Type unit, string fieldName) where T : notnull
@@ -75,8 +79,8 @@ public class UnitFinder : MonoBehaviour
     public static int PickOnBudget(int budget)
     {
         int selected = 0;
-        for (int i = 0; i < unitStats.Count; i++)
-            if (unitStats[i].Price <= budget && unitStats[i].Price > unitStats[selected].Price)
+        for (int i = 0; i < UnitStats.Count; i++)
+            if (UnitStats[i].Price <= budget && UnitStats[i].Price > UnitStats[selected].Price)
                 selected = i;
 
         return selected;

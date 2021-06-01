@@ -29,6 +29,4 @@ public abstract class HumanUnit : Unit
     {
         return enemy.TakeDamage(totalDamage);
     }
-
-    public abstract float GetDefenseAgainst(Type unitType);
 }
