@@ -5,13 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuButtons : MonoBehaviour
 {
-    public TrainingDropDownFill attackerFill;
-    public TrainingDropDownFill defenderFill;
+    public TrainingSettings attackerFill;
+    public TrainingSettings defenderFill;
 
     public void OnStartTrainingClick()
     {
-        TrainingSettings.selectedAttacker = attackerFill.GetSelected();
-        TrainingSettings.selectedDefender = defenderFill.GetSelected();
+        Settings.selectedAttacker = attackerFill.GetSelected();
+        Settings.selectedDefender = defenderFill.GetSelected();
 
         SceneManager.LoadScene(2);
     }

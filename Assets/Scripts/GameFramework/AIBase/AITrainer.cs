@@ -2,23 +2,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using UnityEngine;
 
-public abstract class AITrainer : IPlayerController
+public abstract class AITrainer : AIController
 {
     protected List<AIPlayer> population = new List<AIPlayer>();
 
-    public ReadOnlyCollection<AIPlayer> Population => population.AsReadOnly();
+    public override ReadOnlyCollection<AIPlayer> Population => population.AsReadOnly();
 
-    public abstract Type AIPlayerType { get; }
 
-    protected internal virtual void OnStart()
+    protected internal override void OnStart()
     {
         InitializeVariables();
-        BeforePopCreation();
+        Start();
         population = CreatPopulation();
         AfterPopCreation();
         BeforeEachGeneration();
@@ -27,11 +27,6 @@ public abstract class AITrainer : IPlayerController
     private void InitializeVariables()
     {
         Type t = this.GetType();
-    }
-
-    protected virtual void BeforePopCreation()
-    {
-        return;
     }
 
     /// <summary>
@@ -43,35 +38,61 @@ public abstract class AITrainer : IPlayerController
         return;
     }
 
-    /// <summary>
-    /// Method called before the start of each generation - override if needed
-    /// </summary>
-    protected internal virtual void BeforeEachGeneration()
+    public void Save()
     {
-        return;
+        try
+        {
+            string directoryPath = Path.Combine(Path.GetDirectoryName(Application.dataPath), "Trained", this.GetType().Name);
+
+            if (!Directory.Exists(directoryPath))
+                Directory.CreateDirectory(directoryPath);
+
+            SaveChampion(Path.Combine(directoryPath, DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture)) + ".xml");
+        }
+        catch (Exception _e)
+        {
+            Debug.LogError("Saving failed");
+        }
+
+        Debug.Log(string.Format("{0} champion saved", this.AIPlayerType.Name));
     }
 
-    protected internal virtual void SaveChampion()
+    protected internal virtual void SaveChampion(string file)
     {
         AIPlayer player = GetChampion();
 
         if (player == null)
             return;
 
-        using (var stream = new FileStream(string.Format("{0}", player.ToString()), FileMode.Create))
+        using (var stream = new FileStream(file, FileMode.Create))
         {
             DataContractSerializer serializer = new DataContractSerializer(player.GetType());
             serializer.WriteObject(stream, player);
         }
     }
 
-    public override IPlayer LoadChampion()
+    public override IPlayer Load(string championFile)
     {
-        using (var stream = new FileStream(string.Format("{0}", AIPlayerType.Name), FileMode.Open))
+        if (string.IsNullOrEmpty(championFile))
+            return GetPlayer();
+
+        string path = Path.Combine(Path.GetDirectoryName(Application.dataPath), "Trained", this.GetType().Name, championFile);
+        return LoadChampion(path);
+    }
+
+    public virtual IPlayer LoadChampion(string file)
+    {
+        using (var stream = new FileStream(file, FileMode.Open))
         {
             DataContractSerializer serializer = new DataContractSerializer(AIPlayerType);
             return (IPlayer)serializer.ReadObject(stream);
         }
+    }
+
+    public override IPlayer GetPlayer()
+    {
+        var pop = CreatPopulation();
+        return pop[UnityEngine.Random.Range(0, pop.Count)];
     }
 
     /// <summary>

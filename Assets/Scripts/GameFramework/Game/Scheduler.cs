@@ -60,11 +60,14 @@ internal class Scheduler
 
     public void Shopping(Instance instance)
     {
-        attacker.Info.OwnArmy.MoneyGain();
-        defender.Info.OwnArmy.MoneyGain();
-
         attacker.Info.OwnArmy.TryBuying(attacker.PickToBuy(), instance);
         defender.Info.OwnArmy.TryBuying(defender.PickToBuy(), instance);
+    }
+
+    public void MoneyGain()
+    {
+        attacker.Info.OwnArmy.MoneyGain();
+        defender.Info.OwnArmy.MoneyGain();
     }
 
     public void Set(IPlayer attacker, IPlayer defender)

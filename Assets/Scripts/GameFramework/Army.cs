@@ -14,6 +14,11 @@ public class Army : IEnumerable<IRecruitable>
     public int MoneySpent { get; private set; }
     public int MoneyAll => Money + MoneySpent;
 
+    internal static int defenderStartMoney = 11000;
+    internal static int defenderGain = 1000;
+    internal static int attackerStartMoney = 15000;
+    internal static int attackerGain = 1500;
+
     private readonly List<TroopBase> troops = new List<TroopBase>();
     private readonly List<Building> buildings = new List<Building>();
     private readonly List<TowerBase> towers = new List<TowerBase>();
@@ -27,7 +32,10 @@ public class Army : IEnumerable<IRecruitable>
     internal Army(Role side)
     {
         Side = side;
-        Money = 10000;
+        if (Side == Role.Defender)
+            Money += defenderStartMoney;
+        else
+            Money += attackerStartMoney;
     }
 
     internal IRecruitable AddStructure(string tag, Vector2Int position, Instance instance)
@@ -71,9 +79,9 @@ public class Army : IEnumerable<IRecruitable>
     internal void MoneyGain()
     {
         if (Side == Role.Defender)
-            Money += 10;
+            Money += defenderGain;
         else
-            Money += 15;
+            Money += attackerGain;
     }
 
     public IRecruitable this[int index]
@@ -156,7 +164,7 @@ public class Army : IEnumerable<IRecruitable>
 
     public TroopBase SenseTroopHighestSpeed() => GetOnConditionOfType((x, y) => x.Speed < y.Speed, troops);
 
-    public IRecruitable SenseLowestDefenseAgainst(Attacker attacker)
+    public IRecruitable SenseLowestDamageDecrease(Attacker attacker)
     {
         if (troops.Count + towers.Count == 0)
             return null;

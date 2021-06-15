@@ -1,51 +1,45 @@
-//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using UnityEngine;
 
-//public class AIController : IController<AIPlayer>
-//{
-//    public virtual int RunsPerGenerations => runsPerGen;
-//    float delay = 10;
+public abstract class AIController : IPlayerController
+{
+    public virtual ReadOnlyCollection<AIPlayer> Population { get; private set; }
 
-//    protected int runsPerGen = 1;
-//    private bool scheduleInProgress = false;
-//    private bool running;
+    public abstract Type AIPlayerType { get; }
 
-//    private void Start()
-//    {
-        
-//    }
+    protected internal virtual void OnStart()
+    {
+        InitializeVariables();
+        Start();
+        Population = Array.AsReadOnly(new AIPlayer[1] { (AIPlayer)GetPlayer() });
+        BeforeEachGeneration();
+    }
 
-//    public override void Activate(AIPlayer player, Instance game)
-//    {
-//        this.player = player;
-//        //player.Start(game, );
-//    }
+    private void InitializeVariables()
+    {
+        Type t = this.GetType();
+    }
 
-//    protected void FixedUpdate()
-//    {
-//        if (!running)
-//            return;
+    protected virtual void Start()
+    {
+        return;
+    }
 
-//        delay -= 1;
+    /// <summary>
+    /// Method called before the start of each generation - override if needed
+    /// </summary>
+    protected internal virtual void BeforeEachGeneration()
+    {
+        return;
+    }
 
-//        if (delay <= 0 || !scheduleInProgress)
-//        {
-//            StartCoroutine(ScheduleFind());
-//            delay = 100;
-//        }
+    protected internal virtual void TrainingFinished()
+    {
+        return;
+    }
 
-//    }
 
-//    private IEnumerator ScheduleFind()
-//    {
-//        scheduleInProgress = true;
-//        for (int i = 0; i < OwnArmy.Count; i++)
-//        {
-//            player.FindAction(OwnArmy[i]);
-//            yield return new WaitForSeconds(1);
-//        }
-
-//        scheduleInProgress = false;
-//    }
-//}
+}

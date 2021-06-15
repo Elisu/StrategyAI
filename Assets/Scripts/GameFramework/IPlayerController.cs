@@ -4,5 +4,7 @@ using UnityEngine;
 
 public abstract class IPlayerController : MonoBehaviour
 {
-    public abstract IPlayer LoadChampion();
+    public abstract IPlayer GetPlayer();
+
+    public virtual IPlayer Load(string championFile) => GetPlayer();
 }

@@ -58,7 +58,7 @@ public class MacroActions
         return AttackOnCondition(army.SenseTroopLowestDamage, attacker, out resultAction);
     }
 
-    public static bool AttackWeakestAgainst(Attacker attacker, out IAction resultAction)
+    public static bool AttackWeakestAgainstMe(Attacker attacker, out IAction resultAction)
     {
         Army army = attacker.CurrentInstance.GetEnemyArmy(attacker.Side);
         return AttackOnCondition(army.SenseTroopLowestDamage, attacker, out resultAction);
@@ -94,6 +94,9 @@ public class MacroActions
     {
         resultAction = null;
 
+        if (target == null || attacker == null)
+            return false;
+
         if (!Reachable(attacker, target.Position))
             return false;  
 
@@ -101,10 +104,20 @@ public class MacroActions
         return true;
     }
 
-    public static bool MoveToSafety(IMovable runner, out IAction resultAction)
+    public static bool MoveToSafety(Attacker runner, out IAction resultAction)
     {
-        //TO DO
         resultAction = null;
+
+        if (runner is TowerBase)
+            return false;
+            
+        if (runner.Side == Role.Defender)
+        {
+            var positionBehindWall = runner.CurrentInstance.Map.CastleArea[runner.Health % runner.CurrentInstance.Map.CastleArea.Count];
+            resultAction = new Move(positionBehindWall, (TroopBase)runner);
+            return true;
+        }
+
         return false;
     }
 
@@ -155,6 +168,15 @@ public class SerializableMacroActions
     }
 
     [DataContract]
+    public class AttackWeakestAgainstMe : IMacroAction
+    {
+        public override bool TryAction(Attacker a, out IAction resultAction)
+        {
+            return MacroActions.AttackWeakestAgainstMe(a, out resultAction);
+        }
+    }
+
+    [DataContract]
     public class DoNothing : IMacroAction
     {
         public override bool TryAction(Attacker a, out IAction resultAction)
@@ -169,6 +191,7 @@ public class SerializableMacroActions
 [KnownType(typeof(SerializableMacroActions.AttackInRange))]
 [KnownType(typeof(SerializableMacroActions.AttackWithLowestHealth))]
 [KnownType(typeof(SerializableMacroActions.AttackWithLowestDamage))]
+[KnownType(typeof(SerializableMacroActions.AttackWeakestAgainstMe))]
 [KnownType(typeof(SerializableMacroActions.DoNothing))]
 public abstract class IMacroAction
 {

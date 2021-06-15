@@ -56,7 +56,7 @@ namespace UnitySharpNEAT
         public override Type AIPlayerType => typeof(NeatAI);
 
         #region UNTIY FUNCTIONS
-        protected override void BeforePopCreation()
+        protected override void Start()
         {
             LoadExperiment();
         }
@@ -112,12 +112,12 @@ namespace UnitySharpNEAT
         }
 
 
-        protected override void SaveChampion()
+        protected override void SaveChampion(string file)
         {
             ExperimentIO.WriteChampion(Experiment, EvolutionAlgorithm.CurrentChampGenome);
         }
 
-        public override IPlayer LoadChampion()
+        public override IPlayer LoadChampion(string file)
         {
             LoadExperiment();
             NeatGenome championBrain = Experiment.LoadChampion();
@@ -127,6 +127,11 @@ namespace UnitySharpNEAT
         public override AIPlayer GetChampion()
         {
             return null;
+        }
+
+        public override IPlayer GetPlayer()
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }

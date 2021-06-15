@@ -9,9 +9,9 @@ internal class GameLoop : Loop
     public GameInstance game;
     public IPlayerController attacker;
     public IPlayerController defender;
+
     public Text winnerText;
     public Text moneyText;
-    public string fileToLoad = null;
 
     private void Start()
     {
@@ -22,8 +22,8 @@ internal class GameLoop : Loop
         attacker = Instantiate(attacker);
         defender = Instantiate(defender);
 
-        IPlayer playerDefender = defender.LoadChampion();
-        IPlayer playerAttacker = attacker.LoadChampion();
+        IPlayer playerDefender = defender.Load(defenderSave);
+        IPlayer playerAttacker = attacker.Load(attackerSave);
 
         game.SetPlayers(playerAttacker, playerDefender);
 

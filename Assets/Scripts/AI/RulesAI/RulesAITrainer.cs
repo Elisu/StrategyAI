@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Genetic;
 using System;
+using System.IO;
 
 public class RulesAITrainer : AITrainer
 {
@@ -13,22 +14,26 @@ public class RulesAITrainer : AITrainer
     ShopperPopulation shoppers;
     IMacroAction[] possibleActions;
 
-    AIPlayer champion;
+    RulesAI champion;
+    readonly List<int> fitnessesRecord = new List<int>();
 
     public override Type AIPlayerType => typeof(RulesAI);
 
     protected override List<AIPlayer> CreatPopulation()
     {
-        ICondition damaged = new Conditions.Damaged();
-        ICondition free = new Conditions.Free();
-        ICondition strongest = new Conditions.Strongest();
-        ICondition closestIsTroop = new Conditions.ClosestIsTroopBase();
-        ICondition[] conditions = new ICondition[4] { damaged, free, strongest, closestIsTroop };
+        ICondition[] conditions = new ICondition[7] { new Conditions.Damaged(),
+                                                      new Conditions.Free(),
+                                                      new Conditions.Strongest(),
+                                                      new Conditions.ClosestIsTroopBase(),
+                                                      new Conditions.ClosestIsBuilding(),
+                                                      new Conditions.ClosestIsTower(),
+                                                      new Conditions.IsDefender() };
 
-        possibleActions = new IMacroAction[5] { new SerializableMacroActions.AttackClosest(), 
+        possibleActions = new IMacroAction[6] { new SerializableMacroActions.AttackClosest(), 
                                                 new SerializableMacroActions.AttackWithLowestHealth(), 
                                                 new SerializableMacroActions.AttackWithLowestDamage(), 
-                                                new SerializableMacroActions.AttackInRange(), 
+                                                new SerializableMacroActions.AttackWeakestAgainstMe(),
+                                                new SerializableMacroActions.AttackInRange(),
                                                 new SerializableMacroActions.DoNothing() };
 
         all = new Strategy(PopulationSize, IndividualLength, possibleActions.Length, conditions);
@@ -48,7 +53,7 @@ public class RulesAITrainer : AITrainer
         foreach (AIPlayer player in population)
             ((RulesAI)player).EvaluateFitness();
 
-        champion = FindChampion();
+        champion = (RulesAI)FindChampion();
 
         population.Clear();
  
@@ -58,7 +63,8 @@ public class RulesAITrainer : AITrainer
         for (int i = 0; i < all.PopulationSize; i++)
             population.Add(new RulesAI(all[i], possibleActions, shoppers[i]));
 
-        Debug.LogWarning(string.Format("Best fitness: {0}", all.Champion.Fitness));
+        fitnessesRecord.Add(champion.Fitness);
+        Debug.LogWarning(string.Format("Best fitness: {0}", champion.Fitness));
     }
 
     private AIPlayer FindChampion()
@@ -72,4 +78,13 @@ public class RulesAITrainer : AITrainer
         return best;
     }
     public override AIPlayer GetChampion() => champion;
+
+    protected override void TrainingFinished()
+    {
+        using (var stream = new StreamWriter(Path.Combine(Path.GetDirectoryName(Application.dataPath), "bestRuns")))
+        {
+            foreach (int fitness in fitnessesRecord)
+                stream.WriteLine(fitness);
+        }
+    }
 }

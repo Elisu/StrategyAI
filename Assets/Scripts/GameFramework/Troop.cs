@@ -313,6 +313,6 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
 
     public override float GetDefenseAgainstMe(Damageable enemy)
     {
-        return DefenseModifiersMatrix.GetDefense(enemy.type, type);
+        return DamageModifiersMatrix.DamageModifier(enemy.type, type, Mathf.RoundToInt(Vector2Int.Distance(enemy.Position, this.Position)));
     }
 }

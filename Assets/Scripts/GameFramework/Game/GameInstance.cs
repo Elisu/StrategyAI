@@ -39,11 +39,9 @@ internal class GameInstance : Instance
             IsRunning = false;
             GameOverHandler();
             return;
-        }            
+        }
 
-        scheduler.Shopping(this);
-        scheduler.ScheduleActions();
-        scheduler.RunActions();
+        OneLoop();
     }
 
 }

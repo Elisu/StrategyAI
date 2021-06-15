@@ -35,18 +35,19 @@ public class CoevolutionTrainer : AITrainer
         IMacroAction attackWithLowestDamage = new SerializableMacroActions.AttackWithLowestDamage();
         IMacroAction attackInRange = new SerializableMacroActions.AttackInRange();
         IMacroAction doNothing = new SerializableMacroActions.DoNothing();
+        IMacroAction attackWeakest = new SerializableMacroActions.AttackWeakestAgainstMe();
 
         towerActions = new IMacroAction[4] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth };
         ICondition[] conditions = new ICondition[2] { damaged, free};
         towers = new Strategy(PopulationSize, IndividualLength, towerActions.Length, conditions);
 
         //Melee
-        meleeActions = new IMacroAction[5] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth, doNothing };
+        meleeActions = new IMacroAction[6] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth, doNothing, attackWeakest };
         ICondition[] conditions2 = new ICondition[4] { damaged, free, strongest, clostestIsTroop };
         meleeUnits = new Strategy(PopulationSize, IndividualLength, meleeActions.Length, conditions2);
 
         //Ranged
-        rangedActions = new IMacroAction[5] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth, doNothing };
+        rangedActions = new IMacroAction[6] { attackClosest, attackInRange, attackWithLowestDamage, attackWithLowestHealth, doNothing, attackWeakest };
         ICondition[] conditions3 = conditions2;
         rangedUnits = new Strategy(PopulationSize, IndividualLength, rangedActions.Length, conditions3);
 

@@ -8,7 +8,12 @@ public abstract class Instance : MonoBehaviour
     internal event Action GameOver;
 
     protected IPlayer attacker;
-    protected IPlayer defender;    
+    protected IPlayer defender;
+
+    protected int loopsWithoutAction;
+    protected int loops;
+
+    private const int moneyGainInterval = 200; 
 
     internal IObjectMap Map { get; private set; }
 
@@ -20,6 +25,9 @@ public abstract class Instance : MonoBehaviour
 
    internal void SetPlayers(IPlayer attack, IPlayer defend)
     {
+        loopsWithoutAction = 0;
+        loops = 0;
+
         attacker = attack;
         defender = defend;
 
@@ -59,6 +67,26 @@ public abstract class Instance : MonoBehaviour
     protected void GameOverHandler()
     {
         GameOver?.Invoke();
+    }
+
+    protected void OneLoop()
+    {
+        if (IsRunning)
+        {
+            if (loops % moneyGainInterval == 0)
+                scheduler.MoneyGain();
+
+            scheduler.Shopping(this);
+            scheduler.ScheduleActions();
+
+            if (scheduler.RunningActionsCount == 0)
+                loopsWithoutAction++;
+            else
+                loopsWithoutAction = 0;
+
+            scheduler.RunActions();
+            loops++;
+        }
     }
 
 }

@@ -4,5 +4,5 @@ using UnityEngine;
 
 internal class BasicTowerSetup : Setup<BasicTower>
 {
-
+    
 }

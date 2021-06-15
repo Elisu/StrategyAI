@@ -5,6 +5,8 @@ internal class IObjectMap : Map<Field>
 {
     public float SizeMultiplier { get; protected set; }
 
+    public  IReadOnlyList<Vector2Int> CastleArea { get; private set; }
+
     private List<Field> spawns;
     Dictionary<Vector2Int, VisualController> structureObjects;
     Dictionary<Vector2Int, string> structureTags;
@@ -20,12 +22,14 @@ internal class IObjectMap : Map<Field>
 
     private void LoadMap(List<List<Transform>> realMap)
     {
+        List<Vector2Int> castle = new List<Vector2Int>();
+
         for (int i = 0; i < Width; i++)
             for (int j = 0; j < Height; j++)
             {
                 FieldInfo fieldInfo = realMap[j][i].GetComponent<FieldInfo>();
                 Vector2Int position = new Vector2Int(i, j);
-                Field field = new Field(fieldInfo, position);
+                Field field = new Field(fieldInfo, position);               
 
                 map[i, j] = field;
 
@@ -33,6 +37,7 @@ internal class IObjectMap : Map<Field>
                 {
                     if (field.Square == SquareType.Building)
                     {
+                       
                         Transform child = fieldInfo.transform.GetChild(0);
                         structureObjects.Add(position, child.GetComponent<VisualController>());
                         structureTags.Add(position, child.tag);
@@ -40,9 +45,14 @@ internal class IObjectMap : Map<Field>
 
                     if (field.Square == SquareType.Spawn)
                         spawns.Add(map[i, j]);
+
+                    if (field.Side == Role.Defender)
+                        castle.Add(field.Position);
                 }
 
             }
+
+        CastleArea = castle.AsReadOnly();
     }
 
     public void ReloadMap(Instance instance)

@@ -11,34 +11,35 @@ public class ShopperIndividual : Genetic.Individual<ShopperIndividual>
     public int Length => shoppingOrder.Length;
 
     [DataMember]
+    const int lengthModifier = 10;
+
+    [DataMember]
     readonly int[] shoppingOrder;
 
     readonly List<int> fitnesses = new List<int>();
 
-    int next;
+    int next = -1;
 
     public ShopperIndividual()
     {
-        next = -1;
-        shoppingOrder = new int[UnitFinder.UnitStats.Count];
+        shoppingOrder = new int[UnitFinder.UnitStats.Count * lengthModifier];
 
         for (int i = 0; i < shoppingOrder.Length; i++)
         {
-            shoppingOrder[i] = i;
+            shoppingOrder[i] = Random.Range(0, UnitFinder.UnitStats.Count);
         }
 
-        Shuffle();
+        //Shuffle();
+    }
+
+    public ShopperIndividual(int[] values)
+    {
+        shoppingOrder = values;
     }
 
     public int this[int index]
     {
         get => shoppingOrder[index];
-    }
-
-    public ShopperIndividual(int[] values)
-    {
-        next = -1;
-        shoppingOrder = values;
     }
 
     private void Shuffle()
@@ -58,7 +59,7 @@ public class ShopperIndividual : Genetic.Individual<ShopperIndividual>
         {
             next = (next + 1) % shoppingOrder.Length;
 
-            if (UnitFinder.UnitStats[next].Price <= budget)
+            if (UnitFinder.UnitStats[shoppingOrder[next]].Price <= budget)
                 return shoppingOrder[next];
         }
 

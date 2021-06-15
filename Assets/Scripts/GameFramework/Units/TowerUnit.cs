@@ -14,6 +14,4 @@ public abstract class TowerUnit : Unit
     public int Price { get; protected set; }
 
     public bool Passable => false;
-
-    public abstract float GetDefenseAgainst(Type unitType);
 }

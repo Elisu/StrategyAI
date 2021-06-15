@@ -29,13 +29,30 @@ public class ShopperPopulation
         ShopperIndividual[] selected = EvolutionFunctions.RouletteWheelSelection(population);
 
         selected = EvolutionFunctions.Crossover(selected, OnePointCross);
-        selected = EvolutionFunctions.Mutation(selected, ShuffleMutation);
+        selected = EvolutionFunctions.Mutation(selected, ValueMutation);
         population = selected;
     }
 
     private Tuple<ShopperIndividual, ShopperIndividual> OnePointCross(ShopperIndividual a, ShopperIndividual b)
     {
-        return new Tuple<ShopperIndividual, ShopperIndividual>(a, b);
+        int crossPoint = UnityEngine.Random.Range(0, a.Length);
+
+        int[] first = new int[a.Length];
+        int[] second = new int[b.Length];
+
+        for (int i = 0; i < crossPoint; i++)
+        {
+            first[i] = a[i];
+            second[i] = b[i];
+        }
+
+        for (int i = crossPoint; i < a.Length; i++)
+        {
+            first[i] = b[i];
+            second[i] = a[i];
+        }
+
+        return new Tuple<ShopperIndividual, ShopperIndividual>(new ShopperIndividual(first), new ShopperIndividual(second));
     }
 
     private ShopperIndividual ShuffleMutation(ShopperIndividual ind)
@@ -54,5 +71,17 @@ public class ShopperPopulation
         }
 
         return new ShopperIndividual(shuffled);
+    }
+
+    private ShopperIndividual ValueMutation(ShopperIndividual ind)
+    {
+        int[] mutated = new int[ind.Length];
+
+        for (int i = 0; i < mutated.Length; i++)
+            mutated[i] = ind[i];
+
+        mutated[UnityEngine.Random.Range(0, mutated.Length)] = UnityEngine.Random.Range(0, UnitFinder.UnitStats.Count);
+
+        return new ShopperIndividual(mutated);
     }
 }

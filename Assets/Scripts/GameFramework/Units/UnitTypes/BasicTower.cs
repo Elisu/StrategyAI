@@ -11,9 +11,4 @@ public class BasicTower : TowerUnit
         Damage = BasicTowerSetup.Damage;
         Range = BasicTowerSetup.Range;
     }
-
-    public override float GetDefenseAgainst(Type unitType)
-    {
-        return 1f;
-    }
 }

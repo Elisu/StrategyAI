@@ -13,10 +13,14 @@ public class UnitButtonLoader : MonoBehaviour
         Vector3 startPos = transform.position;
         for (int i = 0; i < UnitFinder.UnitStats.Count; i++)
         {
-            if (buttonPrefab.TryGetComponent<RectTransform>(out RectTransform rect))
-                startPos.y -= rect.rect.height + 2;
             UnitButton button = Instantiate(buttonPrefab, startPos, Quaternion.identity, this.transform);
+
+            float height = buttonPrefab.GetComponent<RectTransform>().rect.height;
+
+            button.transform.localPosition -= new Vector3(0, height + 2, 0);
             button.Set(i, UnitFinder.UnitStats[i].UnitType.Name, UnitFinder.UnitStats[i].Price);
+
+            startPos = button.transform.position;
         }
     }
 }

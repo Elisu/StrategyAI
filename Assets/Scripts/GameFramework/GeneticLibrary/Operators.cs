@@ -62,7 +62,7 @@ namespace Genetic
 
             for (int i = 1; i < pop.Length; i += 2)
             {
-                if (UnityEngine.Random.value < 0.4)
+                if (UnityEngine.Random.value < 0.35)
                 {
                     Tuple<T, T> offs = cross(pop[i - 1], pop[i]);
                     crossed[i - 1] = offs.Item1;
@@ -89,7 +89,7 @@ namespace Genetic
 
             foreach (T ind in pop)
             {
-                if (UnityEngine.Random.value < 0.25)
+                if (UnityEngine.Random.value < 0.15)
                     mutated.Add(mutate(ind));
                 else
                     mutated.Add(ind.GetClone());
@@ -103,15 +103,35 @@ namespace Genetic
             int fitnessResult = 0;
 
             IList<Statistics> ownStats = stats.GetMyStats(role);
+            IList<Statistics> enemyStats = stats.GetEnemyStats(role);
 
             if (stats.Winner == role)
-                fitnessResult += 15000;
+                fitnessResult += 200000;
 
-            int statResults = 0;
+            int ownDamage = 0;
+            int enemyDamage = 0;
+            int enemiesKilled = 0;
+
             foreach (Statistics stat in ownStats)
-                statResults += stat.killedEnemies * 100;
+            {
+                ownDamage += stat.dealtDamage;
 
-            return fitnessResult + statResults;
+                if (stat.UnitType.IsSubclassOf(typeof(HumanUnit)))
+                    enemyDamage += stat.receivedDamage;
+
+                enemiesKilled += stat.killedEnemies;
+            }
+
+            //foreach (Statistics stat in enemyStats)
+            //    if (stat.UnitType.IsSubclassOf(typeof(HumanUnit)))
+            //        enemyDamage += stat.dealtDamage;
+
+            int damageDiff = ownDamage - enemyDamage;
+
+            if (stats.Winner == Role.Neutral)
+                damageDiff /= 10;
+
+            return fitnessResult + Math.Max(0, damageDiff) + enemiesKilled * 10000;
         }
     }
 }

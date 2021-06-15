@@ -6,15 +6,13 @@ internal class TrainingInstance : Instance
 {
     public override bool IsTraining => true;
 
-    int loopsWithoutAction;
-    int loops;
+    int generationCount = 0;
 
-    public void Run(AIPlayer attack, AIPlayer defend)
+    public void Run(AIPlayer attack, AIPlayer defend, int genCount)
     {
         SetPlayers(attack, defend);
         IsRunning = true;
-        loops = 0;
-        loopsWithoutAction = 0;
+        generationCount = genCount;
 
         RunGameTrainingLoop();
     }
@@ -27,19 +25,7 @@ internal class TrainingInstance : Instance
 
         while (defender.Info.OwnArmy.Troops.Count != 0 && attacker.Info.OwnArmy.Troops.Count != 0)
         {
-            if (IsRunning)
-            {
-                scheduler.Shopping(this);
-                scheduler.ScheduleActions();
-
-                if (scheduler.RunningActionsCount == 0)
-                    loopsWithoutAction++;
-                else
-                    loopsWithoutAction = 0;
-
-                scheduler.RunActions();
-                loops++;
-            }
+            OneLoop();
 
             if (loopsWithoutAction > 1000 || loops > 10000)
                 break;
@@ -55,6 +41,7 @@ internal class TrainingInstance : Instance
             stats = GetGameStats(Role.Neutral);
 
         Debug.Log(string.Format("Winner is {0}", stats.Winner));
+        Debug.Log(string.Format("Gen {0}: Winner is {1}", generationCount, stats.Winner));
         ((AIPlayer)defender).RunOver(stats);
         ((AIPlayer)attacker).RunOver(stats);
 

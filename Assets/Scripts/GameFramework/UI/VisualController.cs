@@ -10,6 +10,8 @@ public class VisualController : MonoBehaviour
 
     Attacker attacker;
 
+    Color originalColor;
+
     private void Awake()
     {
         if (lr != null)
@@ -66,13 +68,16 @@ public class VisualController : MonoBehaviour
 
     public void HoverOverEnter()
     {
-        renderer.material.SetFloat("_OutlineWidth", 0.4f);
+        if (renderer != null)
+        {
+            originalColor = renderer.material.color;
+            renderer.material.color = Color.white;
+        }
     }
 
     public void HoverOverExit()
     {
-        renderer.material.SetFloat("_OutlineWidth", 0f);
-
-
+        if (renderer != null)
+            renderer.material.color = originalColor;
     }    
 }

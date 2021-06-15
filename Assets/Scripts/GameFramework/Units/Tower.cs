@@ -28,7 +28,7 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
         CurrentState = State.Fighting;
         Target = enemy;
 
-        int damage = Mathf.CeilToInt(Damage * unit.GetDefenseAgainst(enemy.type));
+        int damage = Mathf.CeilToInt(Damage * GetDefenseAgainstMe(enemy));
         DealtDamage += damage;
 
         return enemy.TakeDamage(damage);
@@ -58,7 +58,7 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
 
     public override float GetDefenseAgainstMe(Damageable enemy)
     {
-        return unit.GetDefenseAgainst(enemy.type);
+        return DamageModifiersMatrix.DamageModifier(enemy.type, type);
     }
 
     protected Tower() { }

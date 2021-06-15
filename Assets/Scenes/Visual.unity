@@ -250,7 +250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -640,7 +640,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3, y: 46.7}
+  m_AnchoredPosition: {x: 0, y: 15.7}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &982364071
@@ -715,14 +715,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapObject: {fileID: 1980576903}
+  defenderSave: test.xml
+  attackerSave: 
   game: {fileID: 3868471417579026627, guid: e0fd41c53e981154096a5f042f57c12b, type: 3}
   attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
     type: 3}
-  defender: {fileID: 6138801334774653003, guid: 560fa0612cee94d48ab784d6b24c2e30,
+  defender: {fileID: 7067290049789075546, guid: 186f7a5ee06e88740a263c80a4cc45a0,
     type: 3}
   winnerText: {fileID: 497692512}
   moneyText: {fileID: 982364071}
-  fileToLoad: 
 --- !u!4 &1435923424
 Transform:
   m_ObjectHideFlags: 0
@@ -820,8 +821,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 109.42682, y: -95.6}
-  m_SizeDelta: {x: 166.2639, y: 207.8714}
+  m_AnchoredPosition: {x: 93.34006, y: -45.9}
+  m_SizeDelta: {x: 168.5972, y: 94.2726}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2031047266
 MonoBehaviour:
@@ -837,13 +838,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonPrefab: {fileID: 6938687734166842705, guid: bd5b5df5802680e4d8d083cbc62d8776,
     type: 3}
---- !u!1001 &7171948027689706345
+--- !u!1001 &2055440083
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 409651050, guid: 8b2947a7469d45345a043a82b3f916f5, type: 3}
+      propertyPath: health
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2186815627403369354, guid: 8b2947a7469d45345a043a82b3f916f5,
+        type: 3}
+      propertyPath: health
+      value: 800
+      objectReference: {fileID: 0}
+    - target: {fileID: 4402882959786940195, guid: 8b2947a7469d45345a043a82b3f916f5,
+        type: 3}
+      propertyPath: health
+      value: 20000
+      objectReference: {fileID: 0}
+    - target: {fileID: 7171948027913415860, guid: 8b2947a7469d45345a043a82b3f916f5,
+        type: 3}
+      propertyPath: health
+      value: 800
+      objectReference: {fileID: 0}
     - target: {fileID: 7171948027913415861, guid: 8b2947a7469d45345a043a82b3f916f5,
         type: 3}
       propertyPath: m_Name
@@ -852,7 +872,17 @@ PrefabInstance:
     - target: {fileID: 7171948027913415862, guid: 8b2947a7469d45345a043a82b3f916f5,
         type: 3}
       propertyPath: range
-      value: 10
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7171948027913415862, guid: 8b2947a7469d45345a043a82b3f916f5,
+        type: 3}
+      propertyPath: damage
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 7171948027913415862, guid: 8b2947a7469d45345a043a82b3f916f5,
+        type: 3}
+      propertyPath: health
+      value: 50000
       objectReference: {fileID: 0}
     - target: {fileID: 7171948027913415863, guid: 8b2947a7469d45345a043a82b3f916f5,
         type: 3}

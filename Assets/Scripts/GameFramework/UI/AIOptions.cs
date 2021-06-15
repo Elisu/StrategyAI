@@ -5,11 +5,11 @@ using UnityEngine;
 public class AIOptions : MonoBehaviour
 {
     [SerializeField]
-    private List<AITrainer> AIs;
+    private List<AIController> AIs;
 
     private static AIOptions instance;
 
-    public static List<AITrainer> Options => instance.AIs;
+    public static List<AIController> Options => instance.AIs;
 
     private void Awake()
     {

@@ -58,6 +58,45 @@ namespace Genetic
             }
         }
 
+        [DataContract]
+        public class ClosestIsBuilding : ICondition
+        {
+            public override bool Evaluate(IAttack attacker, GameInfo info)
+            {
+                var closest = info.EnemyArmy.SenseClosestTo((Attacker)attacker);
+
+                if (closest is Building)
+                    return true;
+
+                return false;
+            }
+        }
+
+        [DataContract]
+        public class ClosestIsTower : ICondition
+        {
+            public override bool Evaluate(IAttack attacker, GameInfo info)
+            {
+                var closest = info.EnemyArmy.SenseClosestTo((Attacker)attacker);
+
+                if (closest is TowerBase)
+                    return true;
+
+                return false;
+            }
+        }
+        [DataContract]
+        public class IsDefender : ICondition
+        {
+            public override bool Evaluate(IAttack attacker, GameInfo info)
+            {
+                if (attacker.Side == Role.Defender)
+                    return true;
+
+                return false;
+            }
+        }
+
     }
 
     [DataContract]
@@ -65,6 +104,9 @@ namespace Genetic
     [KnownType(typeof(Conditions.Free))]
     [KnownType(typeof(Conditions.Strongest))]
     [KnownType(typeof(Conditions.ClosestIsTroopBase))]
+    [KnownType(typeof(Conditions.ClosestIsBuilding))]
+    [KnownType(typeof(Conditions.ClosestIsTower))]
+    [KnownType(typeof(Conditions.IsDefender))]
     public abstract class ICondition
     {
         public abstract bool Evaluate(IAttack attacker, GameInfo info);

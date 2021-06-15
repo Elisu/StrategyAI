@@ -64,7 +64,7 @@ namespace Genetic
 
             foreach (Rule rule in mutated)
             {
-                if (UnityEngine.Random.value < 0.5)
+                if (UnityEngine.Random.value < 0.2)
                     rule.ActionIndex = UnityEngine.Random.Range(0, rule.ActionCount);
             }
 
@@ -78,7 +78,7 @@ namespace Genetic
 
             for (int i = 0; i < Mathf.Min(a.Length, b.Length); i++)
             {
-                if (UnityEngine.Random.value > 0.5)
+                if (UnityEngine.Random.value > 0.3)
                 {
                     first.Add(new Rule(a[i]));
                     second.Add(new Rule(b[i]));
@@ -106,7 +106,7 @@ namespace Genetic
 
             for (int i = end; i < rest.Length; i++)
             {
-                if (UnityEngine.Random.value > 0.5)
+                if (UnityEngine.Random.value > 0.3)
                     first.Add(new Rule(rest[i]));
                 else
                     second.Add(new Rule(rest[i]));

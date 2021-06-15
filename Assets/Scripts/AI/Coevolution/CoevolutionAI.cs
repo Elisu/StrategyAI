@@ -140,6 +140,7 @@ public class CoevolutionAI : AIPlayer
         foreach (GameStats gameStat in stats)
             fitnesses.Add(EvolutionFunctions.ComputeFitness(gameStat, role));
 
+        fitnesses.Sort();
         return fitnesses[fitnesses.Count / 2];
     }
 }

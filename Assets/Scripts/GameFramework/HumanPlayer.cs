@@ -18,7 +18,18 @@ internal class HumanPlayer : IPlayer
     protected internal override Tuple<Attacker, IAction> GetActions()
     {
         if (toDo.Count == 0)
+        {
+            //Auto attack for human player
+            foreach (var recruit in Info.OwnArmy)
+                if (recruit is Attacker attacker && recruit.CurrentState == State.Free)
+                {
+                    MacroActions.AttackInRange(attacker, out IAction result);
+                    return new Tuple<Attacker, IAction>(attacker, result);
+                }
+
             return new Tuple<Attacker, IAction>(null, null);
+        }
+           
 
         return toDo.Dequeue();
     }

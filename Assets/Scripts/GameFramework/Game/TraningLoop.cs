@@ -8,10 +8,11 @@ using UnityEngine;
 
 internal class TraningLoop : Loop
 {
-    public AITrainer attacker;  //TrainingSettings.selectedAttacker;
-    public AITrainer defender; //TrainingSettings.selectedDefender;
+    public AIController attacker;  //TrainingSettings.selectedAttacker;
+    public AIController defender; //TrainingSettings.selectedDefender;
 
     public int gameInstancesCount = 5;
+    public int tries = 3;
     public TrainingInstance gameInstance;
 
     public int generationCount;
@@ -26,6 +27,8 @@ internal class TraningLoop : Loop
 
     private Thread trainingThread;
     private bool terminateThread = false;
+
+    private int currentGeneration = 1;
 
     private void Start()
     {
@@ -58,21 +61,37 @@ internal class TraningLoop : Loop
         if (trainingFinished)
             return;
 
-
         if (generationCount <= 0)
         {
             Debug.Log("FINISHED");
             trainingFinished = true;
-            attacker.SaveChampion();
-            defender.SaveChampion();
+
+            if (attacker is AITrainer trainable)
+            {
+                trainable.Save();
+                trainable.TrainingFinished();
+            }
+               
+
+            if (defender is AITrainer trainable2)
+            {
+                trainable2.Save();
+                trainable2.TrainingFinished();
+            }
+
             return;
         }
 
         if (!trainingThread.IsAlive)
         {
-            attacker.GenerationDone();
-            defender.GenerationDone();
+            if (attacker is AITrainer trainable)
+                trainable.GenerationDone();
+
+            if (defender is AITrainer trainable2)
+                trainable2.GenerationDone();
+
             generationCount--;
+            currentGeneration++;
             progresBar.SetProgress(generationCount);
 
             if (generationCount > 0)
@@ -86,22 +105,6 @@ internal class TraningLoop : Loop
             }
             
         }
-
-        //if (!generationRunning)
-        //    StartCoroutine(RunGeneration());
-
-        //if (RunOneGeneration())
-        //{
-        //    attacker.GenerationDone();
-        //    defender.GenerationDone();
-        //    GenerationCount--;
-
-        //    if (GenerationCount > 0)
-        //    {
-        //        attacker.BeforeEachGeneration();
-        //        defender.BeforeEachGeneration();
-        //    }
-        //}
     }
 
     //IEnumerator RunGeneration()
@@ -133,83 +136,89 @@ internal class TraningLoop : Loop
         IList<AIPlayer> attackerPop = attacker.Population;
         IList<AIPlayer> defenderPop = defender.Population;
 
-        currentAttacker = 0;
-        currentDefender = 0;
-        List<Task> runningTasks = new List<Task>();
+        for (int run = 0; run < tries; run++)
+        {
+            currentAttacker = 0;
+            currentDefender = 0;
+            List<Task> runningTasks = new List<Task>();
 
-        while (currentAttacker != attackerPop.Count || currentDefender != defenderPop.Count)
-        {            
-            runningTasks.Clear();
-            int i = 0;
-            for (; currentAttacker < attackerPop.Count; currentAttacker++)
+            while (currentAttacker != attackerPop.Count || currentDefender != defenderPop.Count)
             {
-                for (; currentDefender < defenderPop.Count; currentDefender++, i++)
+                runningTasks.Clear();
+                int i = 0;
+                for (; currentAttacker < attackerPop.Count; currentAttacker++)
                 {
+                    for (; currentDefender < defenderPop.Count; currentDefender++, i++)
+                    {
+                        if (i >= gameInstancesCount)
+                            break;
+
+                        if (terminateThread)
+                            return;
+
+                        int index = i;
+                        attackerPop[currentAttacker].Start(null, Role.Attacker);
+                        defenderPop[currentDefender].Start(null, Role.Defender);
+                        AIPlayer att = attackerPop[currentAttacker].Clone();
+                        AIPlayer def = defenderPop[currentDefender].Clone();
+
+                        runningTasks.Add(Task.Run(() => instances[index].Run(att, def, currentGeneration)));
+                    }
+
                     if (i >= gameInstancesCount)
                         break;
 
-                    if (terminateThread)
-                        return;
-
-                    int index = i;
-                    AIPlayer att = attackerPop[currentAttacker].Clone();
-                    AIPlayer def = defenderPop[currentDefender].Clone();
-
-                    runningTasks.Add(Task.Run(() => instances[index].Run(att, def)));
+                    if (currentAttacker < attackerPop.Count - 1)
+                        currentDefender = 0;
                 }
 
-                if (i >= gameInstancesCount)
-                    break;
-
-                if (currentAttacker < attackerPop.Count - 1)
-                    currentDefender = 0;
+                Task.WaitAll(runningTasks.ToArray());
             }
-
-            Task.WaitAll(runningTasks.ToArray());
         }
+        
 
         return;
     }
 
-    private bool RunOneGeneration()
-    {
-        IList<AIPlayer> attackerPop = attacker.Population;
-        IList<AIPlayer> defenderPop = defender.Population;
+    //private bool RunOneGeneration()
+    //{
+    //    IList<AIPlayer> attackerPop = attacker.Population;
+    //    IList<AIPlayer> defenderPop = defender.Population;
 
-        List<Task> runningTasks = new List<Task>();
+    //    List<Task> runningTasks = new List<Task>();
 
-        int i = 0;
+    //    int i = 0;
 
-        for (; currentAttacker < attackerPop.Count; currentAttacker++)
-        {
-            for (; currentDefender < defenderPop.Count; currentDefender++, i++)
-            {
-                if (i >= gameInstancesCount)
-                    break;
+    //    for (; currentAttacker < attackerPop.Count; currentAttacker++)
+    //    {
+    //        for (; currentDefender < defenderPop.Count; currentDefender++, i++)
+    //        {
+    //            if (i >= gameInstancesCount)
+    //                break;
 
-                int index = i;
-                AIPlayer att = attackerPop[currentAttacker].Clone();
-                AIPlayer def = defenderPop[currentDefender].Clone();
+    //            int index = i;
+    //            AIPlayer att = attackerPop[currentAttacker].Clone();
+    //            AIPlayer def = defenderPop[currentDefender].Clone();
 
-                runningTasks.Add(Task.Run(() => instances[index].Run(att, def)));
-            }
+    //            runningTasks.Add(Task.Run(() => instances[index].Run(att, def)));
+    //        }
 
-            if (i >= gameInstancesCount)
-                break;
+    //        if (i >= gameInstancesCount)
+    //            break;
 
-            if (currentAttacker < attackerPop.Count - 1)
-                currentDefender = 0;
-        }
+    //        if (currentAttacker < attackerPop.Count - 1)
+    //            currentDefender = 0;
+    //    }
 
-        Task.WaitAll(runningTasks.ToArray());
+    //    Task.WaitAll(runningTasks.ToArray());
 
-        if (currentAttacker == attackerPop.Count && currentDefender == defenderPop.Count)
-        {
-            currentAttacker = 0;
-            currentDefender = 0;
-            return true;
-        }
+    //    if (currentAttacker == attackerPop.Count && currentDefender == defenderPop.Count)
+    //    {
+    //        currentAttacker = 0;
+    //        currentDefender = 0;
+    //        return true;
+    //    }
 
-        return false;
-    }    
+    //    return false;
+    //}    
 }
