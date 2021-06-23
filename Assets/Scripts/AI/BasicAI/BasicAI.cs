@@ -23,6 +23,13 @@ public class BasicAI : AIPlayer
         {
             if (!MacroActions.AttackInRange(attacker, out resultAction))
             {
+                //Wait for reinforcements
+                if (Info.OwnArmy.Count < 2)
+                {
+                    MacroActions.DoNothing(attacker, out resultAction);
+                    return resultAction;
+                }
+
 
                 IRecruitable enemy = Info.EnemyArmy.SenseLowestDamageDecrease(attacker);
                 if (!MacroActions.AttackGiven(enemy, attacker, out resultAction))
@@ -47,6 +54,12 @@ public class BasicAI : AIPlayer
         {
             var closest = Info.EnemyArmy.SenseClosestTo(attacker);
 
+            if (closest == attacker.Target)
+            {
+                MacroActions.DoNothing(attacker, out resultAction);
+                return resultAction;
+            }
+
             if (closest is Building)
             {
                 if (Info.EnemyArmy.Towers.Count > 0)
@@ -58,14 +71,11 @@ public class BasicAI : AIPlayer
                     return resultAction;
             }
 
-
             if (attacker is TroopBase troop)
             {
-                if (troop.CurrentState == State.Fighting && troop.Target.Health >= troop.Health * 2)
+                if (troop.CurrentState == State.Fighting && troop.Target.Health >= troop.Health * 2 && Info.OwnArmy.Troops.Count < 2)
                     MacroActions.MoveToSafety(troop, out resultAction);
-
             }
-
             
         }
 

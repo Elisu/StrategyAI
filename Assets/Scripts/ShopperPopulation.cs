@@ -21,16 +21,26 @@ public class ShopperPopulation
         get => population[index];
     }
 
-    public void Evolve()
+    public void Evolve(bool elitism = false)
     {
+        ShopperIndividual best = population[0];
+
         for (int i = 0; i < population.Length; i++)
+        {
             population[i].Evaluate();
+
+            if (population[i].Fitness > best.Fitness)
+                best = population[i];
+        }           
 
         ShopperIndividual[] selected = EvolutionFunctions.RouletteWheelSelection(population);
 
         selected = EvolutionFunctions.Crossover(selected, OnePointCross);
         selected = EvolutionFunctions.Mutation(selected, ValueMutation);
         population = selected;
+
+        if (elitism)
+            population[0] = best;
     }
 
     private Tuple<ShopperIndividual, ShopperIndividual> OnePointCross(ShopperIndividual a, ShopperIndividual b)

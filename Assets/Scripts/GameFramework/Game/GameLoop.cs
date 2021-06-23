@@ -13,6 +13,11 @@ internal class GameLoop : Loop
     public Text winnerText;
     public Text moneyText;
 
+    [SerializeField]
+    protected string defenderSave;
+    [SerializeField]
+    protected string attackerSave;
+
     private void Start()
     {
         game = Instantiate(game);

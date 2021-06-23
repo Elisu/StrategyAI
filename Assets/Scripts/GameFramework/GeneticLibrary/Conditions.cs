@@ -8,13 +8,29 @@ namespace Genetic
     public class Conditions
     {
         [DataContract]
-        public class Strongest : ICondition
+        public class StrongerThanClosest : ICondition
         {
             public override bool Evaluate(IAttack attacker, GameInfo info)
             {
-                foreach (var troop in info.EnemyArmy.Troops)
-                    if (troop.Damage > attacker.Damage)
-                        return false;
+                var enemy = info.EnemyArmy.SenseClosestTo((Attacker)attacker);
+
+                if (enemy is Attacker enemyAttacker)
+                    if (enemyAttacker.Damage > attacker.Damage)
+                            return false;
+
+                return true;
+            }
+        }
+
+        [DataContract]
+        public class HealthierThanClosest : ICondition
+        {
+            public override bool Evaluate(IAttack attacker, GameInfo info)
+            {
+                var enemy = info.EnemyArmy.SenseClosestTo((Attacker)attacker);
+
+                if (enemy.Health > attacker.Health)
+                    return false;
 
                 return true;
             }
@@ -97,16 +113,43 @@ namespace Genetic
             }
         }
 
+        [DataContract]
+        public class IsAlone : ICondition
+        {
+            public override bool Evaluate(IAttack attacker, GameInfo info)
+            {
+                if (info.OwnArmy.Troops.Count < 2)
+                    return true;
+
+                return false;
+            }
+        }
+
+        [DataContract]
+        public class IsWinning : ICondition
+        {
+            public override bool Evaluate(IAttack attacker, GameInfo info)
+            {
+                if (info.OwnArmy.Troops.Count > info.EnemyArmy.Troops.Count)
+                    return true;
+
+                return false;
+            }
+        }
+
     }
 
     [DataContract]
     [KnownType(typeof(Conditions.Damaged))]
     [KnownType(typeof(Conditions.Free))]
-    [KnownType(typeof(Conditions.Strongest))]
+    [KnownType(typeof(Conditions.StrongerThanClosest))]
+    [KnownType(typeof(Conditions.HealthierThanClosest))]
     [KnownType(typeof(Conditions.ClosestIsTroopBase))]
     [KnownType(typeof(Conditions.ClosestIsBuilding))]
     [KnownType(typeof(Conditions.ClosestIsTower))]
     [KnownType(typeof(Conditions.IsDefender))]
+    [KnownType(typeof(Conditions.IsAlone))]
+    [KnownType(typeof(Conditions.IsWinning))]
     public abstract class ICondition
     {
         public abstract bool Evaluate(IAttack attacker, GameInfo info);

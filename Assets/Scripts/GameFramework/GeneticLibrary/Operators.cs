@@ -15,9 +15,27 @@ namespace Genetic
 
         int Fitness { get; }
     }
+        
 
     public class EvolutionFunctions
     {
+        public static  T[] TournamentSelection<T>(T[] pop) where T : Individual<T>
+        {
+            T[] selected = new T[pop.Length];
+
+            for (int i = 0; i < pop.Length; i++)
+            {
+                int opponent = UnityEngine.Random.Range(0, pop.Length);
+
+                if (pop[i].Fitness > pop[opponent].Fitness)
+                    selected[i] = pop[i].GetClone();
+                else
+                    selected[i] = pop[opponent].GetClone();
+            }
+
+            return selected;
+        }
+
         public static T[] RouletteWheelSelection<T>(T[] pop) where T : Individual<T>
         {
             T[] selected = new T[pop.Length];
@@ -62,7 +80,7 @@ namespace Genetic
 
             for (int i = 1; i < pop.Length; i += 2)
             {
-                if (UnityEngine.Random.value < 0.35)
+                if (UnityEngine.Random.value < 0.25)
                 {
                     Tuple<T, T> offs = cross(pop[i - 1], pop[i]);
                     crossed[i - 1] = offs.Item1;
@@ -89,7 +107,7 @@ namespace Genetic
 
             foreach (T ind in pop)
             {
-                if (UnityEngine.Random.value < 0.15)
+                if (UnityEngine.Random.value < 0.05)
                     mutated.Add(mutate(ind));
                 else
                     mutated.Add(ind.GetClone());
@@ -106,7 +124,7 @@ namespace Genetic
             IList<Statistics> enemyStats = stats.GetEnemyStats(role);
 
             if (stats.Winner == role)
-                fitnessResult += 200000;
+                fitnessResult += 300000;
 
             int ownDamage = 0;
             int enemyDamage = 0;
@@ -128,8 +146,8 @@ namespace Genetic
 
             int damageDiff = ownDamage - enemyDamage;
 
-            if (stats.Winner == Role.Neutral)
-                damageDiff /= 10;
+            //if (stats.Winner == Role.Neutral)
+            //    damageDiff /= 10;
 
             return fitnessResult + Math.Max(0, damageDiff) + enemiesKilled * 10000;
         }

@@ -89,6 +89,24 @@ public class DamageModifiersMatrix
                             return 0.8f;
                     }
                 }
+
+            case nameof(BasicTower):
+                {
+                    switch (against.Name)
+                    {
+                        case nameof(Archers):
+                            return 0.90f;
+                        case nameof(Cavalry):
+                            return 0.7f;
+                        case nameof(Catapult):
+                            return 0.6f;
+                        case nameof(Swordsmen):
+                            return 0.8f;
+                        default:
+                            return 0.8f;
+                    }
+                }
+
             default:
                 return 1f;
 

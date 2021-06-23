@@ -11,7 +11,7 @@ public class ShopperIndividual : Genetic.Individual<ShopperIndividual>
     public int Length => shoppingOrder.Length;
 
     [DataMember]
-    const int lengthModifier = 10;
+    const int lengthModifier = 20;
 
     [DataMember]
     readonly int[] shoppingOrder;
@@ -55,7 +55,7 @@ public class ShopperIndividual : Genetic.Individual<ShopperIndividual>
 
     public int GetNext(int budget)
     {
-        for (int i = 0; i < shoppingOrder.Length; i++)
+        for (int i = 0; i < UnitFinder.UnitStats.Count + 3; i++)
         {
             next = (next + 1) % shoppingOrder.Length;
 
@@ -63,7 +63,7 @@ public class ShopperIndividual : Genetic.Individual<ShopperIndividual>
                 return shoppingOrder[next];
         }
 
-        return 0;
+        return -1;
     }
 
     public ShopperIndividual GetClone()

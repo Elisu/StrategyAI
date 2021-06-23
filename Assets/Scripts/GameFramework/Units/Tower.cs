@@ -31,7 +31,12 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
         int damage = Mathf.CeilToInt(Damage * GetDefenseAgainstMe(enemy));
         DealtDamage += damage;
 
-        return enemy.TakeDamage(damage);
+        bool killed = enemy.TakeDamage(damage);
+
+        if (killed)
+            EnemiesKilled++;
+
+        return killed;
     }
 
     internal override bool TakeDamage(int totalDamage)

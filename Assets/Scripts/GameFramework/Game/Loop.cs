@@ -10,11 +10,6 @@ internal class Loop : MonoBehaviour
     [SerializeField]
     protected GameObject mapObject;
 
-    [SerializeField]
-    protected string defenderSave;
-    [SerializeField]
-    protected string attackerSave;
-
     protected List<List<Transform>> LoadMap()
     {
         List<List<Transform>> mapPrefab = new List<List<Transform>>();
@@ -30,15 +25,6 @@ internal class Loop : MonoBehaviour
         }
 
         return mapPrefab;
-    }
-
-    public AIPlayer LoadPlayerFromFile(string filename, Type type)
-    {
-        using (var stream = new FileStream(filename, FileMode.Open))
-        {
-            DataContractSerializer serializer = new DataContractSerializer(type);
-            return (AIPlayer)serializer.ReadObject(stream);
-        }
     }
 
 }

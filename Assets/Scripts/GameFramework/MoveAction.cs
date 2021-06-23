@@ -37,7 +37,10 @@ internal class Move : IAction
         bool stillGoing = troop.MoveTo(target);
 
         if (!stillGoing)
+        {
+            troop.CorrectPosition();
             troop.StopAction();
+        }
 
         return stillGoing;
     }

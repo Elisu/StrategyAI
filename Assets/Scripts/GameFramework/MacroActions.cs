@@ -117,9 +117,28 @@ public class MacroActions
             resultAction = new Move(positionBehindWall, (TroopBase)runner);
             return true;
         }
+        else
+        {
+            if (runner.CurrentInstance.Map.GetFreeSpawn(runner.Side, out Vector2Int pos))
+            {
+                resultAction = new Move(pos, (TroopBase)runner);
+                return true;            
+            }    
+        }
 
         return false;
     }
+
+    ///// <summary>
+    ///// Defender from behind walls, attacker from field not in range of towers
+    ///// </summary>
+    ///// <param name="runner"></param>
+    ///// <param name="resultAction"></param>
+    ///// <returns></returns>
+    //public static bool AttackClosestFromSafety(Attacker attacker, out IAction resultAction)
+    //{
+    //    if (attacker.CurrentInstance.Map[attacker.Position] is Field fi)
+    //}
 
     public static bool DoNothing(Attacker a, out IAction resultAction)
     {

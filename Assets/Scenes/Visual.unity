@@ -715,8 +715,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapObject: {fileID: 1980576903}
-  defenderSave: test.xml
-  attackerSave: 
   game: {fileID: 3868471417579026627, guid: e0fd41c53e981154096a5f042f57c12b, type: 3}
   attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
     type: 3}
@@ -724,6 +722,8 @@ MonoBehaviour:
     type: 3}
   winnerText: {fileID: 497692512}
   moneyText: {fileID: 982364071}
+  defenderSave: test4.xml
+  attackerSave: 
 --- !u!4 &1435923424
 Transform:
   m_ObjectHideFlags: 0

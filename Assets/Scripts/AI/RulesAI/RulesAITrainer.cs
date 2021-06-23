@@ -23,7 +23,7 @@ public class RulesAITrainer : AITrainer
     {
         ICondition[] conditions = new ICondition[7] { new Conditions.Damaged(),
                                                       new Conditions.Free(),
-                                                      new Conditions.Strongest(),
+                                                      new Conditions.StrongerThanClosest(),
                                                       new Conditions.ClosestIsTroopBase(),
                                                       new Conditions.ClosestIsBuilding(),
                                                       new Conditions.ClosestIsTower(),
@@ -57,8 +57,8 @@ public class RulesAITrainer : AITrainer
 
         population.Clear();
  
-        all.Evolve();
-        shoppers.Evolve();
+        all.Evolve(true);
+        shoppers.Evolve(true);
 
         for (int i = 0; i < all.PopulationSize; i++)
             population.Add(new RulesAI(all[i], possibleActions, shoppers[i]));

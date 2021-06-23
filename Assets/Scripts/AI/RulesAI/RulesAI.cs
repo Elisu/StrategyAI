@@ -46,7 +46,7 @@ public class RulesAI : AIPlayer
 
     public override AIPlayer Clone()
     {
-        return new RulesAI(new StrategyIndividual(individual), possibleActions, shopper, accumulatedResults);
+        return new RulesAI(new StrategyIndividual(individual), possibleActions, shopper.GetClone(), accumulatedResults);
     }
 
     protected override IAction FindAction(Attacker attacker)

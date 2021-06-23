@@ -14,7 +14,6 @@ public abstract class AITrainer : AIController
 
     public override ReadOnlyCollection<AIPlayer> Population => population.AsReadOnly();
 
-
     protected internal override void OnStart()
     {
         InitializeVariables();

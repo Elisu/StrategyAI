@@ -2660,7 +2660,7 @@ GameObject:
   - component: {fileID: 361252171}
   - component: {fileID: 361252172}
   m_Layer: 0
-  m_Name: TrainingLoop
+  m_Name: TrainingRunner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2689,23 +2689,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 361252170}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81fd8269ca3b75343bf1f6d64436a397, type: 3}
+  m_Script: {fileID: 11500000, guid: 442216995f60a4a40a0e4351eba4ed1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapObject: {fileID: 8290190061793899004, guid: a45069545bc712c4ab6b8b56cdf10206,
+  training: {fileID: 6876263519418051365, guid: 3eb72d2ad57883640b2dc54233403903,
     type: 3}
-  defenderSave: 
+  attacker: {fileID: 7067290049789075546, guid: 186f7a5ee06e88740a263c80a4cc45a0,
+    type: 3}
+  defender: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
+    type: 3}
+  tryCount: 3
+  generationCount: 50
   attackerSave: 
-  attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
-    type: 3}
-  defender: {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa,
-    type: 3}
-  gameInstancesCount: 20
-  tries: 1
-  gameInstance: {fileID: 6862441489602338825, guid: 852759d35db7ab54a8e80f3f364d295e,
-    type: 3}
-  generationCount: 100
-  progresBar: {fileID: 1233996273}
+  defenderSave: 
 --- !u!4 &365516321
 Transform:
   m_ObjectHideFlags: 0
@@ -3575,8 +3571,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1233996274}
   - component: {fileID: 1233996276}
-  - component: {fileID: 1233996273}
   - component: {fileID: 1233996275}
+  - component: {fileID: 1233996273}
   m_Layer: 0
   m_Name: UIController
   m_TagString: Untagged
@@ -3667,7 +3663,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AIs:
-  - {fileID: 0}
+  - {fileID: 2960784948529186045, guid: a08a9b133d9c2124db126685495a0462, type: 3}
   - {fileID: 6138801334774653003, guid: 560fa0612cee94d48ab784d6b24c2e30, type: 3}
   - {fileID: 7067290049789075546, guid: 186f7a5ee06e88740a263c80a4cc45a0, type: 3}
   - {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa, type: 3}

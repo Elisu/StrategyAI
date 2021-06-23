@@ -30,12 +30,20 @@ namespace Genetic
             get => population[index];
         }
 
-        public void Evolve()
+        public void Evolve(bool elitism = false)
         {
+            StrategyIndividual best = population[0];
+
             foreach (StrategyIndividual ind in population)
+            {
                 ind.Evaluate();
 
-            SetChampion();
+                if (ind.Fitness > best.Fitness)
+                    best = ind;
+            }
+
+            Champion = best;
+
             StrategyIndividual[] selected = EvolutionFunctions.RouletteWheelSelection(population);
 
             if (selected == null)
@@ -44,18 +52,10 @@ namespace Genetic
             selected = EvolutionFunctions.Crossover(selected, UniformCrossover);
             selected = EvolutionFunctions.Mutation(selected, ActionMutation);
             population = selected;
-        }
 
-        private void SetChampion()
-        {
-            StrategyIndividual best = population[0];
-
-            foreach (var ind in population)
-                if (ind.Fitness > best.Fitness)
-                    best = ind;
-
-            Champion = best;
-        }       
+            if (elitism)
+                population[0] = new StrategyIndividual(Champion);
+        }      
 
 
         private StrategyIndividual ActionMutation(StrategyIndividual ind)
@@ -64,7 +64,7 @@ namespace Genetic
 
             foreach (Rule rule in mutated)
             {
-                if (UnityEngine.Random.value < 0.2)
+                if (UnityEngine.Random.value < 0.1)
                     rule.ActionIndex = UnityEngine.Random.Range(0, rule.ActionCount);
             }
 
@@ -78,7 +78,7 @@ namespace Genetic
 
             for (int i = 0; i < Mathf.Min(a.Length, b.Length); i++)
             {
-                if (UnityEngine.Random.value > 0.3)
+                if (UnityEngine.Random.value > 0.2)
                 {
                     first.Add(new Rule(a[i]));
                     second.Add(new Rule(b[i]));
@@ -106,7 +106,7 @@ namespace Genetic
 
             for (int i = end; i < rest.Length; i++)
             {
-                if (UnityEngine.Random.value > 0.3)
+                if (UnityEngine.Random.value > 0.2)
                     first.Add(new Rule(rest[i]));
                 else
                     second.Add(new Rule(rest[i]));

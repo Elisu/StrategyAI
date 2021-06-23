@@ -6,49 +6,64 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
-internal class TraningLoop : Loop
+internal class TrainingLoop : Loop
 {
-    public AIController attacker;  //TrainingSettings.selectedAttacker;
-    public AIController defender; //TrainingSettings.selectedDefender;
-
-    public int gameInstancesCount = 5;
-    public int tries = 3;
     public TrainingInstance gameInstance;
+    public int parallelInstancesCount = 15;
 
-    public int generationCount;
+    public bool TrainingInProgress { get; private set; } = false;
 
-    public TrainingProgressBar progresBar;
+    AIController attacker;  //TrainingSettings.selectedAttacker;
+    AIController defender; //TrainingSettings.selectedDefender;
 
-    private TrainingInstance[] instances;
-    private int currentAttacker = 0;
-    private int currentDefender = 0;
+    TrainingProgressBar progresBar;
 
-    private bool trainingFinished = false;
+    int tries;
+    int generationCount;
 
-    private Thread trainingThread;
-    private bool terminateThread = false;
+    TrainingInstance[] instances;
+    int currentAttacker;
+    int currentDefender;  
 
-    private int currentGeneration = 1;
+    Thread trainingThread;
+    bool terminateThread = false;
 
-    private void Start()
+    int currentGeneration;
+
+    List<List<Transform>> map;
+
+    private void Awake()
     {
-        instances = new TrainingInstance[gameInstancesCount];
-
-        attacker = Instantiate(attacker);
-        defender = Instantiate(defender);
-
-        //Initializes the AI handlers
-        attacker.OnStart();
-        defender.OnStart();
-
-        List<List<Transform>> map = LoadMap();
-        for (int i = 0; i < gameInstancesCount; i++)
+        map = LoadMap();
+        instances = new TrainingInstance[parallelInstancesCount];
+        for (int i = 0; i < instances.Length; i++)
         {
             instances[i] = Instantiate(gameInstance);
             instances[i].SetMap(map);
         }
 
+        progresBar = FindObjectOfType<TrainingProgressBar>();
+    }
+
+    public void StartTraining(AIController attack, AIController defend, int tryCount, int genCount, string attackSave = null, string defendSave = null)
+    {        
+        tries = tryCount;
+        generationCount = genCount;
+
+        currentGeneration = 1;
+        currentAttacker = 0;
+        currentDefender = 0;
+
+        attacker = Instantiate(attack);
+        defender = Instantiate(defend);
+
+        //Initializes the AI handlers
+        attacker.OnStart();
+        defender.OnStart();
+
         progresBar.SetGenerationCount(generationCount);
+
+        TrainingInProgress = true;
 
         trainingThread = new Thread(new ThreadStart(PerformOneGeneration));
         trainingThread.IsBackground = true;
@@ -58,13 +73,13 @@ internal class TraningLoop : Loop
 
     private void Update()
     {
-        if (trainingFinished)
+        if (!TrainingInProgress)
             return;
 
         if (generationCount <= 0)
         {
             Debug.Log("FINISHED");
-            trainingFinished = true;
+            TrainingInProgress = false;
 
             if (attacker is AITrainer trainable)
             {
@@ -79,6 +94,7 @@ internal class TraningLoop : Loop
                 trainable2.TrainingFinished();
             }
 
+            Finished();
             return;
         }
 
@@ -150,7 +166,7 @@ internal class TraningLoop : Loop
                 {
                     for (; currentDefender < defenderPop.Count; currentDefender++, i++)
                     {
-                        if (i >= gameInstancesCount)
+                        if (i >= instances.Length)
                             break;
 
                         if (terminateThread)
@@ -165,7 +181,7 @@ internal class TraningLoop : Loop
                         runningTasks.Add(Task.Run(() => instances[index].Run(att, def, currentGeneration)));
                     }
 
-                    if (i >= gameInstancesCount)
+                    if (i >= instances.Length)
                         break;
 
                     if (currentAttacker < attackerPop.Count - 1)
@@ -178,6 +194,12 @@ internal class TraningLoop : Loop
         
 
         return;
+    }
+
+    private void Finished()
+    {
+        Destroy(attacker);
+        Destroy(defender);
     }
 
     //private bool RunOneGeneration()

@@ -27,7 +27,7 @@ public class CoevolutionTrainer : AITrainer
     {
         ICondition damaged = new Conditions.Damaged();
         ICondition free = new Conditions.Free();
-        ICondition strongest = new Conditions.Strongest();
+        ICondition strongest = new Conditions.StrongerThanClosest();
         ICondition clostestIsTroop = new Conditions.ClosestIsTroopBase();
 
         IMacroAction attackClosest = new SerializableMacroActions.AttackClosest();
