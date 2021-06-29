@@ -21,13 +21,18 @@ public class RulesAITrainer : AITrainer
 
     protected override List<AIPlayer> CreatPopulation()
     {
-        ICondition[] conditions = new ICondition[7] { new Conditions.Damaged(),
+        ICondition[] conditions = new ICondition[12] { new Conditions.Damaged(),
                                                       new Conditions.Free(),
                                                       new Conditions.StrongerThanClosest(),
                                                       new Conditions.ClosestIsTroopBase(),
                                                       new Conditions.ClosestIsBuilding(),
                                                       new Conditions.ClosestIsTower(),
-                                                      new Conditions.IsDefender() };
+                                                      new Conditions.IsDefender(),
+                                                      new Conditions.HealthierThanClosest(),
+                                                      new Conditions.IsAlone(),
+                                                      new Conditions.IsWinning(),
+                                                      new Conditions.IsInsideCastle(),
+                                                      new Conditions.IsInTowerRange() };
 
         possibleActions = new IMacroAction[6] { new SerializableMacroActions.AttackClosest(), 
                                                 new SerializableMacroActions.AttackWithLowestHealth(), 

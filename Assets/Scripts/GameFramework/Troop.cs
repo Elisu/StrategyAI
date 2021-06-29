@@ -118,9 +118,9 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
 
         Vector2Int nextPos = route.Peek();
 
-        if (CurrentInstance.Map[nextPos] == null || CurrentInstance.Map[nextPos].CanPass(Side) == true || nextPos == Position)
+        if (CurrentInstance.Map[nextPos].OnField == null || CurrentInstance.Map[nextPos].CanPass(Side) == true || nextPos == Position)
         {
-            CurrentInstance.Map[Position] = null;
+            CurrentInstance.Map[Position].OnField = null;
             Vector2 next = new Vector2(nextPos.x - ActualPosition.x, nextPos.y - ActualPosition.y);
 
             if (Mathf.Abs(next.normalized.x * Speed) > Mathf.Abs(next.x) || Mathf.Abs(next.normalized.y * Speed) > Mathf.Abs(next.y))
@@ -133,7 +133,7 @@ public abstract class TroopBase : Attacker, IMovable, IRecruitable
                 route.Dequeue();
             }
 
-            CurrentInstance.Map[Position] = this;
+            CurrentInstance.Map[Position].OnField = this;
 
             if (route.Count > 0)
                 return true;
@@ -181,12 +181,17 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
 
     public override Type type => typeof(T);
 
+    public override int ReloadRate => unit.ReloadRate;
+
     public override Statistics GetStats() => new Statistics(DealtDamage, ReceivedDamage, EnemiesKilled, BuildingsDestroyed, typeof(T));
+
+    private int reloadCountdown;
 
     public Troop(Role side, Vector2Int spawnPos,  Instance instance)
     {
         CurrentInstance = instance;
         mapMultiplier = instance.Map.SizeMultiplier;
+        reloadCountdown = unit.ReloadRate;
 
         for (int i = 0; i < unit.BundleCount; i++)
             troopHealth.Add(unit.Health);
@@ -200,7 +205,7 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
         ActualPosition = spawnPos;
         CurrentState = State.Free;
 
-        CurrentInstance.Map[Position] = this;
+        CurrentInstance.Map[Position].OnField = this;
 
         if (CurrentInstance.IsTraining)
             return;
@@ -278,6 +283,12 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
         CurrentState = State.Fighting;
         Target = enemy;
 
+        if (reloadCountdown > 0)
+        {
+            reloadCountdown--;
+            return false;
+        }
+
         float defense;
 
         if (!defenseCache.TryGetValue(enemy.type, out defense))
@@ -299,13 +310,14 @@ public class Troop<T>: TroopBase where T: HumanUnit, new()
                 BuildingsDestroyed++;
         }
 
+        reloadCountdown = ReloadRate;
         return killed;
     }
 
     private void DestroyTroop()
     {
         CurrentInstance.GetArmy(Side).Remove(this);
-        CurrentInstance.Map[Position] = null;
+        CurrentInstance.Map[Position].OnField = null;
 
         if (Visual != null)
             UnityEngine.Object.Destroy(Visual.gameObject);

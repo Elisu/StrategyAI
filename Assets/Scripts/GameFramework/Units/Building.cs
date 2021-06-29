@@ -8,7 +8,7 @@ public abstract class Building : Damageable, IRecruitable
     private void Destroy()
     {
         CurrentInstance.GetArmy(Side).Remove(this);
-        CurrentInstance.Map[Position] = null;
+        CurrentInstance.Map[Position].OnField = null;
 
         if (Visual != null)
             UnityEngine.Object.Destroy(Visual.gameObject);
@@ -33,7 +33,7 @@ public abstract class Building : Damageable, IRecruitable
 
 public class Wall : Building
 {
-    public override int Health { get; protected set; } = 70000;
+    public override int Health { get; protected set; } = 130000;
 
     public override Vector2Int Position => position;
 

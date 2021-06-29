@@ -38,21 +38,7 @@ public class Field : IObject
         Position = position;
     }
 
-    public Role Side
-    {
-        get
-        {
-            if (OnField == null)
-                return side;
-            else
-            {
-                if (OnField is IRecruitable recruit)
-                    return recruit.Side;
-                else
-                    return Role.Neutral;
-            }
-        }
-    }
+    public Role Side => side;
 
     public bool CanPass(Role role)
     {

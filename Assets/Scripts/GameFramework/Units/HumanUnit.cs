@@ -23,6 +23,8 @@ public abstract class HumanUnit : Unit
 
     internal VisualController UnitPrefab { get; private protected set; }
 
+    public int ReloadRate { get; protected set; }
+
     protected System.Random rnd = new System.Random();
 
     internal virtual bool GiveDamage(Damageable enemy, int totalDamage)

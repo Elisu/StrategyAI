@@ -26,7 +26,7 @@ public class ShopperIndividual : Genetic.Individual<ShopperIndividual>
 
         for (int i = 0; i < shoppingOrder.Length; i++)
         {
-            shoppingOrder[i] = Random.Range(0, UnitFinder.UnitStats.Count);
+            shoppingOrder[i] = Random.Range(-1, UnitFinder.UnitStats.Count);
         }
 
         //Shuffle();
@@ -55,9 +55,12 @@ public class ShopperIndividual : Genetic.Individual<ShopperIndividual>
 
     public int GetNext(int budget)
     {
-        for (int i = 0; i < UnitFinder.UnitStats.Count + 3; i++)
+        for (int i = 0; i < 1; i++)
         {
             next = (next + 1) % shoppingOrder.Length;
+
+            if (shoppingOrder[next] < 0)
+                return -1;
 
             if (UnitFinder.UnitStats[shoppingOrder[next]].Price <= budget)
                 return shoppingOrder[next];

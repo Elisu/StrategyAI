@@ -88,6 +88,7 @@ public abstract class Attacker : Damageable, IAttack
 {
     public abstract int Damage { get; }
 
+    public abstract int ReloadRate { get;  }
     public abstract int Range { get; }
 
     public int DealtDamage { get; protected set; }

@@ -14,10 +14,10 @@ public class Army : IEnumerable<IRecruitable>
     public int MoneySpent { get; private set; }
     public int MoneyAll => Money + MoneySpent;
 
-    internal static int defenderStartMoney = 11000;
-    internal static int defenderGain = 1000;
-    internal static int attackerStartMoney = 15000;
-    internal static int attackerGain = 1500;
+    internal static int defenderStartMoney = 12000;
+    internal static int defenderGain = 1200;
+    internal static int attackerStartMoney = 16000;
+    internal static int attackerGain = 1600;
 
     private readonly List<TroopBase> troops = new List<TroopBase>();
     private readonly List<Building> buildings = new List<Building>();

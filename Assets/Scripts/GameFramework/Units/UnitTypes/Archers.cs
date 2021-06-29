@@ -10,9 +10,10 @@ public class Archers : HumanUnit
         Health = ArchersSetup.Health;
         Speed = ArchersSetup.Speed;
         Damage = ArchersSetup.Damage;
+        ReloadRate = ArchersSetup.ReloadRate;
         Range = ArchersSetup.Range;
         UnitPrefab = ArchersSetup.UnitPrefab;
-        BundleCount = 30;
+        BundleCount = ArchersSetup.BundleCount;
     }
 
     internal override bool GiveDamage(Damageable enemy, int totalDamage)

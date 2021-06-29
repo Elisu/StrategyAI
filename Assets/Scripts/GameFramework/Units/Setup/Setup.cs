@@ -12,9 +12,13 @@ internal abstract class Setup<T> : MonoBehaviour where T: Unit
     [SerializeField]
     private int damage;
     [SerializeField]
+    private int reloadRate;
+    [SerializeField]
     private int range;
     [SerializeField]
     private int price;
+    [SerializeField]
+    private int bundleCount;
     [SerializeField]
     private VisualController unitPrefab;
 
@@ -23,8 +27,10 @@ internal abstract class Setup<T> : MonoBehaviour where T: Unit
     public static int Health { get => instance.health; }
     public static float Speed { get => instance.speed; }
     public static int Damage { get => instance.damage; }
+    public static int ReloadRate { get => instance.reloadRate; }
     public static int Range { get => instance.range; }
     public static int Price { get => instance.price; }
+    public static int BundleCount { get => instance.bundleCount; }
     public static VisualController UnitPrefab { get => instance.unitPrefab; }
 
 

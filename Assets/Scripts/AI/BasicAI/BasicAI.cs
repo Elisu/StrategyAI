@@ -24,12 +24,18 @@ public class BasicAI : AIPlayer
             if (!MacroActions.AttackInRange(attacker, out resultAction))
             {
                 //Wait for reinforcements
-                if (Info.OwnArmy.Count < 2)
+                if (Info.OwnArmy.Troops.Count < 2 )
                 {
-                    MacroActions.DoNothing(attacker, out resultAction);
-                    return resultAction;
-                }
+                    if (attacker.Side == Role.Defender)
+                    {
+                        if (attacker.Range > 1 && Info.Map[attacker.Position].Side == Role.Defender)
+                            MacroActions.DoNothing(attacker, out resultAction);
+                        else 
+                            MacroActions.MoveToSafety(attacker, out resultAction);
 
+                        return resultAction;
+                    }                   
+                }
 
                 IRecruitable enemy = Info.EnemyArmy.SenseLowestDamageDecrease(attacker);
                 if (!MacroActions.AttackGiven(enemy, attacker, out resultAction))
@@ -101,9 +107,11 @@ public class BasicAI : AIPlayer
             {
                 if (UnitFinder.UnitStats[i].Range > 1 && UnitFinder.UnitStats[i].Price <= Info.OwnArmy.Money)
                     return i;
-
             }
         }
+
+        if (Info.OwnArmy.Troops.Count >= Info.EnemyArmy.Count * 1.5)
+            return -1;
 
         tobuy = (tobuy + 1) % UnitFinder.UnitStats.Count;
         return tobuy;

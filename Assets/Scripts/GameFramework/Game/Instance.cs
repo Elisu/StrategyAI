@@ -34,8 +34,8 @@ public abstract class Instance : MonoBehaviour
         Army attackerArmy = new Army(Role.Attacker);
         Army defenderArmy = new Army(Role.Defender);
 
-        attacker.Start(new GameInfo(attackerArmy, defenderArmy), Role.Attacker);
-        defender.Start(new GameInfo(defenderArmy, attackerArmy), Role.Defender);
+        attacker.Start(new GameInfo(attackerArmy, defenderArmy, Map), Role.Attacker);
+        defender.Start(new GameInfo(defenderArmy, attackerArmy, Map), Role.Defender);
 
         Map.ReloadMap(this);
 

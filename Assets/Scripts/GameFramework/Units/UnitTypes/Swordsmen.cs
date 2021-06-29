@@ -11,9 +11,10 @@ public class Swordsmen : HumanUnit
         Health = SwordsmenSetup.Health;
         Speed = SwordsmenSetup.Speed;
         Damage = SwordsmenSetup.Damage;
+        ReloadRate = SwordsmenSetup.ReloadRate;
         Range = SwordsmenSetup.Range;
         UnitPrefab = SwordsmenSetup.UnitPrefab;
-        BundleCount = 50;
+        BundleCount = SwordsmenSetup.BundleCount;
     }
 
     internal override bool GiveDamage(Damageable enemy, int totalDamage)

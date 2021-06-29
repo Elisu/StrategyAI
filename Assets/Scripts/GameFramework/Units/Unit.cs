@@ -9,6 +9,8 @@ public interface Unit
 
     public int Damage { get; }
 
+    public int ReloadRate { get; }
+
     public int Range { get; }
 
     public int Price { get; }

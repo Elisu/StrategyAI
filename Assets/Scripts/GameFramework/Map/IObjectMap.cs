@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-internal class IObjectMap : Map<Field>
+public class IObjectMap : Map<Field>
 {
-    public float SizeMultiplier { get; protected set; }
+    internal float SizeMultiplier { get; private set; }
 
     public  IReadOnlyList<Vector2Int> CastleArea { get; private set; }
 
@@ -11,7 +11,7 @@ internal class IObjectMap : Map<Field>
     Dictionary<Vector2Int, VisualController> structureObjects;
     Dictionary<Vector2Int, string> structureTags;
 
-    public IObjectMap(int height, int width, List<List<Transform>> realMap, float scale) : base(width, height)
+    internal IObjectMap(int height, int width, List<List<Transform>> realMap, float scale) : base(width, height)
     {
         SizeMultiplier = scale;
         spawns = new List<Field>();
@@ -55,7 +55,7 @@ internal class IObjectMap : Map<Field>
         CastleArea = castle.AsReadOnly();
     }
 
-    public void ReloadMap(Instance instance)
+    internal void ReloadMap(Instance instance)
     {
         for (int i = 0; i < Width; i++)
             for (int j = 0; j < Height; j++)
@@ -76,7 +76,7 @@ internal class IObjectMap : Map<Field>
             }
     }
 
-    public bool GetFreeSpawn(Role role, out Vector2Int spawnPos)
+    internal bool GetFreeSpawn(Role role, out Vector2Int spawnPos)
     {
         IObject spawn = spawns.Find(x => x.Side == role && x.CanPass(role) == true);
 
@@ -90,35 +90,29 @@ internal class IObjectMap : Map<Field>
         return false;
     }
 
-    public new IObject this[Vector2Int index]
+    public new Field this[Vector2Int index]
     {
         get
         {
-            if (map[index.x, index.y].OnField != null)
-                return map[index.x, index.y].OnField;
-            else
-                return map[index.x, index.y];
+            return map[index.x, index.y];
         }
 
         set
         {
-            map[index.x, index.y].OnField = value;
+            map[index.x, index.y] = value;
         }
     }
 
-    public new IObject this[int x, int y]
+    public new Field this[int x, int y]
     {
         get
         {
-            if (map[x, y].OnField != null)
-                return map[x, y].OnField;
-            else
-                return map[x, y];
+           return map[x, y];
         }
 
         set
         {
-            map[x, y].OnField = value;
+            map[x, y] = value;
         }
     }
 

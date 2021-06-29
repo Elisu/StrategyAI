@@ -17,16 +17,26 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
 
     public override Type type => typeof(T);
 
+    public override int ReloadRate => unit.ReloadRate;
+
     public override Statistics GetStats() => new Statistics(DealtDamage, ReceivedDamage, EnemiesKilled, BuildingsDestroyed, type);
 
     protected T unit = new T();
 
     private Vector2Int position;
 
+    private int reloadCountdown;
+
     internal override bool GiveDamage(Damageable enemy)
     {
         CurrentState = State.Fighting;
         Target = enemy;
+
+        if (reloadCountdown > 0)
+        {
+            reloadCountdown--;
+            return false;
+        }
 
         int damage = Mathf.CeilToInt(Damage * GetDefenseAgainstMe(enemy));
         DealtDamage += damage;
@@ -36,6 +46,7 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
         if (killed)
             EnemiesKilled++;
 
+        reloadCountdown = ReloadRate;
         return killed;
     }
 
@@ -55,7 +66,7 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
     private void Destroy()
     {
         CurrentInstance.GetArmy(Side).Remove(this);
-        CurrentInstance.Map[Position] = null;
+        CurrentInstance.Map[Position].OnField = null;
 
         if (Visual != null)
             GameObject.Destroy(Visual.gameObject);            
@@ -75,6 +86,7 @@ public class Tower<T> : TowerBase where T : TowerUnit, new()
         CurrentInstance = instance;
         Health = unit.Health;
         position = pos;
+        reloadCountdown = unit.ReloadRate;
 
         if (!CurrentInstance.IsTraining)
         {

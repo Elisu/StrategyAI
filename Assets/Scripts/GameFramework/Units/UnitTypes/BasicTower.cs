@@ -9,6 +9,7 @@ public class BasicTower : TowerUnit
     {
         Health = BasicTowerSetup.Health;
         Damage = BasicTowerSetup.Damage;
+        ReloadRate = BasicTowerSetup.ReloadRate;
         Range = BasicTowerSetup.Range;
     }
 }

@@ -10,9 +10,10 @@ public class Cavalry : HumanUnit
         Health = CavalrySetup.Health;
         Speed = CavalrySetup.Speed;
         Damage = CavalrySetup.Damage;
+        ReloadRate = CavalrySetup.ReloadRate;
         Range = CavalrySetup.Range;
         UnitPrefab = CavalrySetup.UnitPrefab;
-        BundleCount = 20;
+        BundleCount = CavalrySetup.BundleCount;
     }
 
     internal override bool GiveDamage(Damageable enemy, int totalDamage)

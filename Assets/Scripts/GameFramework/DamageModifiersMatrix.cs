@@ -69,7 +69,7 @@ public class DamageModifiersMatrix
                         case nameof(Swordsmen):
                             return 0.7f;
                         default:
-                            return 0.8f;
+                            return 1f;
                     }
                 }
 
@@ -82,7 +82,7 @@ public class DamageModifiersMatrix
                         case nameof(Cavalry):
                             return 0.7f;
                         case nameof(Catapult):
-                            return 0.5f;
+                            return 0.95f;
                         case nameof(Swordsmen):
                             return 0.9f;
                         default:

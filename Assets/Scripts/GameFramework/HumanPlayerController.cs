@@ -46,18 +46,18 @@ internal class HumanPlayerController : IPlayerController
                     Vector2Int pos = Vector2Int.RoundToInt(actualPos);
 
                     //Get the object on the map in given position
-                    IObject objectInPosition = gameMap[pos];
+                    Field field = gameMap[pos];
 
                     //If we have previously selected our unit
                     if (selectedUnit != null)
                     {
                         //If object in position is just an empty field and our selected unit is troop -> we move
-                        if (objectInPosition is Field)
+                        if (field.OnField == null)
                             if (selectedUnit is TroopBase troop)
                                 player.SetAction(selectedUnit, new Move(pos, troop));
 
                         //If object on map is damageable and is on the enemy side -> attack
-                        if (objectInPosition is Damageable toDamage)
+                        if (field.OnField is Damageable toDamage)
                         {
                             if (toDamage.Side != player.Side)
                                 player.SetAction(selectedUnit, new Attack(toDamage, selectedUnit));
@@ -65,7 +65,7 @@ internal class HumanPlayerController : IPlayerController
                     }
 
                     //If we don't have anything selected and object on map is our unit -> select it
-                    if (objectInPosition is Attacker unit && unit.Side == player.Side)
+                    if (field.OnField is Attacker unit && unit.Side == player.Side)
                     {
                         if (selectedUnit != null)
                             selectedUnit.Visual.HoverOverExit();

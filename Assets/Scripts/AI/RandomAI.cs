@@ -14,7 +14,7 @@ public class RandomAI : AIPlayer
     {
         possibleActions = new Action[] { MacroActions.AttackClosest, MacroActions.AttackInRange,
                                          MacroActions.AttackWeakestAgainstMe, MacroActions.AttackWithLowestDamage,
-                                         MacroActions.AttackWithLowestHealth, MacroActions.DoNothing, MacroActions.MoveToSafety };
+                                         MacroActions.AttackWithLowestHealth, MacroActions.DoNothing };
     }
 
     public override AIPlayer Clone()

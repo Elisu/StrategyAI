@@ -10,6 +10,7 @@ public class Catapult : HumanUnit
         Health = CatapultSetup.Health;
         Speed = CatapultSetup.Speed;
         Damage = CatapultSetup.Damage;
+        ReloadRate = CatapultSetup.ReloadRate;
         Range = CatapultSetup.Range;
         UnitPrefab = CatapultSetup.UnitPrefab;
         BundleCount = 1;

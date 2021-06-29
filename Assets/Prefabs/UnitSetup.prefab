@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7171948027913415861
+--- !u!1 &8595572207383033198
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,12 +8,12 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7171948027913415863}
-  - component: {fileID: 7171948027913415860}
-  - component: {fileID: 409651050}
-  - component: {fileID: 2186815627403369354}
-  - component: {fileID: 4402882959786940195}
-  - component: {fileID: 7171948027913415862}
+  - component: {fileID: 8595572207383033172}
+  - component: {fileID: 8595572207383033173}
+  - component: {fileID: 8595572207383033194}
+  - component: {fileID: 8595572207383033195}
+  - component: {fileID: 8595572207383033192}
+  - component: {fileID: 8595572207383033193}
   m_Layer: 0
   m_Name: UnitSetup
   m_TagString: Untagged
@@ -21,13 +21,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7171948027913415863
+--- !u!4 &8595572207383033172
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7171948027913415861}
+  m_GameObject: {fileID: 8595572207383033198}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 47.5, y: 0, z: 45}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -35,97 +35,107 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7171948027913415860
+--- !u!114 &8595572207383033173
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7171948027913415861}
+  m_GameObject: {fileID: 8595572207383033198}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff324ca68b09e914a8b3a5270a2d290b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 2200
+  health: 5500
   speed: 0.02
-  damage: 2
+  damage: 20
+  reloadRate: 0
   range: 1
-  price: 5000
+  price: 5500
+  bundleCount: 10
   unitPrefab: {fileID: 5344744494389361972, guid: 2cafa296b392dad4d8cba96d365b20b1,
     type: 3}
---- !u!114 &409651050
+--- !u!114 &8595572207383033194
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7171948027913415861}
+  m_GameObject: {fileID: 8595572207383033198}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d88501309b6fbf4458bbe03f3e2b3167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 2500
+  health: 11000
   speed: 0.04
-  damage: 3
+  damage: 20
+  reloadRate: 0
   range: 1
   price: 8000
+  bundleCount: 5
   unitPrefab: {fileID: 3223163026237893155, guid: 93b32194e12c46f4485d613f8cf2c8bc,
     type: 3}
---- !u!114 &2186815627403369354
+--- !u!114 &8595572207383033195
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7171948027913415861}
+  m_GameObject: {fileID: 8595572207383033198}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 992c2260250042d42b081e56e47d2513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 2000
+  health: 5000
   speed: 0.02
-  damage: 1
-  range: 4
+  damage: 10
+  reloadRate: 2
+  range: 5
   price: 5000
+  bundleCount: 10
   unitPrefab: {fileID: 501703852416993974, guid: 82b956aa2b7b55d4aa603a36c39a0ff3,
     type: 3}
---- !u!114 &4402882959786940195
+--- !u!114 &8595572207383033192
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7171948027913415861}
+  m_GameObject: {fileID: 8595572207383033198}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b7d12ae1cf69cf4d9c56dcbeaa2543c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 15000
+  health: 80000
   speed: 0.0054
-  damage: 50
-  range: 7
+  damage: 300
+  reloadRate: 10
+  range: 4
   price: 15000
+  bundleCount: 1
   unitPrefab: {fileID: 1415161191751012375, guid: c005297b908441445a2a86413ae43683,
     type: 3}
---- !u!114 &7171948027913415862
+--- !u!114 &8595572207383033193
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7171948027913415861}
+  m_GameObject: {fileID: 8595572207383033198}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd8122f1b69cbd84b9c25b769fe64d4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 100000
+  health: 111500
   speed: 0
-  damage: 40
-  range: 6
+  damage: 300
+  reloadRate: 9
+  range: 7
   price: 20000
+  bundleCount: 1
   unitPrefab: {fileID: 0}

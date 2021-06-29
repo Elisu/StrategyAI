@@ -137,6 +137,38 @@ namespace Genetic
             }
         }
 
+        [DataContract]
+        public class IsInsideCastle : ICondition
+        {
+            public override bool Evaluate(IAttack attacker, GameInfo info)
+            {
+                if (info.Map[attacker.Position].Side == Role.Defender)
+                    return true;
+
+                return false;
+            }
+        }
+
+        [DataContract]
+        public class IsInTowerRange : ICondition
+        {
+            public override bool Evaluate(IAttack attacker, GameInfo info)
+            {
+                IList<TowerBase> towers;
+
+                if (attacker.Side == Role.Defender)
+                    towers = info.OwnArmy.Towers;
+                else
+                    towers = info.EnemyArmy.Towers;
+
+                foreach (var tower in towers)
+                    if (Vector2Int.Distance(attacker.Position, tower.Position) <= tower.Range)
+                        return true;
+
+                return false;
+            }
+        }
+
     }
 
     [DataContract]
@@ -150,6 +182,8 @@ namespace Genetic
     [KnownType(typeof(Conditions.IsDefender))]
     [KnownType(typeof(Conditions.IsAlone))]
     [KnownType(typeof(Conditions.IsWinning))]
+    [KnownType(typeof(Conditions.IsInsideCastle))]
+    [KnownType(typeof(Conditions.IsInTowerRange))]
     public abstract class ICondition
     {
         public abstract bool Evaluate(IAttack attacker, GameInfo info);
