@@ -2610,12 +2610,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   training: {fileID: 6876263519418051365, guid: 3eb72d2ad57883640b2dc54233403903,
     type: 3}
-  attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
+  attacker: {fileID: 7067290049789075546, guid: 186f7a5ee06e88740a263c80a4cc45a0,
     type: 3}
   defender: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
     type: 3}
-  tryCount: 1
-  generationCount: 100
+  tryCount: 3
+  generationCount: 30
   attackerSave: 
   defenderSave: 
 --- !u!4 &365516321

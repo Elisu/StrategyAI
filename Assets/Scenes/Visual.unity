@@ -723,7 +723,7 @@ MonoBehaviour:
   winnerText: {fileID: 497692512}
   moneyText: {fileID: 982364071}
   defenderSave: defender1.xml
-  attackerSave: attacker2.xml
+  attackerSave: att.xml
 --- !u!4 &1435923424
 Transform:
   m_ObjectHideFlags: 0

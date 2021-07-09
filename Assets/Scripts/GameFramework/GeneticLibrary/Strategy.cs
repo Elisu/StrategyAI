@@ -19,10 +19,18 @@ namespace Genetic
         public StrategyIndividual Champion { get; private set; }
         private StrategyIndividual[] population;
 
-        public Strategy(int popSize, int indLength, int actionPossibilitiesCount, ICondition[] conditions)
+        float crossProb;
+        float mutationProb;
+        float actionMutationProb;
+
+        public Strategy(int popSize, int indLength, int actionPossibilitiesCount, ICondition[] conditions, float crossProbability, 
+                        float mutationProbability, float actionMutationProbability)
         { 
             population = StrategyIndividual.CreatePopulation(popSize, indLength, actionPossibilitiesCount, conditions);
             Champion = population[0];
+            crossProb = crossProbability;
+            mutationProb = mutationProbability;
+            actionMutationProb = actionMutationProbability;
         }
 
         public StrategyIndividual this[int index]
@@ -49,8 +57,8 @@ namespace Genetic
             if (selected == null)
                 return;
 
-            selected = EvolutionFunctions.Crossover(selected, UniformCrossover);
-            selected = EvolutionFunctions.Mutation(selected, ActionMutation);
+            selected = EvolutionFunctions.Crossover(selected, UniformCrossover, crossProb);
+            selected = EvolutionFunctions.Mutation(selected, ActionMutation, mutationProb);
             population = selected;
 
             if (elitism)
@@ -64,7 +72,7 @@ namespace Genetic
 
             foreach (Rule rule in mutated)
             {
-                if (UnityEngine.Random.value < 0.1)
+                if (UnityEngine.Random.value < actionMutationProb)
                     rule.ActionIndex = UnityEngine.Random.Range(0, rule.ActionCount);
             }
 
@@ -78,7 +86,7 @@ namespace Genetic
 
             for (int i = 0; i < Mathf.Min(a.Length, b.Length); i++)
             {
-                if (UnityEngine.Random.value > 0.2)
+                if (UnityEngine.Random.value > 0.5)
                 {
                     first.Add(new Rule(a[i]));
                     second.Add(new Rule(b[i]));
@@ -106,7 +114,7 @@ namespace Genetic
 
             for (int i = end; i < rest.Length; i++)
             {
-                if (UnityEngine.Random.value > 0.2)
+                if (UnityEngine.Random.value > 0.5)
                     first.Add(new Rule(rest[i]));
                 else
                     second.Add(new Rule(rest[i]));

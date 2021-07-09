@@ -86,8 +86,4 @@ public class UnitFinder : MonoBehaviour
         return selected;
     }
 
-    public static int BestAgainst(IRecruitable recruit)
-    {
-        return 0;
-    }
 }

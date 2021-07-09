@@ -11,6 +11,10 @@ public class CoevolutionAI : AIPlayer
 {
     public int Fitness { get; private set; }
 
+    public IReadOnlyList<Tuple<int, int, int, int, Role>> FitnessStats => fitnessStatistics.AsReadOnly();
+
+    List<Tuple<int, int, int, int, Role>> fitnessStatistics;
+
     [DataMember]
     readonly StrategyIndividual towers;
     [DataMember]
@@ -136,9 +140,14 @@ public class CoevolutionAI : AIPlayer
     private int GetMeanFitness(GameStats[] stats, Role role)
     {
         List<int> fitnesses = new List<int>();
+        fitnessStatistics = new List<Tuple<int, int, int, int, Role>>();
 
         foreach (GameStats gameStat in stats)
-            fitnesses.Add(EvolutionFunctions.ComputeFitness(gameStat, role));
+        {
+            var fitnessParts = EvolutionFunctions.ComputeFitness(gameStat, role);
+            fitnessStatistics.Add(fitnessParts);
+            fitnesses.Add(fitnessParts.Item1);
+        }
 
         fitnesses.Sort();
         return fitnesses[fitnesses.Count / 2];

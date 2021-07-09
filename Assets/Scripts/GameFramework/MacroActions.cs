@@ -61,7 +61,14 @@ public class MacroActions
     public static bool AttackWeakestAgainstMe(Attacker attacker, out IAction resultAction)
     {
         Army army = attacker.CurrentInstance.GetEnemyArmy(attacker.Side);
-        return AttackOnCondition(army.SenseTroopLowestDamage, attacker, out resultAction);
+        IRecruitable selected = army.SenseLowestDamageDecrease(attacker);
+
+        resultAction = null;
+
+        if (selected == null)
+            return false;
+        else
+            return AttackGiven(selected, attacker, out resultAction);
     }
 
     private static bool AttackOnCondition(Func<IRecruitable> Selection, Attacker attacker, out IAction resultAction)
@@ -203,6 +210,15 @@ public class SerializableMacroActions
             return MacroActions.DoNothing(a, out resultAction);
         }
     }
+
+    [DataContract]
+    public class MoveToSafety : IMacroAction
+    {
+        public override bool TryAction(Attacker a, out IAction resultAction)
+        {
+            return MacroActions.MoveToSafety(a, out resultAction);
+        }
+    }
 }
 
 [DataContract]
@@ -212,6 +228,7 @@ public class SerializableMacroActions
 [KnownType(typeof(SerializableMacroActions.AttackWithLowestDamage))]
 [KnownType(typeof(SerializableMacroActions.AttackWeakestAgainstMe))]
 [KnownType(typeof(SerializableMacroActions.DoNothing))]
+[KnownType(typeof(SerializableMacroActions.MoveToSafety))]
 public abstract class IMacroAction
 {
     public abstract bool TryAction(Attacker a, out IAction resultAction);

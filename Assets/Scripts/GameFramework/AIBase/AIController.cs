@@ -13,7 +13,7 @@ public abstract class AIController : IPlayerController
     protected internal virtual void OnStart()
     {
         InitializeVariables();
-        Start();
+        CustomStart();
         Population = Array.AsReadOnly(new AIPlayer[1] { (AIPlayer)GetPlayer() });
         BeforeEachGeneration();
     }
@@ -23,7 +23,7 @@ public abstract class AIController : IPlayerController
         Type t = this.GetType();
     }
 
-    protected virtual void Start()
+    protected virtual void CustomStart()
     {
         return;
     }

@@ -7,14 +7,17 @@ using UnityEngine;
 public struct GameStats
 {
     public Role Winner { get; private set; }
+    public int LeftFrames { get; private set; }
 
     private readonly ReadOnlyCollection<Statistics> attackerStats;
     private readonly ReadOnlyCollection<Statistics> defenderStats;
 
-    public GameStats(List<Statistics> attacker, List<Statistics> defender, Role win)
+
+    public GameStats(List<Statistics> attacker, List<Statistics> defender, int framesLeft, Role win)
     {
         attackerStats = attacker.AsReadOnly();
         defenderStats = defender.AsReadOnly();
+        LeftFrames = framesLeft;
         Winner = win;
     }
 
@@ -47,6 +50,6 @@ public struct GameStats
             if (filter.Invoke(stat))
                 defender.Add(stat);
 
-        return new GameStats(attacker, defender, Winner);
+        return new GameStats(attacker, defender, LeftFrames, Winner);
     }
 }

@@ -8,9 +8,14 @@ public class ShopperPopulation
 {
     ShopperIndividual[] population;
 
-    public ShopperPopulation(int length)
+    float crossProb;
+    float mutationProb;
+
+    public ShopperPopulation(int length, float crossProbability, float mutationProbability)
     {
         population = new ShopperIndividual[length];
+        crossProb = crossProbability;
+        mutationProb = mutationProbability;
 
         for (int i = 0; i < length; i++)
             population[i] = new ShopperIndividual();
@@ -35,8 +40,8 @@ public class ShopperPopulation
 
         ShopperIndividual[] selected = EvolutionFunctions.RouletteWheelSelection(population);
 
-        selected = EvolutionFunctions.Crossover(selected, OnePointCross);
-        selected = EvolutionFunctions.Mutation(selected, ValueMutation);
+        selected = EvolutionFunctions.Crossover(selected, OnePointCross, crossProb);
+        selected = EvolutionFunctions.Mutation(selected, ValueMutation, mutationProb);
         population = selected;
 
         if (elitism)

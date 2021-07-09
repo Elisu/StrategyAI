@@ -56,7 +56,7 @@ namespace UnitySharpNEAT
         public override Type AIPlayerType => typeof(NeatAI);
 
         #region UNTIY FUNCTIONS
-        protected override void Start()
+        protected override void CustomStart()
         {
             LoadExperiment();
         }

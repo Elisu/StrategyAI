@@ -17,7 +17,7 @@ public abstract class AITrainer : AIController
     protected internal override void OnStart()
     {
         InitializeVariables();
-        Start();
+        CustomStart();
         population = CreatPopulation();
         AfterPopCreation();
         BeforeEachGeneration();

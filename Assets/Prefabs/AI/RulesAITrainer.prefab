@@ -43,5 +43,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 828caf49e94ef9e40aa605ac4eecdaef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PopulationSize: 30
-  IndividualLength: 5
+  PopulationSize: 20
+  IndividualLength: 7
+  crossoverProbability: 0.2
+  mutationProbability: 0.03
+  actionMutationProbability: 0.05

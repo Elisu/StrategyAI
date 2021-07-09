@@ -4,11 +4,16 @@ using UnityEngine;
 using Genetic;
 using System;
 using System.IO;
+using System.Globalization;
 
 public class RulesAITrainer : AITrainer
 {
     public int PopulationSize;
     public int IndividualLength;
+
+    public float crossoverProbability = 0.3f;
+    public float mutationProbability = 0.02f;
+    public float actionMutationProbability = 0.08f;
 
     Strategy all;
     ShopperPopulation shoppers;
@@ -16,6 +21,7 @@ public class RulesAITrainer : AITrainer
 
     RulesAI champion;
     readonly List<int> fitnessesRecord = new List<int>();
+    readonly List<Tuple<int, int, int, int, Role>> accumulatedStats = new List<Tuple<int, int, int, int, Role>>();
 
     public override Type AIPlayerType => typeof(RulesAI);
 
@@ -34,16 +40,17 @@ public class RulesAITrainer : AITrainer
                                                       new Conditions.IsInsideCastle(),
                                                       new Conditions.IsInTowerRange() };
 
-        possibleActions = new IMacroAction[6] { new SerializableMacroActions.AttackClosest(), 
+        possibleActions = new IMacroAction[7] { new SerializableMacroActions.AttackClosest(), 
                                                 new SerializableMacroActions.AttackWithLowestHealth(), 
                                                 new SerializableMacroActions.AttackWithLowestDamage(), 
                                                 new SerializableMacroActions.AttackWeakestAgainstMe(),
                                                 new SerializableMacroActions.AttackInRange(),
-                                                new SerializableMacroActions.DoNothing() };
+                                                new SerializableMacroActions.DoNothing(),
+                                                new SerializableMacroActions.MoveToSafety() };
 
-        all = new Strategy(PopulationSize, IndividualLength, possibleActions.Length, conditions);
+        all = new Strategy(PopulationSize, IndividualLength, possibleActions.Length, conditions, crossoverProbability, mutationProbability, actionMutationProbability);
 
-        shoppers = new ShopperPopulation(PopulationSize);
+        shoppers = new ShopperPopulation(PopulationSize, crossoverProbability, mutationProbability);
 
         List<AIPlayer> pop = new List<AIPlayer>();
 
@@ -56,7 +63,12 @@ public class RulesAITrainer : AITrainer
     public override void GenerationDone()
     {
         foreach (AIPlayer player in population)
+        {
             ((RulesAI)player).EvaluateFitness();
+            accumulatedStats.AddRange(((RulesAI)player).FitnessStats);
+        }
+
+        accumulatedStats.Add(new Tuple<int, int, int, int, Role>(-1, -1, -1, -1, Role.Neutral));
 
         champion = (RulesAI)FindChampion();
 
@@ -86,10 +98,23 @@ public class RulesAITrainer : AITrainer
 
     protected override void TrainingFinished()
     {
-        using (var stream = new StreamWriter(Path.Combine(Path.GetDirectoryName(Application.dataPath), "bestRuns")))
+        using (var stream = new StreamWriter(Path.Combine(Path.GetDirectoryName(Application.dataPath), this.name + "-bestRuns-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture))))
         {
             foreach (int fitness in fitnessesRecord)
                 stream.WriteLine(fitness);
+        }
+
+        using (var stream = new StreamWriter(Path.Combine(Path.GetDirectoryName(Application.dataPath), this.name + "-accumulatedStats-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture))))
+        {
+            int gen = 1;
+
+            foreach (var stat in accumulatedStats)
+            {
+                if (stat.Item1 != -1)
+                    stream.WriteLine("Gen: {0} - {1} {2} {3} {4} {5}", gen, stat.Item1, stat.Item2, stat.Item3, stat.Item4, stat.Item5);
+                else
+                    gen++;
+            }
         }
     }
 }

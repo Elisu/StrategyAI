@@ -8,6 +8,8 @@ internal class TrainingInstance : Instance
 
     int generationCount = 0;
 
+    private int loopLimit = 10000;
+
     public void Run(AIPlayer attack, AIPlayer defend, int genCount)
     {
         SetPlayers(attack, defend);
@@ -27,7 +29,7 @@ internal class TrainingInstance : Instance
         {
             OneLoop();
 
-            if (loopsWithoutAction > 1000 || loops > 10000)
+            if (loopsWithoutAction > 1000 || loops >= loopLimit)
                 break;
         }
 
@@ -55,6 +57,6 @@ internal class TrainingInstance : Instance
         List<Statistics> attackerStats = attacker.Info.OwnArmy.GetAllStats();
         List<Statistics> defenderStats = defender.Info.OwnArmy.GetAllStats();
 
-        return new GameStats(attackerStats, defenderStats, winner); 
+        return new GameStats(attackerStats, defenderStats, loopLimit - loops, winner); 
     }
 }

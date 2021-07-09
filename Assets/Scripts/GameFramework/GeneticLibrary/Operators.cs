@@ -74,13 +74,13 @@ namespace Genetic
             return selected;
         }
 
-        public static T[] Crossover<T>(T[] pop, CrossFunc<T> cross) where T : Individual<T>
+        public static T[] Crossover<T>(T[] pop, CrossFunc<T> cross, float prob) where T : Individual<T>
         {
             T[] crossed = new T[pop.Length];
 
             for (int i = 1; i < pop.Length; i += 2)
             {
-                if (UnityEngine.Random.value < 0.25)
+                if (UnityEngine.Random.value < prob)
                 {
                     Tuple<T, T> offs = cross(pop[i - 1], pop[i]);
                     crossed[i - 1] = offs.Item1;
@@ -101,13 +101,13 @@ namespace Genetic
             return crossed;
         }
 
-        public static T[] Mutation<T>(T[] pop, MutateFunc<T> mutate) where T : Individual<T>
+        public static T[] Mutation<T>(T[] pop, MutateFunc<T> mutate, float prob) where T : Individual<T>
         {
             List<T> mutated = new List<T>();
 
             foreach (T ind in pop)
             {
-                if (UnityEngine.Random.value < 0.05)
+                if (UnityEngine.Random.value < prob)
                     mutated.Add(mutate(ind));
                 else
                     mutated.Add(ind.GetClone());
@@ -116,7 +116,7 @@ namespace Genetic
             return mutated.ToArray();
         }
 
-        public static int ComputeFitness(GameStats stats, Role role)
+        public static Tuple<int, int, int, int, Role> ComputeFitness(GameStats stats, Role role)
         {
             int fitnessResult = 0;
 
@@ -124,7 +124,7 @@ namespace Genetic
             IList<Statistics> enemyStats = stats.GetEnemyStats(role);
 
             if (stats.Winner == role)
-                fitnessResult += 300000;
+                fitnessResult += 400000;
 
             int ownDamage = 0;
             int enemyDamage = 0;
@@ -149,7 +149,7 @@ namespace Genetic
             //if (stats.Winner == Role.Neutral)
             //    damageDiff /= 10;
 
-            return fitnessResult + Math.Max(0, damageDiff) + enemiesKilled * 10000;
+            return new Tuple<int,int,int, int, Role>(fitnessResult + Math.Max(0, damageDiff) + enemiesKilled * 10000, damageDiff, enemiesKilled, stats.LeftFrames, stats.Winner);
         }
     }
 }

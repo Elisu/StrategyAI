@@ -31,7 +31,7 @@ public class NeatAI : INeatPlayer
 
     public override float GetFitness()
     {
-        return EvolutionFunctions.ComputeFitness(accumulatedResults.ToArray()[0], Side);
+        return EvolutionFunctions.ComputeFitness(accumulatedResults.ToArray()[0], Side).Item1;
     }
 
     protected override void UpdateBlackBoxInputs(ISignalArray inputSignalArray, Attacker attacker)
