@@ -84,7 +84,8 @@ public class RulesAI : AIPlayer
 
     protected override void RunOver(GameStats stats)
     {
-        accumulatedResults.Enqueue(stats);
+        if (accumulatedResults != null)
+            accumulatedResults.Enqueue(stats);
     }
 
     public void EvaluateFitness(FitnessCalculation fitnessFunction = null)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -11,7 +12,9 @@ public class TrainingSettings : MonoBehaviour
     public Role role;
     public Dropdown AISelection;
     public InputField inputPrefab;
+    public InputField floatInputPrefab;
     public Dropdown dropdown;
+    public LoadedAI loadedAI;
 
     Vector3 currentPos;
     Dropdown championSelection;
@@ -20,8 +23,8 @@ public class TrainingSettings : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        DontDestroyOnLoad(this.gameObject);
         Fill();
+        OnSelectedChange();
     }
 
     private void Fill()
@@ -34,6 +37,15 @@ public class TrainingSettings : MonoBehaviour
         }
 
         AISelection.RefreshShownValue();
+    }
+
+    public void OnChampionSelection()
+    {
+        if (championSelection.value != 0)
+            DestroyParamInput();
+        else
+            OnSelectedChange();
+
     }
 
     public void OnSelectedChange()
@@ -57,7 +69,13 @@ public class TrainingSettings : MonoBehaviour
         {
             if (variable.FieldType.IsPrimitive)
             {
-                var input = Instantiate(inputPrefab, currentPos, Quaternion.identity, this.transform);
+                InputField input = null;
+
+                if (variable.FieldType == typeof(int))
+                    input = Instantiate(inputPrefab, currentPos, Quaternion.identity, this.transform);
+                else if (variable.FieldType == typeof(float))
+                    input = Instantiate(floatInputPrefab, currentPos, Quaternion.identity, this.transform);
+
                 float height = this.GetComponent<RectTransform>().rect.height;
                 input.transform.localPosition  -= new Vector3(0, height, 0);
                 input.placeholder.gameObject.GetComponent<Text>().text = variable.Name;
@@ -80,16 +98,16 @@ public class TrainingSettings : MonoBehaviour
         if (!Directory.Exists(directoryPath))
             return;
 
-        var input = Instantiate(dropdown, currentPos, Quaternion.identity, this.transform);
+        championSelection = Instantiate(dropdown, currentPos, Quaternion.identity, this.transform);
         float height = this.GetComponent<RectTransform>().rect.height;
-        input.transform.localPosition -= new Vector3(0, height, 0);
-        currentPos = input.transform.position;
-        championSelection = input;
+        championSelection.transform.localPosition -= new Vector3(0, height, 0);
+        currentPos = championSelection.transform.position;
 
         string[] files = Directory.GetFiles(directoryPath);
 
         championSelection.ClearOptions();
         championSelection.options.Add(new Dropdown.OptionData("None"));
+        championSelection.onValueChanged.AddListener(delegate { OnChampionSelection(); }); ;
 
         foreach (var file in files)
             championSelection.options.Add(new Dropdown.OptionData(Path.GetFileName(file)));
@@ -97,30 +115,70 @@ public class TrainingSettings : MonoBehaviour
 
     private void DestroyAllInputs()
     {
-        foreach (InputField inputField in primitiveInputs)
-            Destroy(inputField.gameObject);
-
-        primitiveInputs.Clear();
-
+        DestroyParamInput();
         DestroyChampSelection();
         
     }
 
+    private void DestroyParamInput()
+    {
+        foreach (InputField inputField in primitiveInputs)
+            Destroy(inputField.gameObject);
+
+        primitiveInputs.Clear();
+    }
+
+    private void OnDisable()
+    {
+        DestroyAllInputs();
+    }
+
     private void DestroyChampSelection()
     {
-        Destroy(championSelection);
-        championSelection = null;
+        if (championSelection != null)
+        {
+            Destroy(championSelection.gameObject);
+            championSelection = null;
+        }            
     }  
     
-    public void InitializeVariables(AIController controller)
+    public void InitializeVariables()
     {
-        var variables = controller.GetType().GetFields().Where(field => field.IsPublic);
+        var selected = GetSelected();
+
+        int champion = 0;
+
+        if (championSelection != null)
+            champion = championSelection.value;
+
+        string championFile = null;
+
+        if (champion != 0)
+            championFile = championSelection.options[champion].text;
+
+        selected = TrainingLoop.InstantiateController(championFile, selected, loadedAI);
+        selected.tag = role.ToString();
+        DontDestroyOnLoad(selected);
+
+        var variables = selected.GetType().GetFields().Where(field => field.IsPublic);
 
         foreach (var variable in variables)
         {
             if (variable.FieldType.IsPrimitive)
             {
-                variable.SetValue(controller, primitiveInputs.Dequeue());
+                try
+                {
+                    var input = primitiveInputs.Dequeue();
+
+                    if (variable.FieldType == typeof(float) && float.TryParse(input.text, NumberStyles.Any, CultureInfo.InvariantCulture, out float result))
+                        variable.SetValue(selected, result);
+                    else if (variable.FieldType == typeof(int) && int.TryParse(input.text, out int result2))
+                        variable.SetValue(selected, result2);
+                }
+                catch (Exception _e)
+                {
+                    Debug.LogError("Something went wrong while loading input");
+                }
             }
 
         }

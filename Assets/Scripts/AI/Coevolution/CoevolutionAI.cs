@@ -113,7 +113,8 @@ public class CoevolutionAI : AIPlayer
 
     protected override void RunOver(GameStats stats)
     {
-        accumulatedResults.Enqueue(stats);            
+        if (accumulatedResults != null)
+            accumulatedResults.Enqueue(stats);            
     }
 
     protected override int PickToBuy()

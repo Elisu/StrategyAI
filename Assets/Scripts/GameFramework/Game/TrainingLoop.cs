@@ -11,10 +11,15 @@ internal class TrainingLoop : Loop
     public TrainingInstance gameInstance;
     public int parallelInstancesCount = 15;
 
+    public bool debugMode = false;
+
     public bool TrainingInProgress { get; private set; } = false;
 
     AIController attacker;  //TrainingSettings.selectedAttacker;
     AIController defender; //TrainingSettings.selectedDefender;
+
+    [SerializeField]
+    LoadedAI loadedAI;
 
     TrainingProgressBar progresBar;
 
@@ -54,8 +59,17 @@ internal class TrainingLoop : Loop
         currentAttacker = 0;
         currentDefender = 0;
 
-        attacker = Instantiate(attack);
-        defender = Instantiate(defend);
+        if (debugMode)
+        {
+            attacker = TrainingLoop.InstantiateController(attackSave, attack, loadedAI);
+            defender = TrainingLoop.InstantiateController(defendSave, defend, loadedAI);
+        }
+        else
+        {
+            attacker = attack;
+            defender = defend;
+        }    
+       
 
         //Initializes the AI handlers
         attacker.OnStart();
@@ -200,6 +214,19 @@ internal class TrainingLoop : Loop
     {
         Destroy(attacker);
         Destroy(defender);
+    }
+
+    internal static AIController InstantiateController(string AIFile, AIController controller, LoadedAI ld)
+    {
+        if (!string.IsNullOrEmpty(AIFile))
+        {
+            AIPlayer player = (AIPlayer)controller.Load(AIFile);
+            LoadedAI loadedController = Instantiate(ld);
+            loadedController.SetPlayer(player);
+            return loadedController;
+        }
+        else
+            return Instantiate(controller);        
     }
 
     //private bool RunOneGeneration()

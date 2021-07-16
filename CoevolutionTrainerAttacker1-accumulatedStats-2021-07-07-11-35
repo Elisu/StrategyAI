@@ -91,7 +91,7 @@ Gen: 1 - 10000 -49866 1 Defender
 Gen: 2 - 761485 641485 12 Neutral
 Gen: 2 - 914269 794269 12 Neutral
 Gen: 2 - 990613 490613 10 Attacker
-Gen: 2 - 1139091 629091 11 Attacker
+Gen: 2 - 1109091 626091 11 Attacker
 Gen: 2 - 1160111 630111 13 Attacker
 Gen: 2 - 989364 489364 10 Attacker
 Gen: 2 - 589846 139846 5 Attacker
@@ -4325,8 +4325,8 @@ Gen: 49 - 783519 663519 12 Neutral
 Gen: 49 - 956729 826729 13 Neutral
 Gen: 49 - 1056589 526589 13 Attacker
 Gen: 49 - 1035957 535957 10 Attacker
-Gen: 49 - 1117981 607981 11 Attacker
-Gen: 49 - 1043771 543771 10 Attacker
+Gen: 49 - 1167981 613981 11 Attacker
+Gen: 49 - 1153771 554771 10 Attacker
 Gen: 49 - 984161 854161 13 Neutral
 Gen: 49 - 1267370 737370 13 Attacker
 Gen: 49 - 761903 641903 12 Neutral

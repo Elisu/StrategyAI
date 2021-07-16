@@ -45,6 +45,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PopulationSize: 20
   IndividualLength: 7
-  crossoverProbability: 0.2
-  mutationProbability: 0.03
-  actionMutationProbability: 0.05
+  crossoverProbability: 0.3
+  mutationProbability: 0.02
+  actionMutationProbability: 0.08

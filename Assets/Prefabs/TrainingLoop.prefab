@@ -47,6 +47,6 @@ MonoBehaviour:
     type: 3}
   gameInstance: {fileID: 6862441489602338825, guid: 852759d35db7ab54a8e80f3f364d295e,
     type: 3}
-  progresBar: {fileID: 1539417425480547645, guid: ca89890127136134996a29d1917326a0,
+  parallelInstancesCount: 4
+  loadedAI: {fileID: 8330522222064732371, guid: 67f5b4e6cef44f94aa454b5fc128ea93,
     type: 3}
-  parallelInstancesCount: 15
