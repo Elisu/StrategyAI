@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class RunnerSettings : MonoBehaviour
+internal class RunnerSettings : MonoBehaviour
 {
     public Dropdown RunnerSelection;
     public InputField inputPrefab;
@@ -23,7 +23,6 @@ public class RunnerSettings : MonoBehaviour
 
     void Start()
     {
-        DontDestroyOnLoad(this.gameObject);
         Fill();
         OnSelectedChange();
     }
@@ -112,12 +111,19 @@ public class RunnerSettings : MonoBehaviour
             {
                 try 
                 {
-                    var input = primitiveInputs.Dequeue();
+                    var input = primitiveInputs.Peek();
 
                     if (variable.FieldType == typeof(float) && float.TryParse(input.text, NumberStyles.Any, CultureInfo.InvariantCulture, out float result))
                         variable.SetValue(selected, result);
                     else if (variable.FieldType == typeof(int) && int.TryParse(input.text, out int result2))
                         variable.SetValue(selected, result2);
+                    else
+                    {
+                        Destroy(selected.gameObject);
+                        return;
+                    }
+
+                    primitiveInputs.Dequeue();
                 }
                 catch (Exception _e)
                 {

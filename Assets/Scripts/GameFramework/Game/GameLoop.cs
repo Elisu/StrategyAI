@@ -6,12 +6,14 @@ using UnityEngine.UI;
 
 internal class GameLoop : Loop
 {
+    public bool DEBUG = false;
     public GameInstance game;
     public IPlayerController attacker;
     public IPlayerController defender;
 
     public Text winnerText;
     public Text moneyText;
+    public UnitButtonLoader loader;
 
     [SerializeField]
     protected string defenderSave;
@@ -20,6 +22,25 @@ internal class GameLoop : Loop
 
     private void Start()
     {
+        if (!DEBUG)
+        {
+            var setting = FindObjectOfType<Settings>();
+
+            if (setting != null)
+            {
+                attacker = setting.selectedAttacker;
+                defender = setting.selectedDefender;
+                attackerSave = setting.attackerChampion;
+                defenderSave = setting.defenderChampion;
+
+                Destroy(setting.gameObject);
+            }
+        }
+
+        if (attacker.GetType() == typeof(HumanPlayerController) || defender.GetType() == typeof(HumanPlayerController))
+            loader.gameObject.SetActive(true);
+
+
         game = Instantiate(game);
         game.SetMap(LoadMap());
         game.GameOver += GameOver;

@@ -92,9 +92,6 @@ internal class TrainingLoop : Loop
 
         if (generationCount <= 0)
         {
-            Debug.Log("FINISHED");
-            TrainingInProgress = false;
-
             if (attacker is AITrainer trainable)
             {
                 trainable.Save();
@@ -109,6 +106,9 @@ internal class TrainingLoop : Loop
             }
 
             Finished();
+
+            Debug.Log("FINISHED");
+            TrainingInProgress = false;
             return;
         }
 
@@ -212,8 +212,12 @@ internal class TrainingLoop : Loop
 
     private void Finished()
     {
-        Destroy(attacker);
-        Destroy(defender);
+        if (debugMode)
+        {
+            Destroy(attacker.gameObject);
+            Destroy(defender.gameObject);
+        }
+       
     }
 
     internal static AIController InstantiateController(string AIFile, AIController controller, LoadedAI ld)

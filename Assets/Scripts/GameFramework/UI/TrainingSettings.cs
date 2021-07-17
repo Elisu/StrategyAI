@@ -7,7 +7,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TrainingSettings : MonoBehaviour
+internal class TrainingSettings : MonoBehaviour
 {
     public Role role;
     public Dropdown AISelection;
@@ -15,6 +15,9 @@ public class TrainingSettings : MonoBehaviour
     public InputField floatInputPrefab;
     public Dropdown dropdown;
     public LoadedAI loadedAI;
+
+    public Toggle myToggle;
+    public Toggle enemyToggle;
 
     Vector3 currentPos;
     Dropdown championSelection;
@@ -86,9 +89,40 @@ public class TrainingSettings : MonoBehaviour
         }
     }
 
+    public void OnSelectedChangeGame()
+    {
+        DestroyChampSelection();
+        currentPos = AISelection.transform.position;
+
+        AIController selected = AIOptions.Options[AISelection.value];
+
+        Type trainer = selected.GetType();
+
+        if (trainer.IsSubclassOf(typeof(AITrainer)))
+        {
+            FillChampionList(trainer);
+        }
+    }
+
+    public void OnMyToggleChange(bool check)
+    {
+        if (check)
+            enemyToggle.isOn = false;
+            
+    }
+
     public AIController GetSelected()
     {
         return AIOptions.Options[AISelection.value];
+    }
+
+    public string GetChampion()
+    {
+        
+        if (championSelection == null || championSelection.value == 0)
+            return null;
+        else
+            return championSelection.options[championSelection.value].text;
     }
 
     private void FillChampionList(Type trainer)
@@ -168,12 +202,19 @@ public class TrainingSettings : MonoBehaviour
             {
                 try
                 {
-                    var input = primitiveInputs.Dequeue();
+                    var input = primitiveInputs.Peek();
 
                     if (variable.FieldType == typeof(float) && float.TryParse(input.text, NumberStyles.Any, CultureInfo.InvariantCulture, out float result))
                         variable.SetValue(selected, result);
                     else if (variable.FieldType == typeof(int) && int.TryParse(input.text, out int result2))
                         variable.SetValue(selected, result2);
+                    else
+                    {
+                        Destroy(selected.gameObject);
+                        return;
+                    }
+
+                    primitiveInputs.Dequeue();
                 }
                 catch (Exception _e)
                 {
