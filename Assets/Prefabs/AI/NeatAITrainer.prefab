@@ -44,4 +44,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _experimentConfigFileName: experiment.config
-  PopulationSize: 10
+  PopulationSize: 20

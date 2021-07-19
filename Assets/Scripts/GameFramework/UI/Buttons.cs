@@ -21,6 +21,11 @@ public class Buttons : MonoBehaviour
         foreach (var controller in controllers)
             Destroy(controller.gameObject);
 
+        var runner = FindObjectOfType<TrainingRunner>();
+
+        if (runner != null)
+            Destroy(runner.gameObject);
+
         SceneManager.LoadScene(0);
     }
 }

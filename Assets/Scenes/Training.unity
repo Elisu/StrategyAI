@@ -2582,7 +2582,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &361252171
 Transform:
   m_ObjectHideFlags: 0
@@ -2604,7 +2604,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 361252170}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f1f72f01d40983498b901ac6030155f, type: 3}
   m_Name: 
@@ -2613,10 +2613,10 @@ MonoBehaviour:
     type: 3}
   attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
     type: 3}
-  defender: {fileID: 7067290049789075546, guid: 186f7a5ee06e88740a263c80a4cc45a0,
+  defender: {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa,
     type: 3}
   GenCount: 50
-  timesAttackerDefender: 2
+  timesAttackerDefender: 0
   timesDefenderAttacker: 2
 --- !u!114 &361252173
 MonoBehaviour:
@@ -2625,7 +2625,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 361252170}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 442216995f60a4a40a0e4351eba4ed1d, type: 3}
   m_Name: 
@@ -2634,12 +2634,12 @@ MonoBehaviour:
     type: 3}
   attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
     type: 3}
-  defender: {fileID: 6138801334774653003, guid: 560fa0612cee94d48ab784d6b24c2e30,
+  defender: {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa,
     type: 3}
   tryCount: 1
-  generationCount: 1
+  generationCount: 3
   attackerSave: 
-  defenderSave: 
+  defenderSave: text.xml.champ.xml
 --- !u!4 &365516321
 Transform:
   m_ObjectHideFlags: 0
@@ -3591,6 +3591,7 @@ GameObject:
   - component: {fileID: 1233996276}
   - component: {fileID: 1233996275}
   - component: {fileID: 1233996273}
+  - component: {fileID: 1233996277}
   m_Layer: 0
   m_Name: UIController
   m_TagString: Untagged
@@ -3685,6 +3686,19 @@ MonoBehaviour:
   - {fileID: 6138801334774653003, guid: 560fa0612cee94d48ab784d6b24c2e30, type: 3}
   - {fileID: 7067290049789075546, guid: 186f7a5ee06e88740a263c80a4cc45a0, type: 3}
   - {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa, type: 3}
+--- !u!114 &1233996277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1233996272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecf3561148603c4bb277607d7d9aa25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  console: {fileID: 365819921}
 --- !u!1 &1401674349
 GameObject:
   m_ObjectHideFlags: 0
@@ -3955,7 +3969,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1851149645}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1233996277}
+        m_TargetAssemblyTypeName: Buttons, GameFramework
+        m_MethodName: OnMenuClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1851149645
 MonoBehaviour:
   m_ObjectHideFlags: 0

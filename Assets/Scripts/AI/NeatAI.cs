@@ -13,6 +13,7 @@ public class NeatAI : INeatPlayer
     IMacroAction[] possibleActions;
     ICondition[] inputs;
     ConcurrentQueue<GameStats> accumulatedResults;
+    List<Tuple<int, int, int, int, Role>> accumulatedStats;
 
     public NeatAI(IMacroAction[] actions, ICondition[] conditions, IBlackBox brain) : base(brain)
     {
@@ -28,10 +29,30 @@ public class NeatAI : INeatPlayer
         accumulatedResults = result;
     }
 
+    public IList<Tuple<int, int, int, int, Role>> AccumulattedGetStats()
+    {
+        if (accumulatedStats != null)
+            return accumulatedStats.AsReadOnly();
+
+        return null;
+    }
+
 
     public override float GetFitness()
     {
-        return EvolutionFunctions.ComputeFitness(accumulatedResults.ToArray()[0], Side).Item1;
+        List<int> fitnesses = new List<int>();
+        accumulatedStats = new List<Tuple<int, int, int, int, Role>>();
+        var stats = accumulatedResults.ToArray();
+
+        foreach (GameStats gameStat in stats)
+        {
+            var fitnessParts = EvolutionFunctions.ComputeFitness(gameStat, Side);
+            accumulatedStats.Add(fitnessParts);
+            fitnesses.Add(fitnessParts.Item1);
+        }
+
+        fitnesses.Sort();
+        return fitnesses[fitnesses.Count / 2]/10;
     }
 
     protected override void UpdateBlackBoxInputs(ISignalArray inputSignalArray, Attacker attacker)
@@ -61,7 +82,8 @@ public class NeatAI : INeatPlayer
 
     protected override void RunOver(GameStats stats)
     {
-        accumulatedResults.Enqueue(stats);
+        if (accumulatedResults != null)
+            accumulatedResults.Enqueue(stats);
     }
 
     public override AIPlayer Clone()

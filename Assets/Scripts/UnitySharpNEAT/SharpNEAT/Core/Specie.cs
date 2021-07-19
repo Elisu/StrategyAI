@@ -121,6 +121,9 @@ namespace SharpNeat.Core
         /// </summary>
         public double CalcMeanFitness()
         {
+            if (_genomeList.Count == 0)
+                return 0;
+
             return CalcTotalFitness() / (double)_genomeList.Count;
         }        
 

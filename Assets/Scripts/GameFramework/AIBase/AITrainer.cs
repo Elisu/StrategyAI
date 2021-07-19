@@ -18,7 +18,7 @@ public abstract class AITrainer : AIController
     {
         InitializeVariables();
         CustomStart();
-        population = CreatPopulation();
+        population = CreatePopulation();
         AfterPopCreation();
         BeforeEachGeneration();
     }
@@ -90,14 +90,14 @@ public abstract class AITrainer : AIController
 
     public override IPlayer GetPlayer()
     {
-        var pop = CreatPopulation();
+        var pop = CreatePopulation();
         return pop[UnityEngine.Random.Range(0, pop.Count)];
     }
 
     /// <summary>
     /// 
     /// </summary>
-    protected abstract List<AIPlayer> CreatPopulation();
+    protected abstract List<AIPlayer> CreatePopulation();
 
     /// <summary>
     /// Method called after generation is finished - good for your the generation evaluation code

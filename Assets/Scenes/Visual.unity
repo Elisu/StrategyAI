@@ -801,13 +801,13 @@ MonoBehaviour:
   game: {fileID: 3868471417579026627, guid: e0fd41c53e981154096a5f042f57c12b, type: 3}
   attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
     type: 3}
-  defender: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
+  defender: {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa,
     type: 3}
   winnerText: {fileID: 497692512}
   moneyText: {fileID: 982364071}
   loader: {fileID: 2031047266}
-  defenderSave: defender1.xml
-  attackerSave: att.xml
+  defenderSave: text.xml.champ.xml
+  attackerSave: text.xml.champ.xml
 --- !u!4 &1435923424
 Transform:
   m_ObjectHideFlags: 0
@@ -834,6 +834,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fecf3561148603c4bb277607d7d9aa25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  console: {fileID: 0}
 --- !u!1 &1611852261
 GameObject:
   m_ObjectHideFlags: 0

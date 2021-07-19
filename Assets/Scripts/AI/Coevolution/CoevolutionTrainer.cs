@@ -32,7 +32,7 @@ public class CoevolutionTrainer : AITrainer
 
     public override Type AIPlayerType => typeof(CoevolutionAI);
 
-    protected override List<AIPlayer> CreatPopulation()
+    protected override List<AIPlayer> CreatePopulation()
     {
         ICondition damaged = new Conditions.Damaged();
         ICondition free = new Conditions.Free();
@@ -161,5 +161,8 @@ public class CoevolutionTrainer : AITrainer
                     gen++;
             }
         }
+
+        fitnessesRecord.Clear();
+        accumulatedStats.Clear();
     }
 }

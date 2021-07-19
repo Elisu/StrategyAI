@@ -17,6 +17,7 @@ using System.IO;
 using System.Linq;
 using SharpNeat.Core;
 using Genetic;
+using System.Globalization;
 
 namespace UnitySharpNEAT
 {
@@ -34,13 +35,35 @@ namespace UnitySharpNEAT
 
         public int PopulationSize;
 
-        private readonly IMacroAction[] outputActions = new IMacroAction[5] { new SerializableMacroActions.AttackClosest(),
-                                                                               new SerializableMacroActions.AttackWithLowestHealth(),
-                                                                               new SerializableMacroActions.AttackWithLowestDamage(),
-                                                                               new SerializableMacroActions.AttackInRange(),
-                                                                               new SerializableMacroActions.DoNothing() };
+        readonly List<int> fitnessesRecord = new List<int>();
+        readonly List<Tuple<int, int, int, int, Role>> accumulatedStats = new List<Tuple<int, int, int, int, Role>>();
 
-        private readonly ICondition[] inputConditions = new ICondition[] { new Conditions.Damaged(), new Conditions.Free() };
+
+        private readonly ICondition[] inputConditions = new ICondition[12] { new Conditions.Damaged(),
+                                                        new Conditions.Free(),
+                                                        new Conditions.StrongerThanClosest(),
+                                                        new Conditions.ClosestIsTroopBase(),
+                                                        new Conditions.ClosestIsBuilding(),
+                                                        new Conditions.ClosestIsTower(),
+                                                        new Conditions.IsDefender(),
+                                                        new Conditions.HealthierThanClosest(),
+                                                        new Conditions.IsAlone(),
+                                                        new Conditions.IsWinning(),
+                                                        new Conditions.IsInsideCastle(),
+                                                        new Conditions.IsInTowerRange() };
+
+        private readonly IMacroAction[] outputActions = new IMacroAction[7] { new SerializableMacroActions.AttackClosest(),
+                                                         new SerializableMacroActions.AttackWithLowestHealth(),
+                                                         new SerializableMacroActions.AttackWithLowestDamage(),
+                                                         new SerializableMacroActions.AttackWeakestAgainstMe(),
+                                                         new SerializableMacroActions.AttackInRange(),
+                                                         new SerializableMacroActions.DoNothing(),
+                                                         new SerializableMacroActions.MoveToSafety() };
+
+
+
+
+
 
         private int _networkInputCount => inputConditions.Length;
         private int _networkOutputCount => outputActions.Length;
@@ -55,12 +78,7 @@ namespace UnitySharpNEAT
 
         public override Type AIPlayerType => typeof(NeatAI);
 
-        #region UNTIY FUNCTIONS
-        protected override void CustomStart()
-        {
-            LoadExperiment();
-        }
-        #endregion
+
 
         private void LoadExperiment()
         {
@@ -86,19 +104,25 @@ namespace UnitySharpNEAT
         /// </summary>
         public void StartEvolution()
         {
+            LoadExperiment();
             EvolutionAlgorithm = Experiment.CreateEvolutionAlgorithm(ExperimentIO.GetSaveFilePath(Experiment.Name, ExperimentFileType.Population));
         }
 
-        protected override List<AIPlayer> CreatPopulation()
+        protected override List<AIPlayer> CreatePopulation()
         {
             StartEvolution();
+            return MakePopulation();
+            
+        }
 
+        private List<AIPlayer> MakePopulation()
+        {
             List<INeatPlayer> pop = new List<INeatPlayer>();
 
             List<IBlackBox> brains = EvolutionAlgorithm.GetIBlackBoxes(PopulationSize);
 
             for (int i = 0; i < PopulationSize; i++)
-                pop.Add(new NeatAI(outputActions, inputConditions, brains[i]));            
+                pop.Add(new NeatAI(outputActions, inputConditions, brains[i]));
 
             return new List<AIPlayer>(pop);
         }
@@ -108,19 +132,25 @@ namespace UnitySharpNEAT
         public override void GenerationDone()
         {
             EvolutionAlgorithm.Evaluate(population);
-            population = CreatPopulation();
+
+            foreach(var ind in population)
+                accumulatedStats.AddRange(((NeatAI)ind).AccumulattedGetStats());
+
+            accumulatedStats.Add(new Tuple<int, int, int, int, Role>(-1, -1, -1, -1, Role.Neutral));
+
+            population = MakePopulation();
         }
 
 
         protected override void SaveChampion(string file)
         {
-            ExperimentIO.WriteChampion(Experiment, EvolutionAlgorithm.CurrentChampGenome);
+            ExperimentIO.WriteChampion(Experiment, EvolutionAlgorithm.CurrentChampGenome, file);
         }
 
         public override IPlayer LoadChampion(string file)
         {
             LoadExperiment();
-            NeatGenome championBrain = Experiment.LoadChampion();
+            NeatGenome championBrain = Experiment.LoadChampion(file);
             return new NeatAI(outputActions, inputConditions, Experiment.CreateGenomeDecoder().Decode(championBrain));
         }
 
@@ -128,11 +158,25 @@ namespace UnitySharpNEAT
         {
             return null;
         }
-
-        public override IPlayer GetPlayer()
-        {
-            throw new NotImplementedException();
-        }
         #endregion
+
+        protected override void TrainingFinished()
+        {
+            using (var stream = new StreamWriter(Path.Combine(Path.GetDirectoryName(Application.dataPath), this.name + "-accumulatedStats-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture))))
+            {
+                int gen = 1;
+
+                foreach (var stat in accumulatedStats)
+                {
+                    if (stat.Item1 != -1)
+                        stream.WriteLine("Gen: {0} - {1} {2} {3} {4} {5}", gen, stat.Item1, stat.Item2, stat.Item3, stat.Item4, stat.Item5);
+                    else
+                        gen++;
+                }
+            }
+
+            fitnessesRecord.Clear();
+            accumulatedStats.Clear();
+        }
     }
 }

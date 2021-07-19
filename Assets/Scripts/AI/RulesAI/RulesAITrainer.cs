@@ -25,7 +25,7 @@ public class RulesAITrainer : AITrainer
 
     public override Type AIPlayerType => typeof(RulesAI);
 
-    protected override List<AIPlayer> CreatPopulation()
+    protected override List<AIPlayer> CreatePopulation()
     {
         ICondition[] conditions = new ICondition[12] { new Conditions.Damaged(),
                                                       new Conditions.Free(),
@@ -116,5 +116,8 @@ public class RulesAITrainer : AITrainer
                     gen++;
             }
         }
+
+        fitnessesRecord.Clear();
+        accumulatedStats.Clear();
     }
 }

@@ -205,18 +205,18 @@ namespace UnitySharpNEAT
         /// <summary>
         /// Saves the specified genome to the champion safe file of this experiment (by default: myexperimentname.champ.xml)
         /// </summary>
-        public bool SaveChampion(NeatGenome bestGenome)
-        {
-            return ExperimentIO.WriteChampion(this, bestGenome);
-        }
+        //public bool SaveChampion(NeatGenome bestGenome)
+        //{
+        //    return ExperimentIO.WriteChampion(this, bestGenome);
+        //}
 
         /// <summary>
         /// Loads the saved champion genome from the champion safe file of this experiment (by default: myexperimentname.champ.xml).
         /// If the file does not exist, then null is returned
         /// </summary>
-        public NeatGenome LoadChampion()
+        public NeatGenome LoadChampion(string path)
         {
-            return ExperimentIO.ReadChampion(this);
+            return ExperimentIO.ReadChampion(this, path);
         }
         #endregion
     }

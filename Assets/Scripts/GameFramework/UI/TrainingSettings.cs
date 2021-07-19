@@ -23,11 +23,14 @@ internal class TrainingSettings : MonoBehaviour
     Dropdown championSelection;
     Queue<InputField> primitiveInputs = new Queue<InputField>();
 
+    bool started = false;
+
     // Start is called before the first frame update
     void Start()
     {
         Fill();
         OnSelectedChange();
+        started = true;
     }
 
     private void Fill()
@@ -165,6 +168,12 @@ internal class TrainingSettings : MonoBehaviour
     private void OnDisable()
     {
         DestroyAllInputs();
+    }
+
+    private void OnEnable()
+    {
+        if (started)
+            OnSelectedChange();
     }
 
     private void DestroyChampSelection()

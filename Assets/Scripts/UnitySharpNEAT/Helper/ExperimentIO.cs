@@ -49,7 +49,7 @@ namespace UnitySharpNEAT
                     extention = ".UnknownNeatFileType";
                     break;
             }
-            return Application.persistentDataPath + "/" + experimentName + extention;
+            return experimentName + extention;
         }
 
         /// <summary>
@@ -57,33 +57,33 @@ namespace UnitySharpNEAT
         /// </summary>
         public static bool WritePopulation(INeatExperiment experiment, IList<NeatGenome> genomeList)
         {
-            return WriteGenomes(experiment, genomeList, ExperimentFileType.Population);
+            return WriteGenomes(experiment, genomeList, ExperimentFileType.Population, null);
         }
 
         /// <summary>
         /// Writes the specified genome to the champion safe file of the specified experiment (by default: myexperimentname.champ.xml)
         /// </summary>
-        public static bool WriteChampion(INeatExperiment experiment, NeatGenome bestGenome)
+        public static bool WriteChampion(INeatExperiment experiment, NeatGenome bestGenome, string path)
         {
-            return WriteGenomes(experiment, new NeatGenome[] { bestGenome }, ExperimentFileType.Champion);
+            return WriteGenomes(experiment, new NeatGenome[] { bestGenome }, ExperimentFileType.Champion, path);
         }
 
         /// <summary>
         /// Writes a list of genomes to the save file fitting the experiment name and the ExperimentFileType.
         /// </summary>
-        private static bool WriteGenomes(INeatExperiment experiment, IList<NeatGenome> genomeList, ExperimentFileType fileType)
+        private static bool WriteGenomes(INeatExperiment experiment, IList<NeatGenome> genomeList, ExperimentFileType fileType, string path)
         {
             XmlWriterSettings _xwSettings = new XmlWriterSettings();
             _xwSettings.Indent = true;
 
-            string filePath = GetSaveFilePath(experiment.Name, fileType);
+            string filePath = GetSaveFilePath(path, fileType);
             
-            DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath);
-            if (!dirInf.Exists)
-            {
-                Debug.Log("ExperimentIO - Creating subdirectory");
-                dirInf.Create();
-            }
+            //DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath);
+            //if (!dirInf.Exists)
+            //{
+            //    Debug.Log("ExperimentIO - Creating subdirectory");
+            //    dirInf.Create();
+            //}
             try
             {
                 using (XmlWriter xw = XmlWriter.Create(filePath, _xwSettings))
@@ -106,16 +106,16 @@ namespace UnitySharpNEAT
         /// </summary>
         public static List<NeatGenome> ReadPopulation(INeatExperiment experiment)
         {
-            return ReadGenomes(experiment, ExperimentFileType.Population);
+            return ReadGenomes(experiment, ExperimentFileType.Population, null);
         }
 
         /// <summary>
         /// Loads the saved champion genome from the champion safe file of the specified experiment (by default: myexperimentname.champ.xml).
         /// If the file does not exist, then null is returned.
         /// </summary>
-        public static NeatGenome ReadChampion(INeatExperiment experiment)
+        public static NeatGenome ReadChampion(INeatExperiment experiment, string path)
         {
-            List<NeatGenome> championPop = ReadGenomes(experiment, ExperimentFileType.Champion, false);
+            List<NeatGenome> championPop = ReadGenomes(experiment, ExperimentFileType.Champion, path, false);
             if (championPop == null || championPop.Count == 0)
                 return null;
 
@@ -125,12 +125,12 @@ namespace UnitySharpNEAT
         /// <summary>
         /// Loads a list of genomes from the save file fitting the experiment name and the ExperimentFileType.
         /// </summary>
-        private static List<NeatGenome> ReadGenomes(INeatExperiment experiment, ExperimentFileType fileType, bool createNewGenesIfNotLoadable = true)
+        private static List<NeatGenome> ReadGenomes(INeatExperiment experiment, ExperimentFileType fileType, string path, bool createNewGenesIfNotLoadable = true)
         {
             List<NeatGenome> genomeList = null;
             NeatGenomeFactory genomeFactory = (NeatGenomeFactory)experiment.CreateGenomeFactory();
 
-            string filePath = GetSaveFilePath(experiment.Name, fileType);
+            string filePath = path;
 
             try
             {
