@@ -28,7 +28,7 @@ internal class TrainingLoop : Loop
 
     TrainingInstance[] instances;
     int currentAttacker;
-    int currentDefender;  
+    int currentDefender;
 
     Thread trainingThread;
     bool terminateThread = false;
@@ -36,6 +36,8 @@ internal class TrainingLoop : Loop
     int currentGeneration;
 
     List<List<Transform>> map;
+
+    System.Random rnd = new System.Random();
 
     private void Awake()
     {
@@ -51,7 +53,7 @@ internal class TrainingLoop : Loop
     }
 
     public void StartTraining(AIController attack, AIController defend, int tryCount, int genCount, string attackSave = null, string defendSave = null)
-    {        
+    {
         tries = tryCount;
         generationCount = genCount;
 
@@ -68,8 +70,8 @@ internal class TrainingLoop : Loop
         {
             attacker = attack;
             defender = defend;
-        }    
-       
+        }
+
 
         //Initializes the AI handlers
         attacker.OnStart();
@@ -97,7 +99,7 @@ internal class TrainingLoop : Loop
                 trainable.Save();
                 trainable.TrainingFinished();
             }
-               
+
 
             if (defender is AITrainer trainable2)
             {
@@ -133,7 +135,7 @@ internal class TrainingLoop : Loop
                 trainingThread.IsBackground = true;
                 trainingThread.Start();
             }
-            
+
         }
     }
 
@@ -168,44 +170,53 @@ internal class TrainingLoop : Loop
 
         for (int run = 0; run < tries; run++)
         {
+            int toTrain = 0;
             currentAttacker = 0;
             currentDefender = 0;
             List<Task> runningTasks = new List<Task>();
 
-            while (currentAttacker != attackerPop.Count || currentDefender != defenderPop.Count)
+            while (toTrain < attackerPop.Count + defenderPop.Count)
             {
                 runningTasks.Clear();
-                int i = 0;
-                for (; currentAttacker < attackerPop.Count; currentAttacker++)
+                int i = -1;
+                for (; toTrain < attackerPop.Count + defenderPop.Count; toTrain++)
                 {
-                    for (; currentDefender < defenderPop.Count; currentDefender++, i++)
+                    i++;
+                    if (i >= instances.Length)
+                        break;
+
+                    if (terminateThread)
+                        return;
+
+                    if (toTrain < attackerPop.Count)
                     {
-                        if (i >= instances.Length)
-                            break;
-
-                        if (terminateThread)
-                            return;
-
-                        int index = i;
-                        attackerPop[currentAttacker].Start(null, Role.Attacker);
-                        defenderPop[currentDefender].Start(null, Role.Defender);
-                        AIPlayer att = attackerPop[currentAttacker].Clone();
-                        AIPlayer def = defenderPop[currentDefender].Clone();
-
-                        runningTasks.Add(Task.Run(() => instances[index].Run(att, def, currentGeneration)));
+                        currentAttacker = toTrain;
+                        currentDefender = rnd.Next(0, defenderPop.Count);
                     }
+                    else
+                    {
+                        currentDefender = toTrain - attackerPop.Count; 
+                        currentAttacker = rnd.Next(0, attackerPop.Count);
+                    }
+
+                    int index = i;
+                    attackerPop[currentAttacker].Start(null, Role.Attacker);
+                    defenderPop[currentDefender].Start(null, Role.Defender);
+                    AIPlayer att = attackerPop[currentAttacker].Clone();
+                    AIPlayer def = defenderPop[currentDefender].Clone();
+
+                    runningTasks.Add(Task.Run(() => instances[index].Run(att, def, currentGeneration)));
+
 
                     if (i >= instances.Length)
                         break;
 
-                    if (currentAttacker < attackerPop.Count - 1)
-                        currentDefender = 0;
                 }
 
                 Task.WaitAll(runningTasks.ToArray());
             }
         }
-        
+
 
         return;
     }
@@ -217,7 +228,7 @@ internal class TrainingLoop : Loop
             Destroy(attacker.gameObject);
             Destroy(defender.gameObject);
         }
-       
+
     }
 
     internal static AIController InstantiateController(string AIFile, AIController controller, LoadedAI ld)
@@ -230,7 +241,7 @@ internal class TrainingLoop : Loop
             return loadedController;
         }
         else
-            return Instantiate(controller);        
+            return Instantiate(controller);
     }
 
     //private bool RunOneGeneration()

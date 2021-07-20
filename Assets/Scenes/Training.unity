@@ -279,7 +279,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1953510928}
   m_FillRect: {fileID: 677765634}
   m_HandleRect: {fileID: 0}
@@ -2576,6 +2576,7 @@ GameObject:
   - component: {fileID: 361252171}
   - component: {fileID: 361252172}
   - component: {fileID: 361252173}
+  - component: {fileID: 361252174}
   m_Layer: 0
   m_Name: TrainingRunner
   m_TagString: Untagged
@@ -2611,13 +2612,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   training: {fileID: 5392019084703557051, guid: 038df272be9ccc34a931bf36f3c939ca,
     type: 3}
-  attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
+  attacker: {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa,
     type: 3}
-  defender: {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa,
+  defender: {fileID: 2960784948529186045, guid: a08a9b133d9c2124db126685495a0462,
     type: 3}
   GenCount: 50
-  timesAttackerDefender: 0
-  timesDefenderAttacker: 2
+  timesAttackerDefender: 1
+  timesDefenderAttacker: 1
 --- !u!114 &361252173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2632,14 +2633,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   training: {fileID: 5392019084703557051, guid: 038df272be9ccc34a931bf36f3c939ca,
     type: 3}
-  attacker: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
+  attacker: {fileID: 2960784948529186045, guid: a08a9b133d9c2124db126685495a0462,
     type: 3}
-  defender: {fileID: 2893502298285931330, guid: 60c5606e5633a5d4d9f3fc18ba9136fa,
+  defender: {fileID: 6138801334774653003, guid: 560fa0612cee94d48ab784d6b24c2e30,
     type: 3}
-  tryCount: 1
-  generationCount: 3
+  tryCount: 3
+  generationCount: 50
   attackerSave: 
-  defenderSave: text.xml.champ.xml
+  defenderSave: 
+--- !u!114 &361252174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361252170}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a705b754c68eb74a9f03796cafba2ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  training: {fileID: 5392019084703557051, guid: 038df272be9ccc34a931bf36f3c939ca,
+    type: 3}
+  trainable: {fileID: 6138801334774653003, guid: 560fa0612cee94d48ab784d6b24c2e30,
+    type: 3}
+  starting: {fileID: 2732082378088776095, guid: 7a9d16846b0c65647862c99b89547c56,
+    type: 3}
+  loadedAI: {fileID: 8330522222064732371, guid: 67f5b4e6cef44f94aa454b5fc128ea93,
+    type: 3}
 --- !u!4 &365516321
 Transform:
   m_ObjectHideFlags: 0

@@ -45,8 +45,9 @@ public abstract class AITrainer : AIController
 
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
+            
 
-            SaveChampion(Path.Combine(directoryPath, DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture)) + ".xml");
+            SaveChampion(Path.Combine(directoryPath, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ffff", CultureInfo.InvariantCulture)) + ".xml");
         }
         catch (Exception _e)
         {

@@ -98,13 +98,13 @@ public class RulesAITrainer : AITrainer
 
     protected override void TrainingFinished()
     {
-        using (var stream = new StreamWriter(Path.Combine(Path.GetDirectoryName(Application.dataPath), this.name + "-bestRuns-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture))))
+        using (var stream = new StreamWriter(Path.Combine(Path.GetDirectoryName(Application.dataPath), this.name + "-bestRuns-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ffff", CultureInfo.InvariantCulture))))
         {
             foreach (int fitness in fitnessesRecord)
                 stream.WriteLine(fitness);
         }
 
-        using (var stream = new StreamWriter(Path.Combine(Path.GetDirectoryName(Application.dataPath), this.name + "-accumulatedStats-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture))))
+        using (var stream = new StreamWriter(Path.Combine(Path.GetDirectoryName(Application.dataPath), this.name + "-accumulatedStats-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ffff", CultureInfo.InvariantCulture))))
         {
             int gen = 1;
 

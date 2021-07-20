@@ -681,7 +681,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.47480825, y: -0, z: -0, w: 0.8800893}
-  m_LocalPosition: {x: 42.3, y: 32, z: -6}
+  m_LocalPosition: {x: 45.9, y: 32.4, z: -4.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -806,8 +806,8 @@ MonoBehaviour:
   winnerText: {fileID: 497692512}
   moneyText: {fileID: 982364071}
   loader: {fileID: 2031047266}
-  defenderSave: text.xml.champ.xml
-  attackerSave: text.xml.champ.xml
+  defenderSave: 2021-07-19-11-01.xml.champ.xml
+  attackerSave: 
 --- !u!4 &1435923424
 Transform:
   m_ObjectHideFlags: 0
@@ -1108,7 +1108,7 @@ PrefabInstance:
     - target: {fileID: 8290190061793899007, guid: a45069545bc712c4ab6b8b56cdf10206,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8290190061793899007, guid: a45069545bc712c4ab6b8b56cdf10206,
         type: 3}

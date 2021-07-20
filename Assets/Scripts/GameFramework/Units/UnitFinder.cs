@@ -78,7 +78,7 @@ public class UnitFinder : MonoBehaviour
 
     public static int PickOnBudget(int budget)
     {
-        int selected = 0;
+        int selected = -1;
         for (int i = 0; i < UnitStats.Count; i++)
             if (UnitStats[i].Price <= budget && UnitStats[i].Price > UnitStats[selected].Price)
                 selected = i;
