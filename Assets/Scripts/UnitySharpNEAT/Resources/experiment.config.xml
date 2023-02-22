@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+    <Config>
+      <ExperimentName>NeatAI</ExperimentName>
+      <PopulationSize>20</PopulationSize>
+      <SpecieCount>5</SpecieCount>
+      <Activation>
+        <Scheme>Acyclic</Scheme>
+      </Activation>
+      <ComplexityRegulationStrategy>Absolute</ComplexityRegulationStrategy>
+      <ComplexityThreshold>10</ComplexityThreshold>
+      <Description>AI learns to fight</Description>
+    </Config>
