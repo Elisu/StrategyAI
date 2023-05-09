@@ -17,6 +17,10 @@ namespace Genetic
     }
         
 
+    /// <summary>
+    /// This class implements different genetic operators that 
+    /// can be used in the implementation of a genetic algortihm
+    /// </summary>
     public class EvolutionFunctions
     {
         public static  T[] TournamentSelection<T>(T[] pop) where T : Individual<T>

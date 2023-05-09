@@ -8,6 +8,10 @@ namespace Genetic
 {
     public delegate int FitnessCalculation(GameStats[] stats, Role role);
 
+    /// <summary>
+    /// Implementation of a single individual in the 
+    /// genetic algorithm population
+    /// </summary>
     [DataContract]
     public class StrategyIndividual : Individual<StrategyIndividual>, IEnumerable<Rule>
     {

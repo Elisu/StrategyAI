@@ -8,6 +8,9 @@ namespace Genetic
 {
     //public delegate bool TryAction(Attacker recruit, out IAction action);
 
+    /// <summary>
+    /// Implementation of a genetic algorithm
+    /// </summary>
     public class Strategy
     {
         public int PopulationSize => population.Length;

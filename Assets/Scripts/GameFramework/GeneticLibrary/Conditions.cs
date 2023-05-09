@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace Genetic
 {
+    /// <summary>
+    /// This class represents all 
+    /// </summary>
     public class Conditions
     {
         [DataContract]

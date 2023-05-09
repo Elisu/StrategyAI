@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace Genetic
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [DataContract]
     public class Rule
     {
